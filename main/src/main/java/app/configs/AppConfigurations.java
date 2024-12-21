@@ -1,19 +1,23 @@
 package app.configs;
 
-import app.service.UserService;
+import app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @RequiredArgsConstructor
 public class AppConfigurations {
-    private final UserService userService;
+    // use repo instead of user service in
+    // the reason of cycle dependency (password encoder from appConfigs in userService)
+    // and userService is using in appConfigs
+    private final UserRepository userRepository;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -22,7 +26,8 @@ public class AppConfigurations {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return userService::getUser;
+        return email -> userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Bean
