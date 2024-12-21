@@ -1,2 +1,4 @@
-package app.dto.meditation;public class Tag {
+package app.dto.meditation;
+
+public enum Tag {
 }

@@ -8,11 +8,16 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.UUID;
 
 @Entity
-@Table(name="users")
+@Table(
+        name="users",
+        indexes = @Index(columnList = "email")
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,6 +33,21 @@ public class UserEntity implements UserDetails {
 
     @Column
     private String name;
+
+    @Column(name = "isPractiseBreathOptionTurned")
+    private Boolean hasPractiseBreathOpt;
+
+    @Column(name = "isOpenApplicationOptionTurned")
+    private Boolean hasOpenAppOpt;
+
+    @Column
+    private LocalTime startTimeOfBreathPractise = LocalTime.of(8, 0);
+
+    @Column
+    private LocalTime stopTimeOfBreathPractise = LocalTime.of(22, 0);
+
+    @Column
+    private Integer countBreathPractiseReminderPerDay = 4;
 
     @Column
     private Boolean isPremium;

@@ -1,6 +1,6 @@
 package app.mapper;
 
-import app.dto.SignUpRequest;
+import app.dto.auth.SignUpRequest;
 import app.entity.UserEntity;
 import org.mapstruct.BeforeMapping;
 import org.mapstruct.Mapper;

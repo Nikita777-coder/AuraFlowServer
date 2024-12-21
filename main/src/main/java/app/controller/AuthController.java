@@ -1,7 +1,7 @@
 package app.controller;
 
-import app.dto.SignInRequest;
-import app.dto.SignUpRequest;
+import app.dto.auth.SignInRequest;
+import app.dto.auth.SignUpRequest;
 import app.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

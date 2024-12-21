@@ -1,7 +1,7 @@
 package app.service;
 
-import app.dto.SignInRequest;
-import app.dto.SignUpRequest;
+import app.dto.auth.SignInRequest;
+import app.dto.auth.SignUpRequest;
 import app.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
