@@ -6,6 +6,6 @@ import lombok.Getter;
 @Builder
 @Getter
 public class UserOptions {
-    private Boolean hasBreathPractise;
-    private Boolean hasIn
+    private Boolean hasPractiseBreathOpt;
+    private Boolean hasOpenAppOpt;
 }
