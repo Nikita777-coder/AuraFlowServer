@@ -25,7 +25,7 @@ public class AuthService {
     }
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public String signin(SignInRequest request) {
-        UserDetails resultUser = userService.getUser(request.getLogin());
+        UserDetails resultUser = userService.getUser(request.getEmail());
 
         if (!passwordEncoder.matches(request.getPassword(), resultUser.getPassword())) {
             throw new IllegalArgumentException("password is invalid!");
