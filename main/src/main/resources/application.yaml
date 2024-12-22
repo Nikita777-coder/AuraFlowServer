@@ -15,6 +15,17 @@ spring:
     console:
       enabled: true
 
-token:
-  signing:
-    key: aef72d8bc84e66100cbaba56bf48d91e197f342b0f6cd96b5575f9fbc9ccb629
+# need to remove values when realize
+server:
+  jwt:
+    token:
+      signing:
+        key: aef72d8bc84e66100cbaba56bf48d91e197f342b0f6cd96b5575f9fbc9ccb629 # need to change
+  email:
+    name: AuraFlow@<domen>.com
+    host: smtp.yandex.ru
+    password: <server_email_password>
+    port: 465
+    protocol: smtps
+    debug: false
+    verification-code-length: 4
