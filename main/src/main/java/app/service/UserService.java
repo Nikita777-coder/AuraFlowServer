@@ -49,17 +49,6 @@ public class UserService {
                                UserData newUserData) {
         UserEntity currentUpdatedUser = userMapper.updateUserData(newUserData, getUserByEmail(currentUserDetails.getUsername()));
         userRepository.save(currentUpdatedUser);
-//        Map<String, Object> currentUserProperties = currentUser.toMap();
-//        Map<String, Object> newUserDataProperties = newUserData.toMap();
-//        Map<String, Object> propertiesForUpdating = new HashMap<>();
-//
-//        for (String key: newUserDataProperties.keySet()) {
-//            if (currentUserProperties.containsKey(key) && newUserDataProperties.get(key) != null) {
-//                propertiesForUpdating.put(key, newUserDataProperties.get(key));
-//            }
-//        }
-//
-//        currentUser
         return userMapper.userEntityToUserData(currentUpdatedUser);
     }
 
