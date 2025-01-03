@@ -1,6 +1,5 @@
 package app.service;
 
-import app.component.CurrentUserComponent;
 import app.dto.user.UpdatePasswordData;
 import app.dto.user.UserData;
 import app.dto.user.UserOptions;
@@ -15,15 +14,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(isolation = Isolation.READ_COMMITTED)
 public class UserService {
-    private final CurrentUserComponent currentUserComponent;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -40,17 +36,18 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    public UserOptions getOptions() {
-        return userMapper.userEntityToUserOptions(getCurrentUser());
+    public UserOptions getOptions(UserDetails currentUserDetails) {
+        return userMapper.userEntityToUserOptions(getUserByEmail(currentUserDetails.getUsername()));
     }
 
-    public UserData getUserData() {
-        return userMapper.userEntityToUserData(getCurrentUser());
+    public UserData getUserData(UserDetails currentUserDetails) {
+        return userMapper.userEntityToUserData(getUserByEmail(currentUserDetails.getUsername()));
     }
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public UserData updateUser(UserData newUserData) {
-        UserEntity currentUpdatedUser = userMapper.updateUserData(newUserData, getCurrentUser());
+    public UserData updateUser(UserDetails currentUserDetails,
+                               UserData newUserData) {
+        UserEntity currentUpdatedUser = userMapper.updateUserData(newUserData, getUserByEmail(currentUserDetails.getUsername()));
         userRepository.save(currentUpdatedUser);
 //        Map<String, Object> currentUserProperties = currentUser.toMap();
 //        Map<String, Object> newUserDataProperties = newUserData.toMap();
@@ -67,8 +64,9 @@ public class UserService {
     }
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void updatePassword(UpdatePasswordData updatePasswordData) {
-        UserEntity currentUser = getCurrentUser();
+    public void updatePassword(UserDetails currentUserDetails,
+                               UpdatePasswordData updatePasswordData) {
+        UserEntity currentUser = getUserByEmail(currentUserDetails.getUsername());
 
         if (!passwordEncoder.matches(updatePasswordData.getOldPassword(), currentUser.getPassword())) {
             throw new IllegalArgumentException("Old password is not correct!");
@@ -78,9 +76,8 @@ public class UserService {
         userRepository.save(currentUser);
     }
 
-    private UserEntity getCurrentUser() {
-        UserDetails userDetails = currentUserComponent.getCurrentUser();
-        Optional<UserEntity> currentUser = userRepository.findByEmail(userDetails.getUsername());
+    private UserEntity getUserByEmail(String email) {
+        Optional<UserEntity> currentUser = userRepository.findByEmail(email);
 
         if (currentUser.isEmpty()) {
             throw new RuntimeException("get current user error!");
