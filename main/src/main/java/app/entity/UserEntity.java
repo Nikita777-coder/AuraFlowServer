@@ -34,10 +34,10 @@ public class UserEntity implements UserDetails {
     private String name;
 
     @Column(name = "isPractiseBreathOptionTurned")
-    private Boolean hasPractiseBreathOpt;
+    private Boolean hasPractiseBreathOpt = false;
 
     @Column(name = "isOpenApplicationOptionTurned")
-    private Boolean hasOpenAppOpt;
+    private Boolean hasOpenAppOpt = false;
 
     @Column
     private LocalTime startTimeOfBreathPractise = LocalTime.of(8, 0);
