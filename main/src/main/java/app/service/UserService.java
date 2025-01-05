@@ -65,6 +65,10 @@ public class UserService {
         userRepository.save(currentUser);
     }
 
+    public UserEntity getCurrentUserEntity(UserDetails userDetails) {
+        return userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
+    }
+
     private UserEntity getUserByEmail(String email) {
         Optional<UserEntity> currentUser = userRepository.findByEmail(email);
 
