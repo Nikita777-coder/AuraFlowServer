@@ -40,9 +40,13 @@ public class EmailService {
 
     private String generateSafeVerificationCode() {
         SecureRandom random = new SecureRandom();
-        byte[] bytes = new byte[verificationCodeLength];
-        random.nextBytes(bytes);
-        Base64.Encoder encoder = Base64.getUrlEncoder().withoutPadding();
-        return encoder.encodeToString(bytes).substring(0, verificationCodeLength);
+        StringBuilder code = new StringBuilder(verificationCodeLength);
+
+        for (int i = 0; i < verificationCodeLength; i++) {
+            int digit = random.nextInt(10);
+            code.append(digit);
+        }
+
+        return code.toString();
     }
 }
