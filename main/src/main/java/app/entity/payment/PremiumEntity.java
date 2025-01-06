@@ -32,7 +32,7 @@ public class PremiumEntity {
     @Column(name = "transaction_time")
     private LocalDateTime transactionTime;
 
-    @Column(name = "transaction_time")
+    @Column(name = "expired_time")
     private LocalDateTime expiredTime;
 
     @Column(name = "transaction_id")
