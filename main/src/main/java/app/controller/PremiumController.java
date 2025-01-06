@@ -17,16 +17,15 @@ public class PremiumController {
     private final PremiumService premiumService;
     @GetMapping
     @ResponseBody
-    // Get current time in repository for resolving current premium
     public Boolean hasPremium(@AuthenticationPrincipal UserDetails userDetails) {
         return premiumService.hasPremium(userDetails);
     }
 
-    @PostMapping
-    @ResponseBody
-    public PremiumPaymentData buyPremium(@AuthenticationPrincipal UserDetails userDetails) {
-        return premiumService.buyPremium(userDetails);
-    }
+//    @PostMapping
+//    @ResponseBody
+//    public PremiumPaymentData buyPremium(@AuthenticationPrincipal UserDetails userDetails) {
+//        return premiumService.buyPremium(userDetails);
+//    }
 
     @GetMapping("/history")
     @ResponseBody
