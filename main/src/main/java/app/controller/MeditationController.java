@@ -14,48 +14,56 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/meditation")
 public class MeditationController {
-    private final MeditationService meditationService;
+//    private final MeditationService meditationService;
     @GetMapping
     public List<Meditation> getAllMeditations() {
-        return meditationService.getAll(currentUser);
+        throw new RuntimeException();
+//        return meditationService.getAll(currentUser);
     }
 
     @GetMapping("/recommended")
     public List<Meditation> getRecommendedMeditations(@AuthenticationPrincipal UserDetails currentUser) {
-        return meditationService.getRecommended(currentUser);
+        throw new RuntimeException();
+
+//        return meditationService.getRecommended(currentUser);
     }
 
     @GetMapping("/new")
     public List<Meditation> getNewServiceMeditations() {
-        return meditationService.getNewMeditations();
+        throw new RuntimeException();
+//        return meditationService.getNewMeditations();
     }
 
     @GetMapping("/model-recommended")
     public List<Meditation> getModelRecommendedMeditations(@AuthenticationPrincipal UserDetails currentUser) {
-        return meditationService.getModelRecommended(currentUser);
+        throw new RuntimeException();
+//        return meditationService.getModelRecommended(currentUser);
     }
 
     @PostMapping("/generate")
     public Meditation generateNewMeditation(@AuthenticationPrincipal UserDetails currentUser,
                                             @RequestBody ModelMeditationRequest modelMeditationRequest) {
-        return meditationService.generateNewMeditation(
-                currentUser,
-                modelMeditationRequest
-        );
+        throw new RuntimeException();
+//        return meditationService.generateNewMeditation(
+//                currentUser,
+//                modelMeditationRequest
+//        );
     }
 
     @PostMapping
     public Meditation addMeditationFromCollection(@AuthenticationPrincipal UserDetails currentUser,
                                                   @RequestBody String meditationLink) {
-        return meditationService.addMeditationToUser(currentUser, meditationLink);
+        throw new RuntimeException();
+//        return meditationService.addMeditationToUser(currentUser, meditationLink);
     }
 
     @GetMapping("/user")
     public List<Meditation> getUserMeditations(@AuthenticationPrincipal UserDetails currentUser,
                                                @RequestBody MeditationRequest meditationRequest) {
-        return meditationService.generateNewMeditation(
-                currentUser,
-                meditationRequest
-        );
+        throw new RuntimeException();
+//        return meditationService.generateNewMeditation(
+//                currentUser,
+//                meditationRequest
+//        );
     }
 }
