@@ -20,4 +20,3 @@ public class SignUpRequest {
             message = "password must contains 1 capital, lowercase letter; 1 digit; 1 of symbol: @$!%*?& and min length is 8")
     private String password;
 }
-

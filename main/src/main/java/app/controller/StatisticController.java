@@ -1,8 +1,5 @@
 package app.controller;
 
-import app.dto.statistic.Period;
-import app.dto.statistic.Statistic;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
