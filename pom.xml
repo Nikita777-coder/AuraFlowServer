@@ -16,6 +16,10 @@
     <description>AuraFlowServer</description>
     <packaging>pom</packaging>
 
+    <modules>
+        <module>main</module>
+    </modules>
+
     <url/>
     <licenses>
         <license/>
