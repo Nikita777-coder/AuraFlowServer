@@ -1,5 +1,6 @@
 package app.service;
 
+import app.dto.email.VerificationCodeBody;
 import app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,15 +20,15 @@ public class EmailService {
     private int verificationCodeLength;
     private final JavaMailSender mailSender;
     private final UserRepository userRepository;
-    public String sendVerificationCode(String email) {
-        if (userRepository.findByEmail(email).isPresent()) {
+    public String sendVerificationCode(VerificationCodeBody verificationCodeBody) {
+        if (userRepository.findByEmail(verificationCodeBody.getEmail()).isPresent()) {
             throw new IllegalArgumentException("User with this email exists in database");
         }
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
 
         mailMessage.setFrom(serverMail);
-        mailMessage.setTo(email);
+        mailMessage.setTo(verificationCodeBody.getEmail());
         mailMessage.setSubject("AuraFlow, verification code");
         String generatedVerificationPassword = generateSafeVerificationCode();
         mailMessage.setText(String.format("Your verification code - %s", generatedVerificationPassword));
