@@ -1,31 +1,24 @@
 spring:
-  datasource:
-    url: jdbc:h2:mem:k
-    driverClassName: org.h2.Driver
-    username: sa
-    password: sa
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    generate-ddl: true
     hibernate.ddl-auto: update
     properties:
       hibernate:
-        show_sql: true
-  h2:
-    console:
-      enabled: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
 
 # need to remove values when realize
 server:
   jwt:
     token:
       signing:
-        key: aef72d8bc84e66100cbaba56bf48d91e197f342b0f6cd96b5575f9fbc9ccb629 # need to change
+        key: ${JWT_SIGNING_KEY}
   email:
-    name: AuraFlow@<domen>.com
+    name: ${APP_EMAIL}
     host: smtp.yandex.ru
-    password: <server_email_password>
+    password: ${APP_EMAIL_PASSWORD}
     port: 465
     protocol: smtps
     debug: false
     verification-code-length: 4
+  port: ${PORT:8080}
