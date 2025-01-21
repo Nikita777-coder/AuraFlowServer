@@ -29,7 +29,8 @@ public class SecurityConfigurations {
                                 antMatcher("/email/**"),
                                 antMatcher("/actuator/prometheus"),
                                 antMatcher("/swagger-ui/**"),
-                                antMatcher("/v3/api-docs/**")
+                                antMatcher("/v3/api-docs/**"),
+                                antMatcher("/swagger-ui.html")
                         )
                         .permitAll()
                         .anyRequest()
