@@ -51,7 +51,7 @@ public class UserEntity implements UserDetails {
     @Column
     private Boolean isPremium;
 
-    @Column(columnDefinition = "varchar(32) default 'USER'")
+    @Column
     @Enumerated(value = EnumType.STRING)
     private Role role = Role.USER;
 
