@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface PremiumRepository extends JpaRepository<PremiumEntity, UUID> {
-    @Query("select r from PremiumEntity r where r.userId = :userId and r.transactionStatus = :status and r.expiredTime > CURRENT_TIMESTAMP ")
-    List<PremiumEntity> getCurrentPremium(UUID userId, TransactionStatus status);
+    @Query("select r from PremiumEntity r where r.userEmail = :userEmail and r.transactionStatus = :status and r.expiredTime > CURRENT_TIMESTAMP ")
+    List<PremiumEntity> getCurrentPremium(String userEmail, TransactionStatus status);
 
-    List<PremiumEntity> getPremiumEntitiesByUserId(UUID userId);
+    List<PremiumEntity> getPremiumEntitiesByUserEmail(String email);
 }
