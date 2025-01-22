@@ -23,8 +23,8 @@ public class PremiumEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "buyer_id")
-    private UUID userId;
+    @Column(name = "buyer_email")
+    private String userEmail;
 
     @Column(name = "transaction_status")
     private TransactionStatus transactionStatus;
