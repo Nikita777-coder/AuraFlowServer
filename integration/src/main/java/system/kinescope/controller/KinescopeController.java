@@ -1,8 +1,9 @@
-package kinescope.controller;
+package system.kinescope.controller;
 
 import jakarta.validation.Valid;
-import kinescope.dto.KinescopeUploadRequest;
-import kinescope.service.KinescopeService;
+import system.kinescope.dto.KinescopeUploadRequest;
+import system.kinescope.dto.KinescopeUploadResponse;
+import system.kinescope.service.KinescopeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,8 @@ public class KinescopeController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public String upload(@Valid @RequestBody KinescopeUploadRequest kinescopeUploadRequest) {
+    // return id of saved video in local db of meditations
+    public KinescopeUploadResponse upload(@Valid @RequestBody KinescopeUploadRequest kinescopeUploadRequest) {
         return kinescopeService.upload(kinescopeUploadRequest);
     }
 }

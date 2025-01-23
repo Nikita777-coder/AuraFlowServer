@@ -1,8 +1,10 @@
-package app.service;
+package app.service.authservice;
 
 import app.dto.auth.SignInRequest;
 import app.dto.auth.SignUpRequest;
 import app.mapper.UserMapper;
+import app.service.JwtService;
+import app.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;

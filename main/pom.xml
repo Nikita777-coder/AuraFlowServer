@@ -26,8 +26,17 @@
         <url/>
     </scm>
     <properties>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-spring-boot-starter</artifactId>
+            <version>25.0.3</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>

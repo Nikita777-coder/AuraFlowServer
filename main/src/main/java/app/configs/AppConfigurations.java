@@ -2,6 +2,7 @@ package app.configs;
 
 import app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -10,15 +11,16 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @RequiredArgsConstructor
 public class AppConfigurations {
-    // use repo instead of user service in
-    // the reason of cycle dependency (password encoder from appConfigs in userService)
-    // and userService is using in appConfigs
+    @Value("${services-configs.keycloak.url}")
+    private String keyCloakUrl;
+
     private final UserRepository userRepository;
 
     @Bean
@@ -50,5 +52,12 @@ public class AppConfigurations {
                         .allowedMethods("GET");
             }
         };
+    }
+
+    @Bean
+    public WebClient keyCloakWebClient() {
+        return WebClient.builder()
+                .baseUrl(keyCloakUrl)
+                .build();
     }
 }
