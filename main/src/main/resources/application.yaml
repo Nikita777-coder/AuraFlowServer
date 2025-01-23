@@ -33,3 +33,12 @@ server:
     protocol: smtps
     debug: false
     verification-code-length: 4
+  keycloak:
+    client-id: ${CLIENT_ID:1}
+    client-secret: ${CLIENT_SECRET:some_secret}
+    url: ${KEYCLOAK_URL:http://localhost:8080}
+    realm: ${KEYCLOAK_REALM:realm}
+  oauth:
+    grand-type: "client_credentials"
+  web-client:
+    time-response: 8

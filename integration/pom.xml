@@ -30,6 +30,18 @@
             <artifactId>yookassa-java-sdk</artifactId>
             <version>1.0.5</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+            <version>6.4.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-resource-server</artifactId>
+            <version>6.4.2</version>
+        </dependency>
     </dependencies>
 
 </project>
