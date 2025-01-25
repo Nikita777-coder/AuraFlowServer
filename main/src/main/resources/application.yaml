@@ -33,4 +33,3 @@ server:
     protocol: smtps
     debug: false
     verification-code-length: 4
-
