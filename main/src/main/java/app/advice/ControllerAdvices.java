@@ -1,4 +1,4 @@
-package app.extra;
+package app.advice;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
