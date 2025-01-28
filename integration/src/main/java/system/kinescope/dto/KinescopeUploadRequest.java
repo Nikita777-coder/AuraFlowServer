@@ -12,9 +12,6 @@ import java.util.UUID;
 @Getter
 @Setter
 public class KinescopeUploadRequest {
-    @NotNull(message = "videoplatform project (parent) id can't be null")
-    private UUID projectId;
-
     @NotBlank(message = "can't be empty")
     private String title;
     private String description;
