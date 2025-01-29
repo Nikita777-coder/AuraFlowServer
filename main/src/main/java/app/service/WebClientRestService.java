@@ -5,6 +5,7 @@ import app.service.authservice.KeycloakAuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.representations.AccessTokenResponse;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class WebClientRestService {
     private final WebClient webClient;
     private final KeycloakAuthService keycloakAuthService;
-    public <T> T get(String uri, Class<T> typeKey) {
+    public <T> T get(String uri) {
         String token = getToken();
 
         Mono<T> response = webClient
@@ -25,28 +26,51 @@ public class WebClientRestService {
                 .uri(uriBuilder -> uriBuilder.path(uri).build())
                 .header("Authorization", "Bearer " + token)
                 .retrieve()
-                .bodyToMono(typeKey);
+                .bodyToMono(new ParameterizedTypeReference<T>() {});
 
         return response.block();
     }
 
-    public <T> T get(String uri, Map<String, Object> params, Class<T> typeKey) {
+    public <T> T get(String url, Map<String, String> params) {
         String token = getToken();
 
         Mono<T> response = webClient
                 .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(uri)
-                        .queryParam("from", params.get("from"))
-                        .queryParam("to", params.get("to"))
-                        .queryParam("amount", params.get("amount"))
-                        .build()
-                )
+                .uri(uriBuilder -> {
+                    params.forEach(uriBuilder::queryParam);
+                    return uriBuilder.path(url).build();
+                })
                 .header("Authorization", "Bearer " + token)
                 .retrieve()
-                .bodyToMono(typeKey);
+                .bodyToMono(new ParameterizedTypeReference<T>() {});
 
         return response.block();
+    }
+
+    public <T, R> T post(String uri, R body) {
+        String token = getToken();
+
+        return webClient
+                .post()
+                .uri(uri)
+                .header("Authorization", "Bearer " + token)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<T>() {})
+                .block();
+    }
+
+    public void delete(String url, Map<String, String> params) {
+        webClient
+                .delete()
+                .uri(uriBuilder -> {
+                    params.forEach(uriBuilder::queryParam);
+                    return uriBuilder.path(url).build();
+                })
+                .header("Authorization", "Bearer " + getToken())
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {})
+                .block();
     }
 
     private String getToken() {
