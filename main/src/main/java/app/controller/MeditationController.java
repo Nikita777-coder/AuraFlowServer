@@ -22,63 +22,27 @@ public class MeditationController {
     private final MeditationService meditationService;
     @GetMapping
     public List<Meditation> getAllMeditations() {
-        throw new RuntimeException();
-//        return meditationService.getAll(currentUser);
+        return meditationService.getAll();
     }
 
     @GetMapping("/recommended")
-    public List<Meditation> getRecommendedMeditations(@AuthenticationPrincipal UserDetails currentUser) {
-        throw new RuntimeException();
-
-//        return meditationService.getRecommended(currentUser);
-    }
-
-    @GetMapping("/new")
     public List<Meditation> getNewServiceMeditations() {
-        throw new RuntimeException();
-//        return meditationService.getNewMeditations();
-    }
-
-    @GetMapping("/model-recommended")
-    public List<Meditation> getModelRecommendedMeditations(@AuthenticationPrincipal UserDetails currentUser) {
-        throw new RuntimeException();
-//        return meditationService.getModelRecommended(currentUser);
-    }
-
-    @PostMapping("/generate")
-    public Meditation generateNewMeditation(@AuthenticationPrincipal UserDetails currentUser,
-                                            @RequestBody ModelMeditationRequest modelMeditationRequest) {
-        throw new RuntimeException();
-//        return meditationService.generateNewMeditation(
-//                currentUser,
-//                modelMeditationRequest
-//        );
-    }
-
-    @PostMapping
-    public Meditation addMeditationFromCollection(@AuthenticationPrincipal UserDetails currentUser,
-                                                  @RequestBody String meditationLink) {
-        throw new RuntimeException();
-//        return meditationService.addMeditationToUser(currentUser, meditationLink);
-    }
-
-    @GetMapping("/user")
-    public List<Meditation> getUserMeditations(@AuthenticationPrincipal UserDetails currentUser,
-                                               @RequestBody MeditationRequest meditationRequest) {
-        throw new RuntimeException();
-//        return meditationService.generateNewMeditation(
-//                currentUser,
-//                meditationRequest
-//        );
+        return meditationService.getNewMeditations();
     }
 
     // ADMIN
-    @PostMapping("/upload")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public UUID uploadNewMeditation(@AuthenticationPrincipal UserDetails userDetails,
                                     @Valid @RequestBody MeditationUploadBodyRequest meditationUploadBodyRequest) {
-        throw new RuntimeException();
-//        return meditationService.uploadMeditation(userDetails, meditationUploadBodyRequest);
+        return meditationService.uploadMeditation(userDetails, meditationUploadBodyRequest);
+    }
+
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteMeditation(@AuthenticationPrincipal UserDetails userDetails,
+                                 @RequestParam UUID id) {
+        meditationService.delete(userDetails, id);
     }
 }
