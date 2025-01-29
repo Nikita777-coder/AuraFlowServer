@@ -55,7 +55,7 @@ public class MeditationService {
             throw new IllegalArgumentException("not found");
         }
 
-        webClientRestService.delete(serviceUrl, Map.of("video-id", id.toString()));
+        webClientRestService.delete(serviceUrl, Map.of("video-id", meditation.get().getVideoId().toString()));
         meditationRepository.delete(meditation.get());
     }
     private void checkUserRole(UserDetails userDetails) {
