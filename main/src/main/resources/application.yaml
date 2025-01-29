@@ -20,6 +20,8 @@ spring:
       enabled: true
 
 server:
+  web:
+    max-count-requests: ${MAX_COUNT_REQUESTS:10}
   port: ${PORT:8080}
   jwt:
     token:
@@ -42,3 +44,7 @@ server:
     grand-type: "client_credentials"
   web-client:
     time-response: 8
+  meditation:
+    upload-url: ${MEDITATION_UPLOAD_URL}
+    fixed-rate-time: 60000
+    get-delete-url: ${GET_DELETE_URL}
