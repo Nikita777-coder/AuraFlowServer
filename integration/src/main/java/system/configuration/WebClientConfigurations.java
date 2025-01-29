@@ -12,7 +12,7 @@ import reactor.netty.http.client.HttpClient;
 import java.time.Duration;
 
 public class WebClientConfigurations {
-    @Value("${services-configs.web-client.time-response}")
+    @Value("${service-configs.web-client.time-response}")
     private int responseTimeout;
     @Bean
     public WebClient webClient() {
