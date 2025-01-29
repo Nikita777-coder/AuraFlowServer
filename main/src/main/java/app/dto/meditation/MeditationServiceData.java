@@ -4,15 +4,17 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
-public class Meditation {
-    private String author;
+public class MeditationServiceData {
+    private UUID id;
     private String title;
     private String description;
-    private String videoLink;
-    private List<Tag> tags;
+    private Double duration;
+    private String status;
+    private String embedLink;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
