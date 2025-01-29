@@ -14,16 +14,16 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class KeycloakAuthService {
     private final WebClient keyCloakWebClient;
 
-    @Value("${services-configs.oauth.grand-type}")
+    @Value("${server.oauth.grand-type}")
     private String grandType;
 
-    @Value("${services-configs.keycloak.realm}")
+    @Value("${server.keycloak.realm}")
     private String realm;
 
-    @Value("${services-configs.keycloak.client-id}")
+    @Value("${server.keycloak.client-id}")
     private String clientId;
 
-    @Value("${services-configs.keycloak.client-secret}")
+    @Value("${server.keycloak.client-secret}")
     private String clientSecret;
 
     public AccessTokenResponse getAccessToken() {
