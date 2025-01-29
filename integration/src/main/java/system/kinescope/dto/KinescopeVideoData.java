@@ -9,10 +9,11 @@ import java.util.UUID;
 
 @Getter
 @Setter
-class KinescopeData {
+public class KinescopeVideoData {
     private UUID id;
     private String title;
     private String description;
+    private Double duration;
     private String status;
 
     @JsonProperty("embed_link")
@@ -20,4 +21,7 @@ class KinescopeData {
 
     @JsonProperty("created_at")
     private LocalDateTime createdAt;
+
+    @JsonProperty("updated_at")
+    private LocalDateTime updatedAt;
 }
