@@ -1,6 +1,6 @@
 package app.service;
 
-import app.dto.meditation.MeditationServiceData;
+import app.dto.meditation.MeditationServiceDataWrapper;
 import app.dto.meditation.MeditationStatus;
 import app.entity.meditation.MeditationEntity;
 import app.mapper.MeditationMapper;
@@ -41,9 +41,9 @@ public class AppRegularActions {
         List<MeditationEntity> updatedEntities = new ArrayList<>(maxCountRequests);
 
         for (var video: uploadingMeditations) {
-            MeditationServiceData meditationServiceData =
-                    webClientRestService.get(videoServiceUrl, Map.of("video-id", video.getVideoId().toString()), MeditationServiceData.class);
-            updatedEntities.add(meditationMapper.meditationServiceDataToMeditationEntity(meditationServiceData, video));
+            MeditationServiceDataWrapper meditationServiceData =
+                    webClientRestService.get(videoServiceUrl, Map.of("video-id", video.getVideoId().toString()), MeditationServiceDataWrapper.class);
+            updatedEntities.add(meditationMapper.meditationServiceDataToMeditationEntity(meditationServiceData.getData(), video));
         }
 
         meditationRepository.saveAll(updatedEntities);
