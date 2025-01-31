@@ -38,7 +38,7 @@ public class MeditationService {
     public UUID uploadMeditation(UserDetails userDetails,
                             MeditationUploadBodyRequest meditationUploadBodyRequest) {
         checkUserRole(userDetails);
-        UploadResponse ans = webClientRestService.post(uploadMeditationUrl, meditationUploadBodyRequest);
+        UploadResponse ans = webClientRestService.post(uploadMeditationUrl, meditationUploadBodyRequest, UploadResponse.class);
         return meditationRepository.save(meditationMapper.uploadResponseDataToMeditationEntity(ans.getUploadData())).getId();
     }
     public List<Meditation> getAll() {

@@ -1,6 +1,18 @@
 service-configs:
   keycloak:
-    url: ${KEYCLOAK_URL:http://localhost:8080}
-    realm: ${KEYCLOAK_REALM:realm}
+    issuer-uri: ${KEYCLOAK_URI:http://localhost:8082/realms/AuraFlow}
+    jwt-set-uri: ${service-configs.keycloak.issuer-uri}/protocol/openid-connect/certs
   web-client:
     time-response: 8
+  kinescope:
+    load-video-url: https://uploader.kinescope.io/v2/video
+    v1-video-url: https://api.kinescope.io/v1/videos
+    token: 19028ddf-c8aa-49c0-9986-7436ad50816b
+    project-id: 85838893-5a2b-4d78-9e7e-b0e4bc7a9b97
+
+server:
+  port: 8081
+
+logging:
+  level:
+    org.springframework.security.oauth2: DEBUG
