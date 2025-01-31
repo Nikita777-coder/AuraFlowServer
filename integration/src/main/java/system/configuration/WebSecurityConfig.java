@@ -12,10 +12,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
-    @Value("${service-configs.keycloak.url}")
-    private String keyCloakUrl;
-    @Value("${service-configs.keycloak.realm}")
-    private String keyCloakRealm;
+    @Value("${service-configs.keycloak.jwt-set-uri}")
+    private String jwtSetUri;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -34,9 +32,8 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        String uri = String.format("%s/realms/%s/protocol/openid-connect/certs", keyCloakUrl, keyCloakRealm);
         return NimbusJwtDecoder
-                .withJwkSetUri(uri)
+                .withJwkSetUri(jwtSetUri)
                 .build();
     }
 }

@@ -42,7 +42,7 @@ public class AppRegularActions {
 
         for (var video: uploadingMeditations) {
             MeditationServiceData meditationServiceData =
-                    webClientRestService.get(videoServiceUrl, Map.of("video-id", video.getVideoId().toString()));
+                    webClientRestService.get(videoServiceUrl, Map.of("video-id", video.getVideoId().toString()), MeditationServiceData.class);
             updatedEntities.add(meditationMapper.meditationServiceDataToMeditationEntity(meditationServiceData, video));
         }
 

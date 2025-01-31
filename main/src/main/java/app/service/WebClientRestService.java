@@ -18,20 +18,8 @@ import java.util.Map;
 public class WebClientRestService {
     private final WebClient webClient;
     private final KeycloakAuthService keycloakAuthService;
-    public <T> T get(String uri) {
-        String token = getToken();
 
-        Mono<T> response = webClient
-                .get()
-                .uri(uriBuilder -> uriBuilder.path(uri).build())
-                .header("Authorization", "Bearer " + token)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<T>() {});
-
-        return response.block();
-    }
-
-    public <T> T get(String url, Map<String, String> params) {
+    public <T> T get(String url, Map<String, String> params, Class<T> tClass) {
         String token = getToken();
 
         Mono<T> response = webClient
@@ -42,12 +30,12 @@ public class WebClientRestService {
                 })
                 .header("Authorization", "Bearer " + token)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<T>() {});
+                .bodyToMono(tClass);
 
         return response.block();
     }
 
-    public <T, R> T post(String uri, R body) {
+    public <T, R> T post(String uri, R body, Class<T> tClass) {
         String token = getToken();
 
         return webClient
@@ -56,7 +44,7 @@ public class WebClientRestService {
                 .header("Authorization", "Bearer " + token)
                 .bodyValue(body)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<T>() {})
+                .bodyToMono(tClass)
                 .block();
     }
 
