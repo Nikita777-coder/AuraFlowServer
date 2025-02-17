@@ -3,7 +3,7 @@ service-configs:
     issuer-uri: ${KEYCLOAK_ISSUER_URI}
     jwt-set-uri: ${service-configs.keycloak.issuer-uri}/protocol/openid-connect/certs
   web-client:
-    time-response: 8
+    time-response: ${TIME_RESPONSE}
   kinescope:
     load-video-url: ${VIDEO_STORAGE_LOAD_URL}
     v1-video-url: ${VIDEO_STORAGE_V1_URL}
