@@ -34,7 +34,7 @@ server:
     port: 465
     protocol: smtps
     debug: false
-    verification-code-length: 4
+    verification-code-length: ${VERIFICATION_CODE_LENGTH}
   keycloak:
     client-id: ${CLIENT_ID:1}
     client-secret: ${CLIENT_SECRET:some_secret}
