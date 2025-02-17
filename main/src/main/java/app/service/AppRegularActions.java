@@ -42,8 +42,16 @@ public class AppRegularActions {
 
         for (var video: uploadingMeditations) {
             MeditationServiceDataWrapper meditationServiceData =
-                    webClientRestService.get(videoServiceUrl, Map.of("video-id", video.getVideoId().toString()), MeditationServiceDataWrapper.class);
-            updatedEntities.add(meditationMapper.meditationServiceDataToMeditationEntity(meditationServiceData.getData(), video));
+                    webClientRestService.get(
+                            videoServiceUrl,
+                            Map.of("video-id",
+                                    video.getVideoId().toString()
+                            ),
+                            MeditationServiceDataWrapper.class);
+            updatedEntities.add(meditationMapper.meditationServiceDataToMeditationEntity(
+                    meditationServiceData.getData(),
+                    video)
+            );
         }
 
         meditationRepository.saveAll(updatedEntities);
