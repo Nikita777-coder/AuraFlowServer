@@ -1,0 +1,13 @@
+FROM quay.io/keycloak/keycloak:26.1
+
+ENV KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+ENV KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+ENV KC_DB=${KC_DB}
+ENV KC_DB_URL=${DB_URL}
+ENV KC_DB_USERNAME=${DB_USER}
+ENV KC_DB_PASSWORD=${DB_PASSWORD}
+ENV KC_FEATURES=${KC_FEATURES}
+ENV KC_HTTP_PORT=${PORT}
+ENV KC_HOSTNAME=${KEYCLOAK_HOSTNAME}
+
+ENTRYPOINT ["/bin/sh", "-c", "/opt/keycloak/bin/kc.sh start --hostname=$KC_HOSTNAME --db=$KC_DB --features=$KC_FEATURES --db-url=$KC_DB_URL --db-username=$KC_DB_USERNAME --db-password=$KC_DB_PASSWORD --https-key-store-file=$KC_HTTPS_KEY_STORE_FILE --https-key-store-password=$KC_HTTPS_KEY_STORE_PASSWORD --http-port=$KC_HTTP_PORT"]

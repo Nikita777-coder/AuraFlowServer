@@ -1,4 +1,4 @@
-package yookassa.service;
+package system.yookassa.service;
 
 import me.dynomake.yookassa.Yookassa;
 import me.dynomake.yookassa.exception.BadRequestException;
