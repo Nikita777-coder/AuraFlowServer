@@ -1,5 +1,6 @@
 package app.dto.meditation;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,10 @@ public class UploadData {
     private String title;
     private String description;
     private String status;
+
+    @JsonProperty("embed_link")
     private String embedLink;
+
+    @JsonProperty("created_at")
     private LocalDateTime createdAt;
 }

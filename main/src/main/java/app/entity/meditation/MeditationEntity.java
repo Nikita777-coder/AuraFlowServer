@@ -18,6 +18,7 @@ import java.util.UUID;
 public class MeditationEntity {
     @Id
     @Column
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "video_link")
@@ -31,7 +32,7 @@ public class MeditationEntity {
     @Column
     private String title;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "duration_seconds")

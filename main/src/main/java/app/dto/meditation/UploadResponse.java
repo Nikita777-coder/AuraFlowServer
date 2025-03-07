@@ -6,5 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UploadResponse {
-    private UploadData uploadData;
+    private UploadData data;
 }

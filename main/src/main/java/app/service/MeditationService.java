@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,21 +33,26 @@ public class MeditationService {
     private final MeditationRepository meditationRepository;
     private final MeditationMapper meditationMapper;
 
-    @Value("${server.meditation.upload-url}")
-    private String uploadMeditationUrl;
-    @Value("${server.meditation.get-delete-url}")
-    private String serviceUrl;
+    @Value("${server.integration.main-uri}")
+    private String mainUri;
+
+    @Value("${server.integration.base-url}")
+    private String integrationServiceBaseUrl;
     public UUID uploadMeditation(UserDetails userDetails,
                             MeditationUploadBodyRequest meditationUploadBodyRequest) {
         checkUserRole(userDetails);
-        UploadResponse ans = webClientRestService.post(uploadMeditationUrl, meditationUploadBodyRequest, UploadResponse.class);
-        return meditationRepository.save(meditationMapper.uploadResponseDataToMeditationEntity(ans.getUploadData())).getId();
+        UploadResponse ans = webClientRestService.post(integrationServiceBaseUrl, mainUri, meditationUploadBodyRequest, UploadResponse.class);
+        return meditationRepository.save(meditationMapper.uploadResponseDataToMeditationEntity(ans.getData())).getId();
     }
     public List<Meditation> getAll() {
         return meditationMapper.meditationEntitiesToMeditations(meditationRepository.findAllByStatus(MeditationStatus.DONE));
     }
     public List<Meditation> getNewMeditations() {
-        return meditationMapper.meditationEntitiesToMeditations(meditationRepository.findNewMeditations());
+        return meditationMapper.meditationEntitiesToMeditations(meditationRepository
+                .findAllByCreatedAtAfterAndStatus(
+                        LocalDateTime.now().minusDays(14),
+                        MeditationStatus.DONE)
+        );
     }
     public void delete(UserDetails userDetails, UUID id) {
         checkUserRole(userDetails);
@@ -55,7 +62,7 @@ public class MeditationService {
             throw new IllegalArgumentException("not found");
         }
 
-        webClientRestService.delete(serviceUrl, Map.of("video-id", meditation.get().getVideoId().toString()));
+        webClientRestService.delete(integrationServiceBaseUrl, mainUri, Map.of("video-id", meditation.get().getVideoId().toString()));
         meditationRepository.delete(meditation.get());
     }
     private void checkUserRole(UserDetails userDetails) {
