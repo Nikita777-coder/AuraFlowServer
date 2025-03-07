@@ -25,7 +25,8 @@ public class KinescopeController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public KinescopeUploadResponse upload(@Valid @RequestBody KinescopeUploadRequest kinescopeUploadRequest) {
-        return kinescopeService.upload(kinescopeUploadRequest);
+        var ans = kinescopeService.upload(kinescopeUploadRequest);
+        return ans;
     }
 
     @GetMapping

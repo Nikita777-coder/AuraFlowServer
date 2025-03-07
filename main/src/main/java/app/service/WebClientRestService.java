@@ -19,26 +19,34 @@ public class WebClientRestService {
     private final WebClient webClient;
     private final KeycloakAuthService keycloakAuthService;
 
-    public <T> T get(String url, Map<String, String> params, Class<T> tClass) {
+    public <T> T get(String baseUrl, String uri, Map<String, String> params, Class<T> tClass) {
         String token = getToken();
 
         Mono<T> response = webClient
+                .mutate()
+                .baseUrl(baseUrl)
+                .build()
                 .get()
                 .uri(uriBuilder -> {
                     params.forEach(uriBuilder::queryParam);
-                    return uriBuilder.path(url).build();
+                    return uriBuilder.path(uri).build();
                 })
                 .header("Authorization", "Bearer " + token)
                 .retrieve()
                 .bodyToMono(tClass);
 
-        return response.block();
+        var res = response.block();
+
+        return res;
     }
 
-    public <T, R> T post(String uri, R body, Class<T> tClass) {
+    public <T, R> T post(String baseUrl, String uri, R body, Class<T> tClass) {
         String token = getToken();
 
-        return webClient
+        var ans = webClient
+                .mutate()
+                .baseUrl(baseUrl)
+                .build()
                 .post()
                 .uri(uri)
                 .header("Authorization", "Bearer " + token)
@@ -46,14 +54,19 @@ public class WebClientRestService {
                 .retrieve()
                 .bodyToMono(tClass)
                 .block();
+
+        return ans;
     }
 
-    public void delete(String url, Map<String, String> params) {
+    public void delete(String baseUrl, String uri, Map<String, String> params) {
         webClient
+                .mutate()
+                .baseUrl(baseUrl)
+                .build()
                 .delete()
                 .uri(uriBuilder -> {
                     params.forEach(uriBuilder::queryParam);
-                    return uriBuilder.path(url).build();
+                    return uriBuilder.path(uri).build();
                 })
                 .header("Authorization", "Bearer " + getToken())
                 .retrieve()

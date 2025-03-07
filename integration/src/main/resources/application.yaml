@@ -6,12 +6,12 @@ service-configs:
     time-response: ${TIME_RESPONSE}
   kinescope:
     load-video-url: ${VIDEO_STORAGE_LOAD_URL}
-    v1-video-url: ${VIDEO_STORAGE_V1_URL}
+    v1-video-url: ${VIDEO_STORAGE_V1_UR}
     token: ${VIDEO_STORAGE_TOKEN}
     project-id: ${VIDEO_STORAGE_PROJECT_ID}
 
 server:
-  port: 8081
+  port: ${PORT}
 
 logging:
   level:
