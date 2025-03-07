@@ -2,7 +2,7 @@ package app.controller;
 
 import app.dto.auth.SignInRequest;
 import app.dto.auth.SignUpRequest;
-import app.service.AuthService;
+import app.service.authservice.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
