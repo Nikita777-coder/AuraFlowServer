@@ -29,7 +29,7 @@ public class ApplicationStartup
                         .isPremium(true)
                         .name("name")
                         .role(Role.ADMIN)
-                        .password(bCryptPasswordEncoder.encode("aDm12-q!sdkIs"))
+                        .password(bCryptPasswordEncoder.encode("aDm12q!sdkIs"))
                 .build());
     }
 }
