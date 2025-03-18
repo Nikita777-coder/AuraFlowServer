@@ -25,7 +25,7 @@ public class ApplicationStartup
         userRepository.save(UserEntity
                 .builder()
                         .countBreathPractiseReminderPerDay(4)
-                        .email("admin@a.com")
+                        .email("admin1@a.com")
                         .isPremium(true)
                         .name("name")
                         .role(Role.ADMIN)
