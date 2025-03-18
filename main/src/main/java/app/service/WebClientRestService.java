@@ -20,7 +20,7 @@ public class WebClientRestService {
     private final KeycloakAuthService keycloakAuthService;
 
     public <T> T get(String baseUrl, String uri, Map<String, String> params, Class<T> tClass) {
-        String token = getToken();
+//        String token = getToken();
 
         Mono<T> response = webClient
                 .mutate()
@@ -31,7 +31,7 @@ public class WebClientRestService {
                     params.forEach(uriBuilder::queryParam);
                     return uriBuilder.path(uri).build();
                 })
-                .header("Authorization", "Bearer " + token)
+//                .header("Authorization", "Bearer " + token)
                 .retrieve()
                 .bodyToMono(tClass);
 
@@ -41,7 +41,7 @@ public class WebClientRestService {
     }
 
     public <T, R> T post(String baseUrl, String uri, R body, Class<T> tClass) {
-        String token = getToken();
+//        String token = getToken();
 
         var ans = webClient
                 .mutate()
@@ -49,7 +49,7 @@ public class WebClientRestService {
                 .build()
                 .post()
                 .uri(uri)
-                .header("Authorization", "Bearer " + token)
+//                .header("Authorization", "Bearer " + token)
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono(tClass)
@@ -68,7 +68,7 @@ public class WebClientRestService {
                     params.forEach(uriBuilder::queryParam);
                     return uriBuilder.path(uri).build();
                 })
-                .header("Authorization", "Bearer " + getToken())
+//                .header("Authorization", "Bearer " + getToken())
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<>() {})
                 .block();
