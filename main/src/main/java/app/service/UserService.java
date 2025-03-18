@@ -4,6 +4,7 @@ import app.dto.user.UpdatePasswordData;
 import app.dto.user.UserData;
 import app.dto.user.UserOptions;
 import app.entity.UserEntity;
+import app.entity.userattributes.Role;
 import app.mapper.UserMapper;
 import app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class UserService {
         if (userRepository.findByEmail(entity.getEmail()).isPresent()) {
             throw new IllegalArgumentException("user with this email exists");
         }
+        entity.setRole(Role.USER);
 
         return userRepository.save(entity);
     }
