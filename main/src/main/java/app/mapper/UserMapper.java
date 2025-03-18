@@ -25,7 +25,6 @@ public interface UserMapper {
     @Mapping(target = "startTimeOfBreathPractise", source = "userData.startTimeOfBreathPractise", defaultExpression = "java(currentUserOldData.getStartTimeOfBreathPractise())")
     @Mapping(target = "stopTimeOfBreathPractise", source = "userData.stopTimeOfBreathPractise", defaultExpression = "java(currentUserOldData.getStopTimeOfBreathPractise())")
     @Mapping(target = "countBreathPractiseReminderPerDay", source = "userData.countBreathPractiseReminderPerDay", defaultExpression = "java(currentUserOldData.getCountBreathPractiseReminderPerDay())")
-    @Mapping(target = "authorities", ignore = true)
     UserEntity updateUserData(UserData userData, UserEntity currentUserOldData);
     @BeforeMapping
     default void encodePassword(SignUpRequest request) {
