@@ -20,12 +20,12 @@ import java.util.UUID;
 @RequestMapping("/meditation")
 public class MeditationController {
     private final MeditationService meditationService;
-    @GetMapping
+    @GetMapping("/all")
     public List<Meditation> getAllMeditations() {
         return meditationService.getAll();
     }
 
-    @GetMapping("/recommended")
+    @GetMapping("/new")
     public List<Meditation> getNewServiceMeditations() {
         return meditationService.getNewMeditations();
     }

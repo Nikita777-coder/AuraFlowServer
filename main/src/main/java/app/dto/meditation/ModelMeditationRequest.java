@@ -8,6 +8,7 @@ import java.util.List;
 @Getter
 @Setter
 public class ModelMeditationRequest {
-    String text;
-    List<Tag> tags;
+    private String text;
+    private String musicTitle;
+    private int timeDuration;
 }

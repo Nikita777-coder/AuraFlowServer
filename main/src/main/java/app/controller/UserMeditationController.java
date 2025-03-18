@@ -1,5 +1,6 @@
 package app.controller;
 
+import app.dto.meditation.GeneratedMeditation;
 import app.dto.meditation.Meditation;
 import app.dto.meditation.MeditationRequest;
 import app.dto.meditation.ModelMeditationRequest;
@@ -29,8 +30,8 @@ public class UserMeditationController {
     }
 
     @PostMapping("/generate")
-    public Meditation generateNewMeditation(@AuthenticationPrincipal UserDetails currentUser,
-                                            @RequestBody ModelMeditationRequest modelMeditationRequest) {
+    public GeneratedMeditation generateNewMeditation(@AuthenticationPrincipal UserDetails currentUser,
+                                                     @RequestBody ModelMeditationRequest modelMeditationRequest) {
         throw new RuntimeException();
 //        return meditationService.generateNewMeditation(
 //                currentUser,
@@ -43,11 +44,5 @@ public class UserMeditationController {
         throw new RuntimeException();
 
 //        return meditationService.getRecommended(currentUser);
-    }
-
-    @GetMapping("/model-recommended")
-    public List<Meditation> getModelRecommendedMeditations(@AuthenticationPrincipal UserDetails currentUser) {
-        throw new RuntimeException();
-//        return meditationService.getModelRecommended(currentUser);
     }
 }
