@@ -4,6 +4,7 @@ import app.dto.auth.SignUpRequest;
 import app.dto.user.UserData;
 import app.dto.user.UserOptions;
 import app.entity.UserEntity;
+import lombok.RequiredArgsConstructor;
 import org.mapstruct.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,11 +27,6 @@ public interface UserMapper {
     @Mapping(target = "stopTimeOfBreathPractise", source = "userData.stopTimeOfBreathPractise", defaultExpression = "java(currentUserOldData.getStopTimeOfBreathPractise())")
     @Mapping(target = "countBreathPractiseReminderPerDay", source = "userData.countBreathPractiseReminderPerDay", defaultExpression = "java(currentUserOldData.getCountBreathPractiseReminderPerDay())")
     UserEntity updateUserData(UserData userData, UserEntity currentUserOldData);
-    @BeforeMapping
-    default void encodePassword(SignUpRequest request) {
-        PasswordEncoder encoder = new BCryptPasswordEncoder();
-        request.setPassword(encoder.encode(request.getPassword()));
-    }
     @AfterMapping
     default void handleNullUserData(@MappingTarget UserEntity userEntity, UserData userData, UserEntity currentUserOldData) {
         if (userData == null && currentUserOldData != null) {
