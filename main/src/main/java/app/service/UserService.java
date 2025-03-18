@@ -30,6 +30,7 @@ public class UserService {
             throw new IllegalArgumentException("user with this email exists");
         }
         entity.setRole(Role.USER);
+        entity.setPassword(passwordEncoder.encode(entity.getPassword()));
 
         return userRepository.save(entity);
     }
