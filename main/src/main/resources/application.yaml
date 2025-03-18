@@ -1,61 +1,9 @@
-#spring:
-#  datasource:
-#    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}
-#    username: ${SPRING_DATASOURCE_USERNAME}
-#    password: ${SPRING_DATASOURCE_PASSWORD}
-#    driver-class-name: org.postgresql.Driver
-#    tomcat:
-#      max-active: 10
-#      max-idle: 5
-#      min-idle: 2
-#      initial-size: 5
-#      remove-abandoned: true
-#  jpa:
-#    hibernate:
-#      ddl-auto: update
-#    generate-ddl: true
-#    database-platform: org.hibernate.dialect.PostgreSQLDialect
-#    show-sql: true
-#  h2:
-#    console:
-#      enabled: true
-#
-#server:
-#  web:
-#    max-count-requests: ${MAX_COUNT_REQUESTS}
-#  jwt:
-#    token:
-#      signing:
-#        key: ${JWT_SIGNING_KEY}
-#  email:
-#    name: ${APP_EMAIL}
-#    host: smtp.yandex.ru
-#    password: ${APP_EMAIL_PASSWORD}
-#    port: 465
-#    protocol: smtps
-#    debug: false
-#    verification-code-length: ${VERIFICATION_CODE_LENGTH}
-#  keycloak:
-#    client-id: ${CLIENT_ID}
-#    client-secret: ${CLIENT_SECRET}
-#    url: ${KEYCLOAK_URL}
-#    realm: ${KEYCLOAK_REALM}
-#  oauth:
-#    grand-type: "client_credentials"
-#  web-client:
-#    time-response: 8
-#  integration:
-#    base-url: ${INTEGRATION_SERVICE_BASE_URL}
-#    main-uri: ${MAIN_URI}
-#    fixed-rate-time: 60000
-
-
 spring:
   datasource:
-    url: jdbc:h2:mem:database
-    username: sa
-    password: sa
-    driver-class-name: org.h2.Driver
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
     tomcat:
       max-active: 10
       max-idle: 5
@@ -66,6 +14,7 @@ spring:
     hibernate:
       ddl-auto: update
     generate-ddl: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
   h2:
     console:
@@ -73,30 +22,29 @@ spring:
 
 server:
   web:
-    max-count-requests: ${MAX_COUNT_REQUESTS:10}
-  port: ${PORT:8081}
+    max-count-requests: ${MAX_COUNT_REQUESTS}
   jwt:
     token:
       signing:
-        key: ${JWT_SIGNING_KEY:NzQxODIzYWIxOWU2MDAzZGUzYTU0OGFiYjU3NzFlZGRlNzNmMWViMDBjZjU1MGRkZWNhMjEwMmVhODRhYTNjZTBjYmEyZGUyZTM0ODljMzg5NDk2MTQ2MzViNzMyMTQ5NDA0ZDRmNzk2MzM5ZWRmNDEyYjQ2OGUxMjljZDE1OTI2NzM4ZmM5NTQwM2NlNDljZWMyMjQzODQ5MjgzYThjYjdlMWRlOTBkNGZjMjUyNGQzMzVkYWQ3ZjBkODQxOTA2NGM0ZmE2Yzg5ZGYwM2IyNzJjYWU0YjBmZjczMTA2OTA1YWVhNjFhOTk5MDc1ZjA5MTE2YjM0ODVmOTUxOGFmYzFkNTg4NzdkZDIyNjdjMjQwZDc1Nzc5YTJiNWYyMzZhNWJlOTIzYjJmNzhlZjAzNjY4YzZlOTJkZDI2MWFlZGQ3OTdlNDFiOWQ0Y2E4NjEzMjBjOGUwNTIxM2ZhZjMyOGU3ODRlYzBkNGVjODYwMmI4YjU1OWVjOTE3MWU3YmM5YTYyYTk5MzkxYTExYWE0ZTNjMjlmMzdmNTA4MDljNjQ5YjJjN2U2N2FjM2QyN2NjZjhkYzhmZGQxNWJiYjg4NTRiY2Q3ZWFjZTRjNTkyNmQyODE4MDc3ZTIzMTA1Y2U3NWY2MDE3Y2RiODRlNDA1ZDVmMzEyYzkxZmE1YTA5YmY}
+        key: ${JWT_SIGNING_KEY}
   email:
-    name: auraflowapp@yandex.ru
+    name: ${APP_EMAIL}
     host: smtp.yandex.ru
-    password: qlpedjberbbkzmsm
+    password: ${APP_EMAIL_PASSWORD}
     port: 465
     protocol: smtps
     debug: false
-    verification-code-length: 4
+    verification-code-length: ${VERIFICATION_CODE_LENGTH}
   keycloak:
-    client-id: ${CLIENT_ID:1}
-    client-secret: ${CLIENT_SECRET:some_secret}
-    url: ${KEYCLOAK_URL:http://localhost:8080}
-    realm: ${KEYCLOAK_REALM:realm}
+    client-id: ${CLIENT_ID}
+    client-secret: ${CLIENT_SECRET}
+    url: ${KEYCLOAK_URL}
+    realm: ${KEYCLOAK_REALM}
   oauth:
     grand-type: "client_credentials"
   web-client:
     time-response: 8
   integration:
-    base-url: ${INTEGRATION_SERVICE_BASE_URL:http://localhost:8082}
-    main-uri: ${MAIN_URI:/integration/video-storage}
+    base-url: ${INTEGRATION_SERVICE_BASE_URL}
+    main-uri: ${MAIN_URI}
     fixed-rate-time: 60000
