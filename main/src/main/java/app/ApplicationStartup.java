@@ -22,14 +22,14 @@ public class ApplicationStartup
     @Override
     public void onApplicationEvent(final ApplicationReadyEvent event) {
 
-        userRepository.save(UserEntity
-                .builder()
-                .countBreathPractiseReminderPerDay(4)
-                .email("admin@a.com")
-                .isPremium(true)
-                .name("name")
-                .role(Role.ADMIN)
-                .password(bCryptPasswordEncoder.encode("aDm12q!sdkIs"))
-                .build());
+//        userRepository.save(UserEntity
+//                .builder()
+//                .countBreathPractiseReminderPerDay(4)
+//                .email("admin@a.com")
+//                .isPremium(true)
+//                .name("name")
+//                .role(Role.ADMIN)
+//                .password(bCryptPasswordEncoder.encode("aDm12q!sdkIs"))
+//                .build());
     }
 }
