@@ -12,7 +12,7 @@ import java.util.UUID;
 public class MeditationUploadBodyRequest {
     private String sourceLink;
     private UUID parentId;
-    private MultipartFile uploadVideo;
+    private MultipartFile uploadVideoPath;
     private String title;
     private String description;
     private List<Tag> tags;
