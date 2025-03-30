@@ -6,11 +6,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +53,27 @@ public class WebClientRestService {
                 .uri(uri)
 //                .header("Authorization", "Bearer " + token)
                 .bodyValue(body)
+                .retrieve()
+                .bodyToMono(tClass)
+                .block();
+
+        return ans;
+    }
+
+    public <T> T post(String baseUrl, String uri, Map<String, Object> params, Class<T> tClass) {
+//        String token = getToken();
+
+        var ans = webClient
+                .mutate()
+                .baseUrl(baseUrl)
+                .build()
+                .post()
+                .uri(uriBuilder -> {
+                    params.forEach(uriBuilder::queryParam);
+                    return uriBuilder.path(uri).build();
+                })
+//                .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
                 .retrieve()
                 .bodyToMono(tClass)
                 .block();
