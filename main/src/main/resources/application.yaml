@@ -46,5 +46,8 @@ server:
     time-response: 8
   integration:
     base-url: ${INTEGRATION_SERVICE_BASE_URL}
-    main-uri: ${MAIN_URI}
+    video-storage:
+      uri: ${VIDEO_STORAGE_URI}
+      type: ${VIDEO_STORAGE_TYPE}
+      yandex-upload-path: ${YANDEX_UPLOAD_PATH}
     fixed-rate-time: 60000

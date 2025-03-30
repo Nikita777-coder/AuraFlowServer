@@ -26,11 +26,17 @@ public class AppRegularActions {
     private final WebClientRestService webClientRestService;
     private final MeditationMapper meditationMapper;
 
-    @Value("${server.integration.main-uri}")
+    @Value("${server.integration.video-storage.type}")
+    private String videoStorageType;
+
+    @Value("${server.integration.video-storage.uri}")
     private String mainUri;
 
     @Value("${server.integration.base-url}")
     private String integrationServiceBaseUrl;
+
+    @Value("${server.integration.video-storage.yandex-upload-path}")
+    private String yandexUploadPathVideo;
 
     @Value("${server.web.max-count-requests}")
     private int maxCountRequests;
@@ -62,6 +68,15 @@ public class AppRegularActions {
                         meditationServiceData.getData(),
                         video)
                 );
+
+                if (videoStorageType.equalsIgnoreCase("yandex")) {
+                    webClientRestService.post(
+                            integrationServiceBaseUrl,
+                            yandexUploadPathVideo,
+                            meditationServiceData,
+                            String.class
+                    );
+                }
             } catch (IllegalStateException ex) {
                 deleteEntities.add(video);
             }
