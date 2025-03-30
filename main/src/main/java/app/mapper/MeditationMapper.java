@@ -25,12 +25,12 @@ public interface MeditationMapper {
     @Mapping(target = "videoId", source = "oldEntity.videoId")
     @Mapping(target = "id", source = "oldEntity.id")
     @Mapping(target = "tags", source = "oldEntity.tags")
-    @Mapping(target = "videoLink", source = "oldEntity.videoLink")
     @Mapping(target = "durationSeconds", source = "meditationServiceData.duration")
     @Mapping(target = "title", source = "meditationServiceData.title")
     @Mapping(target = "description", source = "meditationServiceData.description")
     @Mapping(target = "createdAt", source = "oldEntity.createdAt")
     @Mapping(target = "status", source = "meditationServiceData.status")
+    @Mapping(target = "videoLink", ignore = true)
     MeditationEntity meditationServiceDataToMeditationEntity(MeditationServiceData meditationServiceData, MeditationEntity oldEntity);
 
     default Tag tagEntityToTag(TagEntity entity) {

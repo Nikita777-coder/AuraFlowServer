@@ -3,14 +3,13 @@ package app.service;
 import app.dto.meditation.Meditation;
 import app.dto.meditation.MeditationStatus;
 import app.dto.meditation.MeditationUploadBodyRequest;
-import app.dto.meditation.UploadResponse;
+import app.dto.meditation.UploadResponseFull;
 import app.entity.meditation.MeditationEntity;
 import app.entity.userattributes.Role;
 import app.mapper.MeditationMapper;
 import app.repository.MeditationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -33,16 +31,16 @@ public class MeditationService {
     private final MeditationRepository meditationRepository;
     private final MeditationMapper meditationMapper;
 
-    @Value("${server.integration.main-uri}")
-    private String mainUri;
+    @Value("${server.integration.video-storage.uri}")
+    private String videoStorageUri;
 
     @Value("${server.integration.base-url}")
     private String integrationServiceBaseUrl;
     public UUID uploadMeditation(UserDetails userDetails,
                             MeditationUploadBodyRequest meditationUploadBodyRequest) {
         checkUserRole(userDetails);
-        UploadResponse ans = webClientRestService.post(integrationServiceBaseUrl, mainUri, meditationUploadBodyRequest, UploadResponse.class);
-        return meditationRepository.save(meditationMapper.uploadResponseDataToMeditationEntity(ans.getData())).getId();
+        UploadResponseFull ans = webClientRestService.post(integrationServiceBaseUrl, videoStorageUri, meditationUploadBodyRequest, UploadResponseFull.class);
+        return meditationRepository.save(meditationMapper.uploadResponseDataToMeditationEntity(ans.getUploadResponse().getData())).getId();
     }
     public List<Meditation> getAll() {
         return meditationMapper.meditationEntitiesToMeditations(meditationRepository.findAllByStatus(MeditationStatus.DONE));
@@ -62,7 +60,7 @@ public class MeditationService {
             throw new IllegalArgumentException("not found");
         }
 
-        webClientRestService.delete(integrationServiceBaseUrl, mainUri, Map.of("video-id", meditation.get().getVideoId().toString()));
+        webClientRestService.delete(integrationServiceBaseUrl, videoStorageUri, Map.of("video-id", meditation.get().getVideoId().toString()));
         meditationRepository.delete(meditation.get());
     }
     private void checkUserRole(UserDetails userDetails) {
