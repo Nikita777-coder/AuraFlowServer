@@ -16,12 +16,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,10 +34,33 @@ public class MeditationService {
 
     @Value("${server.integration.base-url}")
     private String integrationServiceBaseUrl;
-    public UUID uploadMeditation(UserDetails userDetails,
+
+    public UUID uploadMeditationByUploadVideo(UserDetails userDetails,
+                                              MultipartFile file,
+                                              String title,
+                                              String description) {
+        checkUserRole(userDetails);
+        var args = new HashMap<>() {
+            {
+                                put("upload-video", file);
+                                put("title", title);
+                                put("description", description);
+            }
+        };
+        UploadResponseFull ans = webClientRestService.post(
+                integrationServiceBaseUrl,
+                videoStorageUri + "/by-upload-video",
+                args,
+                UploadResponseFull.class
+        );
+
+        return meditationRepository.save(meditationMapper.uploadResponseDataToMeditationEntity(ans.getUploadResponse().getData())).getId();
+    }
+
+    public UUID uploadMeditationByUrl(UserDetails userDetails,
                             MeditationUploadBodyRequest meditationUploadBodyRequest) {
         checkUserRole(userDetails);
-        UploadResponseFull ans = webClientRestService.post(integrationServiceBaseUrl, videoStorageUri, meditationUploadBodyRequest, UploadResponseFull.class);
+        UploadResponseFull ans = webClientRestService.post(integrationServiceBaseUrl, videoStorageUri + "/by-url", meditationUploadBodyRequest, UploadResponseFull.class);
         return meditationRepository.save(meditationMapper.uploadResponseDataToMeditationEntity(ans.getUploadResponse().getData())).getId();
     }
     public List<Meditation> getAll() {
