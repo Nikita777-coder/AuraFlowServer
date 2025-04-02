@@ -65,6 +65,8 @@ public interface MeditationMapper {
 
     @AfterMapping
     default void mapMeditationStatus(UploadData uploadData, @MappingTarget MeditationEntity meditation) {
-        meditation.setStatus(MeditationStatus.valueOf(uploadData.getStatus().toUpperCase()));
+        if (uploadData.getStatus() != null) {
+            meditation.setStatus(MeditationStatus.valueOf(uploadData.getStatus().toUpperCase()));
+        }
     }
 }

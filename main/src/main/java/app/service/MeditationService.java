@@ -40,17 +40,12 @@ public class MeditationService {
                                               String title,
                                               String description) {
         checkUserRole(userDetails);
-        var args = new HashMap<>() {
-            {
-                                put("upload-video", file);
-                                put("title", title);
-                                put("description", description);
-            }
-        };
-        UploadResponseFull ans = webClientRestService.post(
+        UploadResponseFull ans = webClientRestService.postVideo(
                 integrationServiceBaseUrl,
                 videoStorageUri + "/by-upload-video",
-                args,
+                title,
+                file,
+                description,
                 UploadResponseFull.class
         );
 

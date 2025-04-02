@@ -89,24 +89,27 @@ public class AppRegularActions {
     @Async
     @Scheduled(fixedRateString = "${server.integration.fixed-rate-time}")
     public void deleteUselessLocalMeditations() {
-        List<MeditationEntity> uploadingMeditations = meditationRepository.findAll().stream().limit(maxCountRequests).toList();
-        List<MeditationEntity> deleteEntities = new ArrayList<>(maxCountRequests);
+        if (videoStorageType.equals("kinescope")) {
+            List<MeditationEntity> uploadingMeditations = meditationRepository.findAll().stream().limit(maxCountRequests).toList();
+            List<MeditationEntity> deleteEntities = new ArrayList<>(maxCountRequests);
 
-        for (var video: uploadingMeditations) {
-            try {
-                webClientRestService.get(
-                        integrationServiceBaseUrl,
-                        mainUri,
-                        Map.of("video-id",
-                                video.getVideoId().toString()
-                        ),
-                        MeditationServiceDataWrapper.class);
-            } catch (IllegalStateException ex) {
-                deleteEntities.add(video);
+
+            for (var video : uploadingMeditations) {
+                try {
+                    webClientRestService.get(
+                            integrationServiceBaseUrl,
+                            mainUri,
+                            Map.of("video-id",
+                                    video.getVideoId().toString()
+                            ),
+                            MeditationServiceDataWrapper.class);
+                } catch (IllegalStateException ex) {
+                    deleteEntities.add(video);
+                }
             }
-        }
 
-        deleteUselessMeditations(deleteEntities);
+            deleteUselessMeditations(deleteEntities);
+        }
     }
 
     @Async
