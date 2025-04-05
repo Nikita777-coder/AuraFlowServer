@@ -49,5 +49,6 @@ server:
     video-storage:
       uri: ${VIDEO_STORAGE_URI}
       type: ${VIDEO_STORAGE_TYPE}
-      upload-path: ${UPLOAD_PATH}
+      kinescope-uri: ${KINESCOPE_URI}
+      upload-path: ${YANDEX_UPLOAD_PATH}
     fixed-rate-time: 60000

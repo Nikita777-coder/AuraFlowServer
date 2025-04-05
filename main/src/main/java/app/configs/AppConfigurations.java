@@ -93,7 +93,7 @@ public class AppConfigurations {
     }
 
     private Mono<? extends Throwable> handleServerErrors(ClientResponse clientResponse) {
-        throw new IllegalArgumentException(clientResponse.toString());
+        throw new IllegalStateException(clientResponse.toString());
     }
     private Mono<? extends Throwable> handleClientErrors(ClientResponse clientResponse) {
         throw new IllegalStateException(clientResponse.toString());

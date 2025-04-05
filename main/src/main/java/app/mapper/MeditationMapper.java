@@ -33,6 +33,14 @@ public interface MeditationMapper {
     @Mapping(target = "videoLink", ignore = true)
     MeditationEntity meditationServiceDataToMeditationEntity(MeditationServiceData meditationServiceData, MeditationEntity oldEntity);
 
+    @Mapping(target = "wasUploadFromUrl", source = "wasUploadedFromUrl")
+    @Mapping(target = "uploadResponse.data.id", source = "videoId")
+    @Mapping(target = "uploadResponse.data.title", source = "title")
+    @Mapping(target = "uploadResponse.data.description", source = "description")
+    @Mapping(target = "uploadResponse.data.status", source = "status")
+    @Mapping(target = "uploadResponse.data.embedLink", source = "videoLink")
+    UploadResponseFull meditationEntityToUploadResponseFull(MeditationEntity meditation);
+
     default Tag tagEntityToTag(TagEntity entity) {
         if (entity == null || entity.getTag() == null) {
             return null;
