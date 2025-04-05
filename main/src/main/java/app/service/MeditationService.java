@@ -6,10 +6,7 @@ import app.dto.meditation.MeditationUploadBodyRequest;
 import app.dto.meditation.UploadResponseFull;
 import app.entity.meditation.MeditationEntity;
 import app.entity.userattributes.Role;
-import app.extra.storageparams.KinescopeSrorageParams;
-import app.extra.storageparams.StorageParams;
 import app.extra.storageparams.StorageParamsManager;
-import app.extra.storageparams.YandexcloudStorageParams;
 import app.mapper.MeditationMapper;
 import app.repository.MeditationRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +31,7 @@ public class MeditationService {
     private final WebClientRestService webClientRestService;
     private final MeditationRepository meditationRepository;
     private final MeditationMapper meditationMapper;
-    private final StorageParamsManager storageParamsManager
+    private final StorageParamsManager storageParamsManager;
 
     @Value("${server.integration.video-storage.uri}")
     private String videoStorageUri;
