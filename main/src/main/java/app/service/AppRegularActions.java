@@ -15,8 +15,10 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 @Service
 @EnableAsync
@@ -35,8 +37,8 @@ public class AppRegularActions {
     @Value("${server.integration.base-url}")
     private String integrationServiceBaseUrl;
 
-    @Value("${server.integration.video-storage.yandex-upload-path}")
-    private String yandexUploadPathVideo;
+    @Value("${server.integration.video-storage.upload-path}")
+    private String uploadPath;
 
     @Value("${server.web.max-count-requests}")
     private int maxCountRequests;
@@ -72,7 +74,7 @@ public class AppRegularActions {
                 if (videoStorageType.equalsIgnoreCase("yandex")) {
                     webClientRestService.post(
                             integrationServiceBaseUrl,
-                            yandexUploadPathVideo,
+                            uploadPath,
                             meditationServiceData,
                             String.class
                     );
@@ -93,9 +95,9 @@ public class AppRegularActions {
             List<MeditationEntity> uploadingMeditations = meditationRepository.findAll().stream().limit(maxCountRequests).toList();
             List<MeditationEntity> deleteEntities = new ArrayList<>(maxCountRequests);
 
-
             for (var video : uploadingMeditations) {
                 try {
+
                     webClientRestService.get(
                             integrationServiceBaseUrl,
                             mainUri,
@@ -104,6 +106,30 @@ public class AppRegularActions {
                             ),
                             MeditationServiceDataWrapper.class);
                 } catch (IllegalStateException ex) {
+                    deleteEntities.add(video);
+                }
+            }
+
+            deleteUselessMeditations(deleteEntities);
+        }
+    }
+
+    @Async
+    @Scheduled(fixedRateString = "${server.integration.fixed-rate-time}")
+    public void deleteUselessLocalMeditationsFromYandex() {
+        if (videoStorageType.equals("yandexcloud")) {
+            List<MeditationEntity> uploadingMeditations = meditationRepository.findAll().stream().limit(maxCountRequests).toList();
+            List<MeditationEntity> deleteEntities = new ArrayList<>(maxCountRequests);
+
+            for (var video : uploadingMeditations) {
+                if (!webClientRestService.get(
+                        integrationServiceBaseUrl,
+                        mainUri,
+                        Map.of("video-link",
+                                video.getVideoLink()
+                        ),
+                        String.class)
+                        .equals("success")) {
                     deleteEntities.add(video);
                 }
             }
