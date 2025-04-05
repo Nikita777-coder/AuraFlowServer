@@ -70,7 +70,7 @@ public class MeditationService {
     }
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<Meditation> getAll() {
-        return meditationMapper.meditationEntitiesToMeditations(meditationRepository.findAllByStatus(MeditationStatus.DONE));
+        return meditationMapper.meditationEntitiesToMeditations(meditationRepository.findAllByStatusIn(List.of(MeditationStatus.DONE, null)));
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)

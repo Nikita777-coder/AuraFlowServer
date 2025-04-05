@@ -3,6 +3,7 @@ package app.service;
 import app.dto.meditation.MeditationServiceDataWrapper;
 import app.dto.meditation.MeditationStatus;
 import app.entity.meditation.MeditationEntity;
+import app.extra.storageparams.StorageParamsManager;
 import app.mapper.MeditationMapper;
 import app.repository.MeditationRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class AppRegularActions {
     private final MeditationRepository meditationRepository;
     private final WebClientRestService webClientRestService;
     private final MeditationMapper meditationMapper;
+    private final StorageParamsManager storageParamsManager;
 
     @Value("${server.integration.video-storage.type}")
     private String videoStorageType;
@@ -42,6 +44,9 @@ public class AppRegularActions {
 
     @Value("${server.web.max-count-requests}")
     private int maxCountRequests;
+
+    @Value("${server.integration.video-storage.kinescope-uri}")
+    private String kinescopeUri;
     @Async
     @Scheduled(fixedRateString = "${server.integration.fixed-rate-time}")
     @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -60,7 +65,7 @@ public class AppRegularActions {
                 MeditationServiceDataWrapper meditationServiceData =
                         webClientRestService.get(
                                 integrationServiceBaseUrl,
-                                mainUri,
+                                kinescopeUri,
                                 Map.of("video-id",
                                         video.getVideoId().toString()
                                 ),
@@ -71,15 +76,15 @@ public class AppRegularActions {
                         video)
                 );
 
-                if (videoStorageType.equalsIgnoreCase("yandex")) {
+                if (videoStorageType.equalsIgnoreCase("yandexcloud")) {
                     webClientRestService.post(
                             integrationServiceBaseUrl,
                             uploadPath,
-                            meditationServiceData,
+                            meditationMapper.meditationEntityToUploadResponseFull(video),
                             String.class
                     );
                 }
-            } catch (IllegalStateException ex) {
+            } catch (IllegalStateException | IllegalArgumentException ex) {
                 deleteEntities.add(video);
             }
         }
@@ -97,7 +102,6 @@ public class AppRegularActions {
 
             for (var video : uploadingMeditations) {
                 try {
-
                     webClientRestService.get(
                             integrationServiceBaseUrl,
                             mainUri,
@@ -105,7 +109,7 @@ public class AppRegularActions {
                                     video.getVideoId().toString()
                             ),
                             MeditationServiceDataWrapper.class);
-                } catch (IllegalStateException ex) {
+                } catch (IllegalStateException | IllegalArgumentException ex) {
                     deleteEntities.add(video);
                 }
             }
@@ -122,15 +126,18 @@ public class AppRegularActions {
             List<MeditationEntity> deleteEntities = new ArrayList<>(maxCountRequests);
 
             for (var video : uploadingMeditations) {
-                if (!webClientRestService.get(
-                        integrationServiceBaseUrl,
-                        mainUri,
-                        Map.of("video-link",
-                                video.getVideoLink()
-                        ),
-                        String.class)
-                        .equals("success")) {
-                    deleteEntities.add(video);
+                if (video.getStatus() != MeditationStatus.UPLOADING) {
+                    try {
+                        webClientRestService.get(
+                                integrationServiceBaseUrl,
+                                mainUri,
+                                Map.of("video-link",
+                                        video.getVideoLink()
+                                ),
+                                String.class);
+                    } catch (IllegalArgumentException | IllegalStateException ex) {
+                        deleteEntities.add(video);
+                    }
                 }
             }
 
