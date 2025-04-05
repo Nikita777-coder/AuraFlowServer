@@ -9,7 +9,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserMeditationService {
-    private final MedtitationAlbumService medtitationAlbumService;
+//    private final MedtitationAlbumService medtitationAlbumService;
 
     public GeneratedMeditation generatedMeditation(String text) {
         List<String> topics = extractMeditationThemesFromText(text);
