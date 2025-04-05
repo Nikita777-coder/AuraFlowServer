@@ -49,4 +49,6 @@ public class MeditationEntity {
 
     @Column
     private MeditationStatus status;
+
+    private boolean wasUploadedFromUrl;
 }

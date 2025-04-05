@@ -6,6 +6,10 @@ import app.dto.meditation.MeditationUploadBodyRequest;
 import app.dto.meditation.UploadResponseFull;
 import app.entity.meditation.MeditationEntity;
 import app.entity.userattributes.Role;
+import app.extra.storageparams.KinescopeSrorageParams;
+import app.extra.storageparams.StorageParams;
+import app.extra.storageparams.StorageParamsManager;
+import app.extra.storageparams.YandexcloudStorageParams;
 import app.mapper.MeditationMapper;
 import app.repository.MeditationRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,12 +32,16 @@ public class MeditationService {
     private final WebClientRestService webClientRestService;
     private final MeditationRepository meditationRepository;
     private final MeditationMapper meditationMapper;
+    private final StorageParamsManager storageParamsManager
 
     @Value("${server.integration.video-storage.uri}")
     private String videoStorageUri;
 
     @Value("${server.integration.base-url}")
     private String integrationServiceBaseUrl;
+
+    @Value("${server.integration.video-storage.type}")
+    private String type;
 
     public UUID uploadMeditationByUploadVideo(UserDetails userDetails,
                                               MultipartFile file,
@@ -49,7 +57,10 @@ public class MeditationService {
                 UploadResponseFull.class
         );
 
-        return meditationRepository.save(meditationMapper.uploadResponseDataToMeditationEntity(ans.getUploadResponse().getData())).getId();
+        var entity = meditationMapper.uploadResponseDataToMeditationEntity(ans.getUploadResponse().getData());
+        entity.setWasUploadedFromUrl(ans.isWasUploadFromUrl());
+
+        return meditationRepository.save(entity).getId();
     }
 
     public UUID uploadMeditationByUrl(UserDetails userDetails,
@@ -58,9 +69,12 @@ public class MeditationService {
         UploadResponseFull ans = webClientRestService.post(integrationServiceBaseUrl, videoStorageUri + "/by-url", meditationUploadBodyRequest, UploadResponseFull.class);
         return meditationRepository.save(meditationMapper.uploadResponseDataToMeditationEntity(ans.getUploadResponse().getData())).getId();
     }
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<Meditation> getAll() {
         return meditationMapper.meditationEntitiesToMeditations(meditationRepository.findAllByStatus(MeditationStatus.DONE));
     }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<Meditation> getNewMeditations() {
         return meditationMapper.meditationEntitiesToMeditations(meditationRepository
                 .findAllByCreatedAtAfterAndStatus(
@@ -76,7 +90,10 @@ public class MeditationService {
             throw new IllegalArgumentException("not found");
         }
 
-        webClientRestService.delete(integrationServiceBaseUrl, videoStorageUri, Map.of("video-id", meditation.get().getVideoId().toString()));
+        webClientRestService.delete(integrationServiceBaseUrl, videoStorageUri, storageParamsManager.getParams().
+                get(type.toLowerCase()).getParams(meditation.get())
+        );
+
         meditationRepository.delete(meditation.get());
     }
     private void checkUserRole(UserDetails userDetails) {
