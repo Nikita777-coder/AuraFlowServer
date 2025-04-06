@@ -24,8 +24,8 @@ public class MeditationAlbumEntity {
     private String title;
     private String description;
 
-    @OneToMany
-    private List<MeditationEntity> meditations;
+    @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<UserMeditationEntity> meditations;
 
     @ManyToOne
     private UserEntity user;
