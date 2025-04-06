@@ -3,7 +3,7 @@ package app.service;
 import app.dto.meditation.MeditationServiceDataWrapper;
 import app.dto.meditation.MeditationStatus;
 import app.entity.meditation.MeditationEntity;
-import app.extra.storageparams.StorageParamsManager;
+import app.extra.ProgramCommons;
 import app.mapper.MeditationMapper;
 import app.repository.MeditationRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +16,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 @Service
 @EnableAsync
@@ -28,7 +26,7 @@ public class AppRegularActions {
     private final MeditationRepository meditationRepository;
     private final WebClientRestService webClientRestService;
     private final MeditationMapper meditationMapper;
-    private final StorageParamsManager storageParamsManager;
+    private final ProgramCommons storageParamsManager;
 
     @Value("${server.integration.video-storage.type}")
     private String videoStorageType;

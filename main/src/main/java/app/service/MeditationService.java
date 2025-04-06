@@ -2,15 +2,12 @@ package app.service;
 
 import app.dto.meditation.*;
 import app.entity.meditation.MeditationEntity;
-import app.entity.userattributes.Role;
-import app.extra.storageparams.StorageParamsManager;
+import app.extra.ProgramCommons;
 import app.mapper.MeditationMapper;
 import app.mapper.TagMapper;
 import app.repository.MeditationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -26,11 +23,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 public class MeditationService {
+    private final ProgramCommons programCommons;
     private final TagMapper tagMapper;
     private final WebClientRestService webClientRestService;
     private final MeditationRepository meditationRepository;
     private final MeditationMapper meditationMapper;
-    private final StorageParamsManager storageParamsManager;
+    private final ProgramCommons storageParamsManager;
 
     @Value("${server.integration.video-storage.uri}")
     private String videoStorageUri;
@@ -47,7 +45,7 @@ public class MeditationService {
                                               String description,
                                               String author,
                                               List<Tag> tags) {
-        checkUserRole(userDetails);
+        programCommons.checkUserRole(userDetails);
         UploadResponseFull ans = webClientRestService.postVideo(
                 integrationServiceBaseUrl,
                 videoStorageUri + "/by-upload-video",
@@ -75,7 +73,7 @@ public class MeditationService {
     }
     public UUID uploadMeditationByUrl(UserDetails userDetails,
                             MeditationUploadBodyRequest meditationUploadBodyRequest) {
-        checkUserRole(userDetails);
+        programCommons.checkUserRole(userDetails);
         UploadResponseFull ans = webClientRestService.post(integrationServiceBaseUrl, videoStorageUri + "/by-url", meditationUploadBodyRequest, UploadResponseFull.class);
 
         var entity = meditationMapper.uploadResponseDataToMeditationEntity(ans);
@@ -104,7 +102,7 @@ public class MeditationService {
         );
     }
     public void delete(UserDetails userDetails, UUID id) {
-        checkUserRole(userDetails);
+        programCommons.checkUserRole(userDetails);
         Optional<MeditationEntity> meditation = meditationRepository.findById(id);
 
         if (meditation.isEmpty()) {
@@ -116,10 +114,5 @@ public class MeditationService {
         );
 
         meditationRepository.delete(meditation.get());
-    }
-    private void checkUserRole(UserDetails userDetails) {
-        if (!userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_" + Role.ADMIN))) {
-            throw new AccessDeniedException("access deny");
-        }
     }
 }

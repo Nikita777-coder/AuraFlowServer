@@ -13,5 +13,5 @@ public class MeditationAlbum {
     private UUID id;
     private String title;
     private String description;
-    private List<MeditationEntity> meditations;
+    private List<UserMeditationEntity> meditations;
 }
