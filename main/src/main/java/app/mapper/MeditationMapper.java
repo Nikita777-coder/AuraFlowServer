@@ -8,17 +8,21 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface MeditationMapper {
-    @Mapping(source = "embedLink", target = "videoLink")
+    @Mapping(source = "uploadResponse.data.embedLink", target = "videoLink")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "status", ignore = true)
-    @Mapping(target = "videoId", source = "id")
-    MeditationEntity uploadResponseDataToMeditationEntity(UploadData response);
+    @Mapping(target = "videoId", source = "uploadResponse.data.id")
+    @Mapping(target = "title", source = "uploadResponse.data.title")
+    @Mapping(target = "description", source = "uploadResponse.data.description")
+    @Mapping(target = "createdAt", source = "uploadResponse.data.createdAt")
+    MeditationEntity uploadResponseDataToMeditationEntity(UploadResponseFull response);
 
     List<Meditation> meditationEntitiesToMeditations(List<MeditationEntity> meditationEntities);
 
@@ -26,11 +30,11 @@ public interface MeditationMapper {
     @Mapping(target = "id", source = "oldEntity.id")
     @Mapping(target = "tags", source = "oldEntity.tags")
     @Mapping(target = "durationSeconds", source = "meditationServiceData.duration")
-    @Mapping(target = "title", source = "meditationServiceData.title")
-    @Mapping(target = "description", source = "meditationServiceData.description")
+    @Mapping(target = "title", source = "oldEntity.title")
+    @Mapping(target = "description", source = "oldEntity.description")
     @Mapping(target = "createdAt", source = "oldEntity.createdAt")
     @Mapping(target = "status", source = "meditationServiceData.status")
-    @Mapping(target = "videoLink", ignore = true)
+    @Mapping(target = "videoLink", source = "oldEntity.videoLink")
     MeditationEntity meditationServiceDataToMeditationEntity(MeditationServiceData meditationServiceData, MeditationEntity oldEntity);
 
     @Mapping(target = "wasUploadFromUrl", source = "wasUploadedFromUrl")
@@ -72,9 +76,15 @@ public interface MeditationMapper {
     }
 
     @AfterMapping
-    default void mapMeditationStatus(UploadData uploadData, @MappingTarget MeditationEntity meditation) {
-        if (uploadData.getStatus() != null) {
-            meditation.setStatus(MeditationStatus.valueOf(uploadData.getStatus().toUpperCase()));
+    default void mapNullFiledsOfMeditationEntity(UploadResponseFull uploadData, @MappingTarget MeditationEntity meditation) {
+        if (uploadData.getUploadResponse().getData().getStatus() != null) {
+            meditation.setStatus(MeditationStatus.valueOf(uploadData.getUploadResponse().getData().getStatus().toUpperCase()));
         }
+
+        if (uploadData.getUploadResponse().getData().getCreatedAt() == null) {
+            meditation.setCreatedAt(LocalDateTime.now());
+        }
+
+        meditation.setAuthor("service");
     }
 }

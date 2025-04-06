@@ -1,9 +1,8 @@
 package app.controller;
 
 import app.dto.meditation.Meditation;
-import app.dto.meditation.MeditationRequest;
 import app.dto.meditation.MeditationUploadBodyRequest;
-import app.dto.meditation.ModelMeditationRequest;
+import app.dto.meditation.Tag;
 import app.service.MeditationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,8 +48,10 @@ public class MeditationController {
     public UUID uploadNewMeditation(@AuthenticationPrincipal UserDetails userDetails,
                                     @RequestParam String title,
                                     @RequestParam("upload-video") MultipartFile file,
-                                    @RequestParam(required = false) String description) {
-        return meditationService.uploadMeditationByUploadVideo(userDetails, file, title, description);
+                                    @RequestParam(required = false) String description,
+                                    @RequestParam(required = false) String author,
+                                    @RequestParam(required = false) List<Tag> tags) {
+        return meditationService.uploadMeditationByUploadVideo(userDetails, file, title, description, author, tags);
     }
 
     @DeleteMapping

@@ -71,12 +71,9 @@ public class AppRegularActions {
                                 ),
                                 MeditationServiceDataWrapper.class);
                 meditationServiceData.getData().setStatus(meditationServiceData.getData().getStatus().toUpperCase());
-                updatedEntities.add(meditationMapper.meditationServiceDataToMeditationEntity(
-                        meditationServiceData.getData(),
-                        video)
-                );
 
-                if (videoStorageType.equalsIgnoreCase("yandexcloud")) {
+                if (videoStorageType.equalsIgnoreCase("yandexcloud") &&
+                        meditationServiceData.getData().getStatus().equals("DONE")) {
                     webClientRestService.post(
                             integrationServiceBaseUrl,
                             uploadPath,
@@ -84,6 +81,11 @@ public class AppRegularActions {
                             String.class
                     );
                 }
+
+                updatedEntities.add(meditationMapper.meditationServiceDataToMeditationEntity(
+                        meditationServiceData.getData(),
+                        video)
+                );
             } catch (IllegalStateException | IllegalArgumentException ex) {
                 deleteEntities.add(video);
             }
@@ -126,14 +128,12 @@ public class AppRegularActions {
             List<MeditationEntity> deleteEntities = new ArrayList<>(maxCountRequests);
 
             for (var video : uploadingMeditations) {
-                if (video.getStatus() != MeditationStatus.UPLOADING) {
+                if (video.getStatus() != MeditationStatus.UPLOADING && video.getStatus() != MeditationStatus.PROCESSING) {
                     try {
                         webClientRestService.get(
                                 integrationServiceBaseUrl,
                                 mainUri,
-                                Map.of("video-link",
-                                        video.getVideoLink()
-                                ),
+                                storageParamsManager.getParams().get(videoStorageType).getParams(video),
                                 String.class);
                     } catch (IllegalArgumentException | IllegalStateException ex) {
                         deleteEntities.add(video);
