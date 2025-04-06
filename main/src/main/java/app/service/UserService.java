@@ -68,7 +68,7 @@ public class UserService {
         userRepository.save(currentUser);
     }
 
-    private UserEntity getUserByEmail(String email) {
+    public UserEntity getUserByEmail(String email) {
         Optional<UserEntity> currentUser = userRepository.findByEmail(email);
 
         if (currentUser.isEmpty()) {
