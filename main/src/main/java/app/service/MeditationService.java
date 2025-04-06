@@ -1,13 +1,11 @@
 package app.service;
 
-import app.dto.meditation.Meditation;
-import app.dto.meditation.MeditationStatus;
-import app.dto.meditation.MeditationUploadBodyRequest;
-import app.dto.meditation.UploadResponseFull;
+import app.dto.meditation.*;
 import app.entity.meditation.MeditationEntity;
 import app.entity.userattributes.Role;
 import app.extra.storageparams.StorageParamsManager;
 import app.mapper.MeditationMapper;
+import app.mapper.TagMapper;
 import app.repository.MeditationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +26,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 public class MeditationService {
+    private final TagMapper tagMapper;
     private final WebClientRestService webClientRestService;
     private final MeditationRepository meditationRepository;
     private final MeditationMapper meditationMapper;
@@ -45,7 +44,9 @@ public class MeditationService {
     public UUID uploadMeditationByUploadVideo(UserDetails userDetails,
                                               MultipartFile file,
                                               String title,
-                                              String description) {
+                                              String description,
+                                              String author,
+                                              List<Tag> tags) {
         checkUserRole(userDetails);
         UploadResponseFull ans = webClientRestService.postVideo(
                 integrationServiceBaseUrl,
@@ -56,21 +57,42 @@ public class MeditationService {
                 UploadResponseFull.class
         );
 
-        var entity = meditationMapper.uploadResponseDataToMeditationEntity(ans.getUploadResponse().getData());
-        entity.setWasUploadedFromUrl(ans.isWasUploadFromUrl());
+        var entity = meditationMapper.uploadResponseDataToMeditationEntity(ans);
+
+        if (ans.getUploadResponse().getData().getStatus() == null) {
+            entity.setStatus(MeditationStatus.DONE);
+        }
+
+        if (author != null) {
+            entity.setAuthor(author);
+        }
+
+        if (tags != null && !tags.isEmpty()) {
+            entity.setTags(tagMapper.tagsToTagsEntities(tags));
+        }
 
         return meditationRepository.save(entity).getId();
     }
-
     public UUID uploadMeditationByUrl(UserDetails userDetails,
                             MeditationUploadBodyRequest meditationUploadBodyRequest) {
         checkUserRole(userDetails);
         UploadResponseFull ans = webClientRestService.post(integrationServiceBaseUrl, videoStorageUri + "/by-url", meditationUploadBodyRequest, UploadResponseFull.class);
-        return meditationRepository.save(meditationMapper.uploadResponseDataToMeditationEntity(ans.getUploadResponse().getData())).getId();
+
+        var entity = meditationMapper.uploadResponseDataToMeditationEntity(ans);
+
+        if (meditationUploadBodyRequest.getAuthor() != null) {
+            entity.setAuthor(meditationUploadBodyRequest.getAuthor());
+        }
+
+        if (meditationUploadBodyRequest.getTags() != null && !meditationUploadBodyRequest.getTags().isEmpty()) {
+            entity.setTags(tagMapper.tagsToTagsEntities(meditationUploadBodyRequest.getTags()));
+        }
+
+        return meditationRepository.save(entity).getId();
     }
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<Meditation> getAll() {
-        return meditationMapper.meditationEntitiesToMeditations(meditationRepository.findAllByStatusIn(List.of(MeditationStatus.DONE, null)));
+        return meditationMapper.meditationEntitiesToMeditations(meditationRepository.findAllByStatusIn(List.of(MeditationStatus.DONE)));
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)

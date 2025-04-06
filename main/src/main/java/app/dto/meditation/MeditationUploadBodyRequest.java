@@ -13,6 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class MeditationUploadBodyRequest {
+    private String author;
     private String sourceLink;
     private UUID parentId;
 
