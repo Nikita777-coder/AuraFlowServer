@@ -44,6 +44,7 @@ public interface MeditationMapper {
     @Mapping(target = "uploadResponse.data.status", source = "status")
     @Mapping(target = "uploadResponse.data.embedLink", source = "videoLink")
     UploadResponseFull meditationEntityToUploadResponseFull(MeditationEntity meditation);
+    UserMeditationEntity meditationEntityToUserMeditationEntity(MeditationEntity entity);
 
     default Tag tagEntityToTag(TagEntity entity) {
         if (entity == null || entity.getTag() == null) {

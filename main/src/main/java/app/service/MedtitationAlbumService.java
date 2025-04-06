@@ -7,7 +7,9 @@ import app.entity.MeditationAlbumEntity;
 import app.entity.UserEntity;
 import app.entity.userattributes.Role;
 import app.extra.ProgramCommons;
+import app.mapper.MeditationAlbumMapper;
 import app.mapper.MeditationMapper;
+import app.repository.MeditationAlbumRepository;
 import app.repository.MeditationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -39,7 +41,6 @@ public class MedtitationAlbumService {
                 programCommons.isUserAdmin(userDetails)
         );
 
-        // ignore user and meditations
         MeditationAlbumEntity entity = meditationAlbumMapper.meditationAlbumRequestToMeditationAlbumEntity(meditationAlbumRequest);
         entity.setUser(userEntity);
         entity.setMeditations(userAlbumMeditationEntities);
@@ -63,11 +64,11 @@ public class MedtitationAlbumService {
     public List<MeditationAlbumPlatform> getAllServiceAlbums(UserDetails userDetails) {
         if (programCommons.isUserAdmin(userDetails)) {
             return meditationAlbumMapper.meditationAlbumEntitiesToMeditationAlbumsPlatform(
-                    meditationAlbumRepository.findAllByUserEmail(userDetails.getUsername())
+                    meditationAlbumRepository.findAllByUser_Email(userDetails.getUsername())
             );
         }
 
-        return meditationAlbumMapper.meditationAlbumEntitiesToMeditationAlbumsPlatform(meditationAlbumRepository.findAllByUserRole(Role.ADMIN));
+        return meditationAlbumMapper.meditationAlbumEntitiesToMeditationAlbumsPlatform(meditationAlbumRepository.findAllByUser_Role(Role.ADMIN));
     }
     public List<MeditationAlbum> getAllUser(UserDetails userDetails) {
         if (programCommons.isUserAdmin(userDetails)) {
@@ -75,7 +76,7 @@ public class MedtitationAlbumService {
         }
 
         return meditationAlbumMapper.meditationAlbumEntitiesToMeditationAlbums(
-                meditationAlbumRepository.findAllByUserEmail(userDetails)
+                meditationAlbumRepository.findAllByUser_Email(userDetails.getUsername())
         );
     }
     public void deleteAlbumById(UserDetails userDetails, UUID id) {
@@ -95,11 +96,9 @@ public class MedtitationAlbumService {
             checkUserAlbums(userDetails, meditationAlbumRequest.getTitle());
         }
 
-        // check null values. if some then from old entity get
-        meditationAlbumMapper.prepareMeditationAlbumRequestFromOldMeditationAlbumEntity(meditationAlbumRequest, entity);
+        MeditationAlbumRequest albumRequest = meditationAlbumMapper.prepareMeditationAlbumRequestFromOldMeditationAlbumEntity(meditationAlbumRequest, entity);
 
-        // ignore user and meditations
-        MeditationAlbumEntity updatedEntity = meditationAlbumMapper.meditationAlbumRequestToMeditationAlbumEntity(meditationAlbumRequest);
+        MeditationAlbumEntity updatedEntity = meditationAlbumMapper.meditationAlbumRequestToMeditationAlbumEntity(albumRequest);
         updatedEntity.setUser(userService.getUserByEmail(userDetails.getUsername()));
         updatedEntity.setMeditations(userAlbumMeditationEntities);
         updatedEntity.setId(entity.getId());
@@ -107,7 +106,7 @@ public class MedtitationAlbumService {
         return meditationAlbumRepository.save(updatedEntity).getId();
     }
     private MeditationAlbumEntity getAlbumById(UUID id) {
-        return meditationAlbumRepository.findById(id).orElseThrow(new IllegalArgumentException("No such album"));
+        return meditationAlbumRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("No such album"));
     }
     private List<UserMeditationEntity> getAlbumMeditationsByIds(List<UUID> ids, boolean isUserAdmin) {
         List<UserMeditationEntity> userMeditationEntities = new ArrayList<>(ids.size());
@@ -140,12 +139,12 @@ public class MedtitationAlbumService {
         return entity;
     }
     private void checkUserAlbums(UserDetails userDetails, String title) {
-        List<MeditationAlbumEntity> albums = meditationAlbumRepository.findAllByUser(
-                userService.getUserByEmail(userDetails.getUsername())
+        List<MeditationAlbumEntity> albums = meditationAlbumRepository.findAllByUser_Email(
+                userDetails.getUsername()
         );
 
         if (programCommons.isUserAdmin(userDetails)) {
-            albums = meditationAlbumRepository.findAllByUserRole(Role.ADMIN);
+            albums = meditationAlbumRepository.findAllByUser_Role(Role.ADMIN);
         }
 
         if (albums.stream().anyMatch(el -> el.getTitle().equals(title))) {
