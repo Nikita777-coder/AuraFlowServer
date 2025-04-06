@@ -12,7 +12,6 @@ import app.mapper.MeditationMapper;
 import app.repository.MeditationAlbumRepository;
 import app.repository.MeditationRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
