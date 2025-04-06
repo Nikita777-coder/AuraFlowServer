@@ -26,7 +26,7 @@ public class MeditationEntity {
 
     private UUID videoId;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.PERSIST)
     private List<TagEntity> tags;
 
     @Column
@@ -49,4 +49,6 @@ public class MeditationEntity {
 
     @Column
     private MeditationStatus status;
+
+    private boolean wasUploadedFromUrl;
 }

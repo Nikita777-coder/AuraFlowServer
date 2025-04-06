@@ -1,9 +1,8 @@
 package app.controller;
 
 import app.dto.meditation.Meditation;
-import app.dto.meditation.MeditationRequest;
 import app.dto.meditation.MeditationUploadBodyRequest;
-import app.dto.meditation.ModelMeditationRequest;
+import app.dto.meditation.Tag;
 import app.service.MeditationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,12 +31,27 @@ public class MeditationController {
     }
 
     // ADMIN
-    @PostMapping
+    @PostMapping("by-url")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public UUID uploadNewMeditation(@AuthenticationPrincipal UserDetails userDetails,
                                     @Valid @RequestBody MeditationUploadBodyRequest meditationUploadBodyRequest) {
-        return meditationService.uploadMeditation(userDetails, meditationUploadBodyRequest);
+        return meditationService.uploadMeditationByUrl(userDetails, meditationUploadBodyRequest);
+    }
+
+    @PostMapping(
+            value = "/by-upload-video",
+            consumes = "multipart/form-data"
+    )
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public UUID uploadNewMeditation(@AuthenticationPrincipal UserDetails userDetails,
+                                    @RequestParam String title,
+                                    @RequestParam("upload-video") MultipartFile file,
+                                    @RequestParam(required = false) String description,
+                                    @RequestParam(required = false) String author,
+                                    @RequestParam(required = false) List<Tag> tags) {
+        return meditationService.uploadMeditationByUploadVideo(userDetails, file, title, description, author, tags);
     }
 
     @DeleteMapping

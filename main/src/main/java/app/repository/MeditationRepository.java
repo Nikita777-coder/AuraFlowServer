@@ -14,6 +14,5 @@ import java.util.UUID;
 public interface MeditationRepository extends JpaRepository<MeditationEntity, UUID> {
     List<MeditationEntity> findAllByCreatedAtAfterAndStatus(LocalDateTime createdAt, MeditationStatus status);
     List<MeditationEntity> findAllByStatusIn(List<MeditationStatus> meditationStatuses);
-    List<MeditationEntity> findAllByStatus(MeditationStatus meditationStatus);
     MeditationEntity findByTitle(String title);
 }
