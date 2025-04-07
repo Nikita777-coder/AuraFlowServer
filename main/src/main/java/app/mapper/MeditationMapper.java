@@ -3,6 +3,7 @@ package app.mapper;
 import app.dto.meditation.*;
 import app.entity.meditation.MeditationEntity;
 import app.entity.meditation.TagEntity;
+import app.entity.usermeditation.UserMeditationEntity;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -44,6 +45,8 @@ public interface MeditationMapper {
     @Mapping(target = "uploadResponse.data.status", source = "status")
     @Mapping(target = "uploadResponse.data.embedLink", source = "videoLink")
     UploadResponseFull meditationEntityToUploadResponseFull(MeditationEntity meditation);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "meditationFromPlatform", source = "entity")
     UserMeditationEntity meditationEntityToUserMeditationEntity(MeditationEntity entity);
 
     default Tag tagEntityToTag(TagEntity entity) {
