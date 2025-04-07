@@ -1,6 +1,6 @@
 package app.entity;
 
-import app.entity.meditation.MeditationEntity;
+import app.entity.usermeditation.UserMeditationEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
