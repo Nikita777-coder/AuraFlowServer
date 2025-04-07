@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1743996845634-1" author="Xiaomi (generated)">
+        <createTable tableName="meditation_albums">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_meditation_albums"/>
+            </column>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="user_id" type="UUID"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1743996845634-2" author="Xiaomi (generated)">
+        <createTable tableName="meditation_albums_meditations">
+            <column name="meditation_album_entity_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="meditations_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1743996845634-3" author="Xiaomi (generated)">
+        <createTable tableName="meditations">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_meditations"/>
+            </column>
+            <column name="video_link" type="VARCHAR(255)"/>
+            <column name="video_id" type="UUID"/>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="description" type="TEXT"/>
+            <column name="duration_seconds" type="DOUBLE"/>
+            <column name="creation_at" type="DATETIME"/>
+            <column name="updated_at" type="DATETIME"/>
+            <column name="author" type="VARCHAR(255)"/>
+            <column name="status" type="SMALLINT"/>
+            <column name="was_uploaded_from_url" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1743996845634-4" author="Xiaomi (generated)">
+        <createTable tableName="meditations_tags">
+            <column name="meditation_entity_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tags_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1743996845634-5" author="Xiaomi (generated)">
+        <createTable tableName="premiums">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_premiums"/>
+            </column>
+            <column name="buyer_email" type="VARCHAR(255)"/>
+            <column name="transaction_status" type="SMALLINT"/>
+            <column name="transaction_time" type="DATETIME"/>
+            <column name="expired_time" type="DATETIME"/>
+            <column name="transaction_id" type="UUID"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1743996845634-6" author="Xiaomi (generated)">
+        <createTable tableName="statuses">
+            <column name="status_name" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_statuses"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1743996845634-7" author="Xiaomi (generated)">
+        <createTable tableName="tags">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_tags"/>
+            </column>
+            <column name="tag" type="SMALLINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1743996845634-8" author="Xiaomi (generated)">
+        <createTable tableName="user_meditations">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_user_meditations"/>
+            </column>
+            <column name="meditation_from_platform_id" type="UUID"/>
+            <column name="pause_time" type="DOUBLE"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1743996845634-9" author="Xiaomi (generated)">
+        <createTable tableName="users">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_users"/>
+            </column>
+            <column name="password" type="VARCHAR(255)"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="is_practise_breath_option_turned" type="BOOLEAN"/>
+            <column name="is_open_application_option_turned" type="BOOLEAN"/>
+            <column name="start_time_of_breath_practise" type="TIME"/>
+            <column name="stop_time_of_breath_practise" type="TIME"/>
+            <column name="count_breath_practise_reminder_per_day" type="INT"/>
+            <column name="is_premium" type="BOOLEAN"/>
+            <column name="role" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1743996845634-10" author="Xiaomi (generated)">
+        <addUniqueConstraint columnNames="meditations_id" constraintName="uc_meditation_albums_meditations_meditations"
+                             tableName="meditation_albums_meditations"/>
+    </changeSet>
+    <changeSet id="1743996845634-11" author="Xiaomi (generated)">
+        <addUniqueConstraint columnNames="tags_id" constraintName="uc_meditations_tags_tags"
+                             tableName="meditations_tags"/>
+    </changeSet>
+    <changeSet id="1743996845634-12" author="Xiaomi (generated)">
+        <addUniqueConstraint columnNames="email" constraintName="uc_users_email" tableName="users"/>
+    </changeSet>
+    <changeSet id="1743996845634-13" author="Xiaomi (generated)">
+        <createIndex indexName="idx_74165e195b2f7b25de690d14a" tableName="users">
+            <column name="email"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="1743996845634-14" author="Xiaomi (generated)">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="meditation_albums"
+                                 constraintName="FK_MEDITATION_ALBUMS_ON_USER" referencedColumnNames="id"
+                                 referencedTableName="users"/>
+    </changeSet>
+    <changeSet id="1743996845634-15" author="Xiaomi (generated)">
+        <addForeignKeyConstraint baseColumnNames="meditation_from_platform_id" baseTableName="user_meditations"
+                                 constraintName="FK_USER_MEDITATIONS_ON_MEDITATION_FROM_PLATFORM"
+                                 referencedColumnNames="id" referencedTableName="meditations"/>
+    </changeSet>
+    <changeSet id="1743996845634-16" author="Xiaomi (generated)">
+        <addForeignKeyConstraint baseColumnNames="meditation_album_entity_id"
+                                 baseTableName="meditation_albums_meditations"
+                                 constraintName="fk_medalbmed_on_meditation_album_entity" referencedColumnNames="id"
+                                 referencedTableName="meditation_albums"/>
+    </changeSet>
+    <changeSet id="1743996845634-17" author="Xiaomi (generated)">
+        <addForeignKeyConstraint baseColumnNames="meditations_id" baseTableName="meditation_albums_meditations"
+                                 constraintName="fk_medalbmed_on_user_meditation_entity" referencedColumnNames="id"
+                                 referencedTableName="user_meditations"/>
+    </changeSet>
+    <changeSet id="1743996845634-18" author="Xiaomi (generated)">
+        <addForeignKeyConstraint baseColumnNames="meditation_entity_id" baseTableName="meditations_tags"
+                                 constraintName="fk_medtag_on_meditation_entity" referencedColumnNames="id"
+                                 referencedTableName="meditations"/>
+    </changeSet>
+    <changeSet id="1743996845634-19" author="Xiaomi (generated)">
+        <addForeignKeyConstraint baseColumnNames="tags_id" baseTableName="meditations_tags"
+                                 constraintName="fk_medtag_on_tag_entity" referencedColumnNames="id"
+                                 referencedTableName="tags"/>
+    </changeSet>
+
+</databaseChangeLog>
