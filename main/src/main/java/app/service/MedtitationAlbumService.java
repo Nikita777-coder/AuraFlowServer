@@ -1,7 +1,6 @@
 package app.service;
 
 import app.dto.meditationalbum.MeditationAlbum;
-import app.dto.meditationalbum.MeditationAlbumPlatform;
 import app.dto.meditationalbum.MeditationAlbumRequest;
 import app.entity.MeditationAlbumEntity;
 import app.entity.UserEntity;
@@ -9,37 +8,37 @@ import app.entity.userattributes.Role;
 import app.entity.usermeditation.UserMeditationEntity;
 import app.extra.ProgramCommons;
 import app.mapper.MeditationAlbumMapper;
-import app.mapper.MeditationMapper;
 import app.repository.MeditationAlbumRepository;
-import app.repository.MeditationRepository;
 import app.repository.UserMeditationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class MedtitationAlbumService {
-    private final MeditationMapper meditationMapper;
     private final ProgramCommons programCommons;
     private final UserService userService;
     private final UserMeditationRepository userMeditationRepository;
-    private final MeditationRepository meditationRepository;
     private final MeditationAlbumRepository meditationAlbumRepository;
     private final MeditationAlbumMapper meditationAlbumMapper;
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public UUID createAlbum(UserDetails userDetails,
                                        MeditationAlbumRequest meditationAlbumRequest) {
         UserEntity userEntity = userService.getUserByEmail(userDetails.getUsername());
-        checkUserAlbums(userDetails, meditationAlbumRequest.getTitle());
+        checkUserTitleAlbums(userDetails, meditationAlbumRequest.getTitle());
 
-        List<UserMeditationEntity> userAlbumMeditationEntities = getAlbumMeditationsByIds(
+        List<UserMeditationEntity> userAlbumMeditationEntities = programCommons.getAlbumMeditationsByIds(
                 meditationAlbumRequest.getMeditations(),
-                programCommons.isUserAdmin(userDetails)
+                userMeditationRepository
         );
 
         MeditationAlbumEntity entity = meditationAlbumMapper.meditationAlbumRequestToMeditationAlbumEntity(meditationAlbumRequest);
@@ -50,7 +49,7 @@ public class MedtitationAlbumService {
     }
     public MeditationAlbum getAlbum(UserDetails userDetails,
                                     UUID id) {
-        MeditationAlbumEntity meditationAlbumEntity = getAlbumById(id);
+        MeditationAlbumEntity meditationAlbumEntity = programCommons.getAlbumById(id, meditationAlbumRepository);
 
         if (!programCommons.isUserAdmin(userDetails) && !meditationAlbumEntity.getUser().getEmail().equals(userDetails.getUsername())) {
             throw new AccessDeniedException("access deny");
@@ -58,43 +57,36 @@ public class MedtitationAlbumService {
 
         return meditationAlbumMapper.meditationAlbumEntityToMeditationAlbum(meditationAlbumEntity);
     }
-    public MeditationAlbumPlatform getPlatformAlbum(UUID id) {
-        MeditationAlbumEntity meditationAlbumEntity = getAlbumById(id);
-        return meditationAlbumMapper.meditationAlbumEntityToMeditationAlbumPlatform(meditationAlbumEntity);
-    }
-    public List<MeditationAlbumPlatform> getAllServiceAlbums(UserDetails userDetails) {
-        if (programCommons.isUserAdmin(userDetails)) {
-            return meditationAlbumMapper.meditationAlbumEntitiesToMeditationAlbumsPlatform(
-                    meditationAlbumRepository.findAllByUser_Email(userDetails.getUsername())
-            );
-        }
-
-        return meditationAlbumMapper.meditationAlbumEntitiesToMeditationAlbumsPlatform(meditationAlbumRepository.findAllByUser_Role(Role.ADMIN));
+    public Optional<MeditationAlbumEntity> getAlbum(String name) {
+        return meditationAlbumRepository.findByTitle(name);
     }
     public List<MeditationAlbum> getAllUser(UserDetails userDetails) {
-        if (programCommons.isUserAdmin(userDetails)) {
-            throw new IllegalArgumentException("illegal point usage");
-        }
-
         return meditationAlbumMapper.meditationAlbumEntitiesToMeditationAlbums(
                 meditationAlbumRepository.findAllByUser_Email(userDetails.getUsername())
         );
     }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void deleteAlbumById(UserDetails userDetails, UUID id) {
         MeditationAlbumEntity entity = checkControl(userDetails, id);
 
         meditationAlbumRepository.delete(entity);
     }
-    public UUID updateAlbum(UserDetails userDetails, UUID id, MeditationAlbumRequest meditationAlbumRequest) {
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public MeditationAlbum updateAlbum(UserDetails userDetails, UUID id, MeditationAlbumRequest meditationAlbumRequest) {
         MeditationAlbumEntity entity = checkControl(userDetails, id);
 
-        List<UserMeditationEntity> userAlbumMeditationEntities = getAlbumMeditationsByIds(
-                meditationAlbumRequest.getMeditations(),
-                programCommons.isUserAdmin(userDetails)
-        );
+        List<UserMeditationEntity> userAlbumMeditationEntities = entity.getMeditations();
+        if (meditationAlbumRequest.getMeditations() != null) {
+            userAlbumMeditationEntities = programCommons.getAlbumMeditationsByIds(
+                    meditationAlbumRequest.getMeditations(),
+                    userMeditationRepository
+            );
+        }
 
         if (meditationAlbumRequest.getTitle() != null) {
-            checkUserAlbums(userDetails, meditationAlbumRequest.getTitle());
+            checkUserTitleAlbums(userDetails, meditationAlbumRequest.getTitle());
         }
 
         MeditationAlbumRequest albumRequest = meditationAlbumMapper.prepareMeditationAlbumRequestFromOldMeditationAlbumEntity(meditationAlbumRequest, entity);
@@ -104,49 +96,22 @@ public class MedtitationAlbumService {
         updatedEntity.setMeditations(userAlbumMeditationEntities);
         updatedEntity.setId(entity.getId());
 
-        return meditationAlbumRepository.save(updatedEntity).getId();
-    }
-    private MeditationAlbumEntity getAlbumById(UUID id) {
-        return meditationAlbumRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("No such album"));
-    }
-    private List<UserMeditationEntity> getAlbumMeditationsByIds(List<UUID> ids, boolean isUserAdmin) {
-        List<UserMeditationEntity> userMeditationEntities = new ArrayList<>(ids.size());
-
-        for (UUID id : ids) {
-            if (isUserAdmin) {
-                userMeditationEntities.add(
-                      meditationMapper.meditationEntityToUserMeditationEntity(
-                        meditationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(String.format("no meditation by id %s", id))
-                      ))
-                );
-            } else {
-                userMeditationEntities.add(
-                        userMeditationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(String.format("no meditation by id %s", id)))
-                );
-            }
-        }
-
-        return userMeditationEntities;
+        return meditationAlbumMapper.meditationAlbumEntityToMeditationAlbum(meditationAlbumRepository.save(updatedEntity));
     }
     private MeditationAlbumEntity checkControl(UserDetails userDetails, UUID id) {
-        MeditationAlbumEntity entity = getAlbumById(id);
+        MeditationAlbumEntity entity = programCommons.getAlbumById(id, meditationAlbumRepository);
 
-        if ((entity.getUser().getRole().equals(Role.USER) && !programCommons.isUserAdmin(userDetails)
-                && !entity.getUser().getEmail().equals(userDetails.getUsername())
-        ) || (entity.getUser().getRole().equals(Role.ADMIN) && !entity.getUser().getEmail().equals(userDetails.getUsername()))) {
+        if (entity.getUser().getRole().equals(Role.USER) && !programCommons.isUserAdmin(userDetails)
+                && !entity.getUser().getEmail().equals(userDetails.getUsername())) {
             throw new AccessDeniedException("Access deny");
         }
 
         return entity;
     }
-    private void checkUserAlbums(UserDetails userDetails, String title) {
+    private void checkUserTitleAlbums(UserDetails userDetails, String title) {
         List<MeditationAlbumEntity> albums = meditationAlbumRepository.findAllByUser_Email(
                 userDetails.getUsername()
         );
-
-        if (programCommons.isUserAdmin(userDetails)) {
-            albums = meditationAlbumRepository.findAllByUser_Role(Role.ADMIN);
-        }
 
         if (albums.stream().anyMatch(el -> el.getTitle().equals(title))) {
             throw new IllegalArgumentException("album with this name already existed");
