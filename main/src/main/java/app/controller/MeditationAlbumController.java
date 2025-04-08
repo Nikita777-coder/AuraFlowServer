@@ -1,7 +1,6 @@
 package app.controller;
 
 import app.dto.meditationalbum.MeditationAlbum;
-import app.dto.meditationalbum.MeditationAlbumPlatform;
 import app.dto.meditationalbum.MeditationAlbumRequest;
 import app.service.MedtitationAlbumService;
 import jakarta.validation.Valid;
@@ -14,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/meditation-album")
+@RequestMapping("/user-meditation-album")
 @RequiredArgsConstructor
 public class MeditationAlbumController {
     private final MedtitationAlbumService medtitationAlbumService;
@@ -35,33 +34,20 @@ public class MeditationAlbumController {
         return medtitationAlbumService.getAlbum(userDetails, id);
     }
 
-    @GetMapping("/platform")
-    @ResponseBody
-    public MeditationAlbumPlatform getMeditationPlatformAlbum(@RequestParam UUID id) {
-        return medtitationAlbumService.getPlatformAlbum(id);
-    }
-
-    @GetMapping("/all-platform")
-    @ResponseBody
-    public List<MeditationAlbumPlatform> getMeditationPlatformAlbums(@AuthenticationPrincipal UserDetails userDetails) {
-        return medtitationAlbumService.getAllServiceAlbums(userDetails);
-    }
-
-    @GetMapping("/all-user")
+    @GetMapping("/all")
     @ResponseBody
     public List<MeditationAlbum> getMeditationAlbums(@AuthenticationPrincipal UserDetails userDetails) {
         return medtitationAlbumService.getAllUser(userDetails);
     }
 
     @DeleteMapping
-    @ResponseBody
     public void deleteAlbum(@AuthenticationPrincipal UserDetails userDetails,
                               @RequestParam UUID id) {
         medtitationAlbumService.deleteAlbumById(userDetails, id);
     }
 
     @PatchMapping
-    public UUID updateAlbum(@AuthenticationPrincipal UserDetails userDetails,
+    public MeditationAlbum updateAlbum(@AuthenticationPrincipal UserDetails userDetails,
                                        @RequestParam UUID id,
                                        @Valid @RequestBody MeditationAlbumRequest meditationAlbumRequest) {
         return medtitationAlbumService.updateAlbum(userDetails, id, meditationAlbumRequest);

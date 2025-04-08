@@ -2,6 +2,7 @@ package app.entity.meditation;
 
 import app.dto.meditation.MeditationStatus;
 import jakarta.persistence.*;
+import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,12 +11,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Table(name = "meditations")
+@Table(name = "platform_meditations")
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-public class MeditationEntity {
+public class MeditationEntity implements app.entity.Entity {
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.UUID)
