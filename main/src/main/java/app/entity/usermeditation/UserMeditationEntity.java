@@ -1,5 +1,6 @@
 package app.entity.usermeditation;
 
+import app.entity.UserEntity;
 import app.entity.meditation.MeditationEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -14,13 +15,16 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserMeditationEntity {
+public class UserMeditationEntity implements app.entity.Entity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @OneToOne
     private MeditationEntity meditationFromPlatform;
+
+    @ManyToOne
+    private UserEntity user;
 
     @OneToMany(mappedBy = "statusName")
     private List<StatusEntity> statuses;

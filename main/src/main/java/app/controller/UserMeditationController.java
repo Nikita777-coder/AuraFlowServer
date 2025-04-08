@@ -24,40 +24,40 @@ public class UserMeditationController {
                                                   @RequestParam UUID meditationId) {
         return userMeditationService.addMeditationToUser(currentUser, meditationId);
     }
-    @GetMapping("/all")
-    @ResponseBody
-    public List<Meditation> getUserMeditations(@AuthenticationPrincipal UserDetails currentUser,
-                                               @RequestBody MeditationRequest meditationRequest) {
-        return userMeditationService.getUserAll(
-                currentUser,
-                meditationRequest
-        );
-    }
-
-    @PostMapping("/generate")
-    @ResponseBody
-    public GeneratedMeditation generateNewMeditation(@AuthenticationPrincipal UserDetails currentUser,
-                                                     @RequestBody ModelMeditationRequest modelMeditationRequest) {
-        return userMeditationService.generateNewMeditation(
-                currentUser,
-                modelMeditationRequest
-        );
-    }
-
-    @GetMapping("/specially-selected")
-    @ResponseBody
-    public List<Meditation> getRecommendedMeditations(@AuthenticationPrincipal UserDetails currentUser) {
-        return userMeditationService.getRecommended(currentUser);
-    }
-    @PatchMapping
-    @ResponseBody
-    public Meditation update(@AuthenticationPrincipal UserDetails currentUser,
-                             @RequestBody MeditationRequest updateMeditationData) {
-        return userMeditationService.update(currentUser, updateMeditationData);
-    }
-    @DeleteMapping
-    public void delete(@AuthenticationPrincipal UserDetails currentUser,
-                       @RequestParam UUID id) {
-        userMeditationService.delete(currentUser, id);
-    }
+//    @GetMapping("/all")
+//    @ResponseBody
+//    public List<Meditation> getUserMeditations(@AuthenticationPrincipal UserDetails currentUser,
+//                                               @RequestBody MeditationRequest meditationRequest) {
+//        return userMeditationService.getUserAll(
+//                currentUser,
+//                meditationRequest
+//        );
+//    }
+//
+//    @PostMapping("/generate")
+//    @ResponseBody
+//    public GeneratedMeditation generateNewMeditation(@AuthenticationPrincipal UserDetails currentUser,
+//                                                     @RequestBody ModelMeditationRequest modelMeditationRequest) {
+//        return userMeditationService.generateNewMeditation(
+//                currentUser,
+//                modelMeditationRequest
+//        );
+//    }
+//
+//    @GetMapping("/specially-selected")
+//    @ResponseBody
+//    public List<Meditation> getRecommendedMeditations(@AuthenticationPrincipal UserDetails currentUser) {
+//        return userMeditationService.getRecommended(currentUser);
+//    }
+//    @PatchMapping
+//    @ResponseBody
+//    public Meditation update(@AuthenticationPrincipal UserDetails currentUser,
+//                             @RequestBody MeditationRequest updateMeditationData) {
+//        return userMeditationService.update(currentUser, updateMeditationData);
+//    }
+//    @DeleteMapping
+//    public void delete(@AuthenticationPrincipal UserDetails currentUser,
+//                       @RequestParam UUID id) {
+//        userMeditationService.delete(currentUser, id);
+//    }
 }
