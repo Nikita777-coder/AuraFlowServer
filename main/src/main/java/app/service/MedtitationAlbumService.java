@@ -120,8 +120,7 @@ public class MedtitationAlbumService {
     private MeditationAlbumEntity checkControl(UserDetails userDetails, UUID id) {
         MeditationAlbumEntity entity = programCommons.getAlbumById(id, meditationAlbumRepository);
 
-        if (entity.getUser().getRole().equals(Role.USER) && !programCommons.isUserAdmin(userDetails)
-                && !entity.getUser().getEmail().equals(userDetails.getUsername())) {
+        if (!programCommons.isUserAdmin(userDetails) && !entity.getUser().getEmail().equals(userDetails.getUsername())) {
             throw new AccessDeniedException("Access deny");
         }
 

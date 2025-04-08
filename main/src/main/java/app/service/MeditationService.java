@@ -44,7 +44,8 @@ public class MeditationService {
                                               String title,
                                               String description,
                                               String author,
-                                              List<Tag> tags) {
+                                              List<Tag> tags,
+                                              boolean isPromoted) {
         programCommons.checkUserRole(userDetails);
         UploadResponseFull ans = webClientRestService.postVideo(
                 integrationServiceBaseUrl,
@@ -69,6 +70,8 @@ public class MeditationService {
             entity.setTags(tagMapper.tagsToTagsEntities(tags));
         }
 
+        entity.setPromoted(isPromoted);
+
         return meditationRepository.save(entity).getId();
     }
     public UUID uploadMeditationByUrl(UserDetails userDetails,
@@ -92,6 +95,10 @@ public class MeditationService {
     public List<Meditation> getAll() {
         return meditationMapper.meditationEntitiesToMeditations(meditationRepository.findAllByStatusIn(List.of(MeditationStatus.DONE)));
     }
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public List<Meditation> getRecommended() {
+        return meditationMapper.meditationEntitiesToMeditations(meditationRepository.findAllByPromoted(true));
+    }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<Meditation> getNewMeditations() {
@@ -103,16 +110,39 @@ public class MeditationService {
     }
     public void delete(UserDetails userDetails, UUID id) {
         programCommons.checkUserRole(userDetails);
+        MeditationEntity meditation = getMeditation(id);
+
+        webClientRestService.delete(integrationServiceBaseUrl, videoStorageUri, storageParamsManager.getParams().
+                get(type.toLowerCase()).getParams(meditation)
+        );
+
+        meditationRepository.delete(meditation);
+    }
+    public Meditation update(UserDetails userDetails, MeditationUpdateRequest request) {
+        programCommons.checkUserRole(userDetails);
+        MeditationEntity meditation = getMeditation(request.getId());
+
+        meditation = meditationMapper.updateMeditationEntity(
+                meditation, request
+        );
+
+        if (request.getTags() != null) {
+            meditation.setTags(tagMapper.tagsToTagsEntities(request.getTags()));
+        }
+
+        return meditationMapper.meditationEntityToMeditation(
+                meditationRepository.save(
+                       meditation
+                )
+        );
+    }
+    private MeditationEntity getMeditation(UUID id) {
         Optional<MeditationEntity> meditation = meditationRepository.findById(id);
 
         if (meditation.isEmpty()) {
             throw new IllegalArgumentException("not found");
         }
 
-        webClientRestService.delete(integrationServiceBaseUrl, videoStorageUri, storageParamsManager.getParams().
-                get(type.toLowerCase()).getParams(meditation.get())
-        );
-
-        meditationRepository.delete(meditation.get());
+        return meditation.get();
     }
 }
