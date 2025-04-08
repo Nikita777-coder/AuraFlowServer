@@ -15,4 +15,5 @@ public interface MeditationRepository extends JpaRepository<MeditationEntity, UU
     List<MeditationEntity> findAllByCreatedAtAfterAndStatus(LocalDateTime createdAt, MeditationStatus status);
     List<MeditationEntity> findAllByStatusIn(List<MeditationStatus> meditationStatuses);
     MeditationEntity findByTitle(String title);
+    List<MeditationEntity> findAllByPromoted(boolean promoted);
 }

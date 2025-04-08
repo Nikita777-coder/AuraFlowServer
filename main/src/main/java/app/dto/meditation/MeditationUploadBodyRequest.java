@@ -23,6 +23,7 @@ public class MeditationUploadBodyRequest {
     @NotBlank(message = "can't be null")
     private String title;
 
+    private boolean isPromoted = false;
     private String description;
     private List<Tag> tags;
 }
