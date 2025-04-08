@@ -1,6 +1,7 @@
 package app.controller;
 
 import app.dto.meditation.Meditation;
+import app.dto.meditation.MeditationUpdateRequest;
 import app.dto.meditation.MeditationUploadBodyRequest;
 import app.dto.meditation.Tag;
 import app.service.MeditationService;
@@ -39,6 +40,11 @@ public class MeditationController {
         return meditationService.uploadMeditationByUrl(userDetails, meditationUploadBodyRequest);
     }
 
+    @GetMapping("/recommended")
+    public List<Meditation> getRecommended() {
+        return meditationService.getRecommended();
+    }
+
     @PostMapping(
             value = "/by-upload-video",
             consumes = "multipart/form-data"
@@ -50,8 +56,11 @@ public class MeditationController {
                                     @RequestParam("upload-video") MultipartFile file,
                                     @RequestParam(required = false) String description,
                                     @RequestParam(required = false) String author,
-                                    @RequestParam(required = false) List<Tag> tags) {
-        return meditationService.uploadMeditationByUploadVideo(userDetails, file, title, description, author, tags);
+                                    @RequestParam(required = false) List<Tag> tags,
+                                    @RequestParam(name = "need-to-promote", required = false) boolean isPromoted) {
+        return meditationService.uploadMeditationByUploadVideo(
+                userDetails, file, title, description, author, tags, isPromoted
+        );
     }
 
     @DeleteMapping
@@ -59,5 +68,15 @@ public class MeditationController {
     public void deleteMeditation(@AuthenticationPrincipal UserDetails userDetails,
                                  @RequestParam UUID id) {
         meditationService.delete(userDetails, id);
+    }
+    @PatchMapping
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public Meditation update(@AuthenticationPrincipal UserDetails userDetails,
+                             @Valid @RequestBody MeditationUpdateRequest meditationUpdateRequest) {
+        return meditationService.update(
+                userDetails,
+                meditationUpdateRequest
+        );
     }
 }

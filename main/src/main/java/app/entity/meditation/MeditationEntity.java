@@ -48,6 +48,8 @@ public class MeditationEntity implements app.entity.Entity {
     @Column
     private String author;
 
+    private boolean isPromoted;
+
     @Column
     private MeditationStatus status;
 

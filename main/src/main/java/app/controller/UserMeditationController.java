@@ -1,10 +1,8 @@
 package app.controller;
 
-import app.dto.meditation.GeneratedMeditation;
-import app.dto.meditation.Meditation;
-import app.dto.meditation.MeditationRequest;
-import app.dto.meditation.ModelMeditationRequest;
+import app.dto.meditation.*;
 import app.service.UserMeditationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,19 +18,19 @@ public class UserMeditationController {
     private final UserMeditationService userMeditationService;
     @PostMapping("/add")
     @ResponseBody
-    public Meditation addMeditationFromCollection(@AuthenticationPrincipal UserDetails currentUser,
+    public UUID addMeditationFromCollection(@AuthenticationPrincipal UserDetails currentUser,
                                                   @RequestParam UUID meditationId) {
         return userMeditationService.addMeditationToUser(currentUser, meditationId);
     }
-//    @GetMapping("/all")
-//    @ResponseBody
-//    public List<Meditation> getUserMeditations(@AuthenticationPrincipal UserDetails currentUser,
-//                                               @RequestBody MeditationRequest meditationRequest) {
-//        return userMeditationService.getUserAll(
-//                currentUser,
-//                meditationRequest
-//        );
-//    }
+    @GetMapping("/all")
+    @ResponseBody
+    public List<UserMeditation> getUserMeditations(@AuthenticationPrincipal UserDetails currentUser,
+                                                   @RequestBody MeditationRequest meditationRequest) {
+        return userMeditationService.getUserAll(
+                currentUser,
+                meditationRequest
+        );
+    }
 //
 //    @PostMapping("/generate")
 //    @ResponseBody
@@ -44,20 +42,15 @@ public class UserMeditationController {
 //        );
 //    }
 //
-//    @GetMapping("/specially-selected")
-//    @ResponseBody
-//    public List<Meditation> getRecommendedMeditations(@AuthenticationPrincipal UserDetails currentUser) {
-//        return userMeditationService.getRecommended(currentUser);
-//    }
-//    @PatchMapping
-//    @ResponseBody
-//    public Meditation update(@AuthenticationPrincipal UserDetails currentUser,
-//                             @RequestBody MeditationRequest updateMeditationData) {
-//        return userMeditationService.update(currentUser, updateMeditationData);
-//    }
-//    @DeleteMapping
-//    public void delete(@AuthenticationPrincipal UserDetails currentUser,
-//                       @RequestParam UUID id) {
-//        userMeditationService.delete(currentUser, id);
-//    }
+    @PatchMapping
+    @ResponseBody
+    public UserMeditation update(@AuthenticationPrincipal UserDetails currentUser,
+                             @Valid @RequestBody UserMeditationUpdateRequest updateMeditationData) {
+        return userMeditationService.update(currentUser, updateMeditationData);
+    }
+    @DeleteMapping
+    public void delete(@AuthenticationPrincipal UserDetails currentUser,
+                       @RequestParam UUID id) {
+        userMeditationService.delete(currentUser, id);
+    }
 }

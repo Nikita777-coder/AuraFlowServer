@@ -1,5 +1,6 @@
 package app.dto.meditation;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,13 +10,13 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class Meditation {
+public class MeditationUpdateRequest {
+    @NotBlank
     private UUID id;
     private String author;
     private String title;
     private String description;
     private String videoLink;
-    private List<Tag> tags;
-    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private List<Tag> tags;
 }
