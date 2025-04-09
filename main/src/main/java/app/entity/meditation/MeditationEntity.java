@@ -48,7 +48,7 @@ public class MeditationEntity implements app.entity.Entity {
     @Column
     private String author;
 
-    private boolean isPromoted;
+    private boolean promoted;
 
     @Column
     private MeditationStatus status;
