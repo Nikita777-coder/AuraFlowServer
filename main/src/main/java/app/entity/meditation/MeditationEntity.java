@@ -17,6 +17,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class MeditationEntity implements app.entity.Entity {
+
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.UUID)
