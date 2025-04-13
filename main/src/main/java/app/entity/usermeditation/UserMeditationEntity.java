@@ -1,11 +1,15 @@
 package app.entity.usermeditation;
 
+import app.entity.MeditationAlbumEntity;
+import app.entity.MeditationPlatformAlbumEntity;
 import app.entity.UserEntity;
 import app.entity.meditation.MeditationEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,15 +24,21 @@ public class UserMeditationEntity implements app.entity.Entity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @OneToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST})
     private MeditationEntity meditationFromPlatform;
 
     @ManyToOne
     private UserEntity user;
 
-    @OneToMany(mappedBy = "statusName")
+    @OneToMany(cascade = CascadeType.PERSIST)
     private List<StatusEntity> statuses;
 
     @Column(name = "pause_time")
     private double pauseTime = 0.0;
+
+    @ManyToMany(
+            mappedBy = "meditations",
+            cascade = {CascadeType.PERSIST, CascadeType.REFRESH}
+    )
+    private List<MeditationAlbumEntity> albumEntities;
 }

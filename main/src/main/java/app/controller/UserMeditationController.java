@@ -1,6 +1,7 @@
 package app.controller;
 
 import app.dto.meditation.*;
+import app.entity.usermeditation.StatusEntity;
 import app.service.UserMeditationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,11 +26,12 @@ public class UserMeditationController {
     }
     @GetMapping("/all")
     @ResponseBody
-    public List<UserMeditation> getUserMeditations(@AuthenticationPrincipal UserDetails currentUser,
-                                                   @RequestBody MeditationRequest meditationRequest) {
+    public List<UserMeditation> getUserMeditations(@AuthenticationPrincipal UserDetails currentUser
+//                                                   @RequestParam  List<Status> statuses
+                                                   ) {
         return userMeditationService.getUserAll(
                 currentUser,
-                meditationRequest
+                new ArrayList<>()
         );
     }
 //

@@ -1,11 +1,15 @@
 package app.service;
 
 import app.dto.meditation.*;
+import app.entity.MeditationPlatformAlbumEntity;
 import app.entity.meditation.MeditationEntity;
+import app.entity.usermeditation.UserMeditationEntity;
 import app.extra.ProgramCommons;
 import app.mapper.MeditationMapper;
 import app.mapper.TagMapper;
+import app.repository.MeditationPlatformAlbumRepository;
 import app.repository.MeditationRepository;
+import app.repository.UserMeditationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,6 +33,7 @@ public class MeditationService {
     private final MeditationRepository meditationRepository;
     private final MeditationMapper meditationMapper;
     private final ProgramCommons storageParamsManager;
+    private final MeditationPlatformAlbumRepository meditationPlatformAlbumRepository;
 
     @Value("${server.integration.video-storage.uri}")
     private String videoStorageUri;
@@ -38,6 +43,7 @@ public class MeditationService {
 
     @Value("${server.integration.video-storage.type}")
     private String type;
+    private final UserMeditationRepository userMeditationRepository;
 
     public UUID uploadMeditationByUploadVideo(UserDetails userDetails,
                                               MultipartFile file,
@@ -116,6 +122,16 @@ public class MeditationService {
                 get(type.toLowerCase()).getParams(meditation)
         );
 
+        List<MeditationPlatformAlbumEntity> albums = meditation.getAlbumEntities();
+        for (MeditationPlatformAlbumEntity album : albums) {
+            album.getMeditationsFromPlatform().remove(meditation);
+        }
+
+        meditationPlatformAlbumRepository.saveAll(albums);
+
+//        List<UserMeditationEntity> userMeditations = meditation.getUserMeditationEntities();
+//        userMeditationRepository.deleteAll(userMeditations);
+
         meditationRepository.delete(meditation);
     }
     public Meditation update(UserDetails userDetails, MeditationUpdateRequest request) {
@@ -130,11 +146,15 @@ public class MeditationService {
             meditation.setTags(tagMapper.tagsToTagsEntities(request.getTags()));
         }
 
-        return meditationMapper.meditationEntityToMeditation(
-                meditationRepository.save(
-                       meditation
-                )
+        var en = meditationRepository.save(
+                meditation
         );
+
+        var upd = meditationMapper.meditationEntityToMeditation(
+             en
+        );
+
+        return upd;
     }
     private MeditationEntity getMeditation(UUID id) {
         Optional<MeditationEntity> meditation = meditationRepository.findById(id);
