@@ -1,6 +1,8 @@
 package app.entity.meditation;
 
 import app.dto.meditation.MeditationStatus;
+import app.entity.MeditationPlatformAlbumEntity;
+import app.entity.usermeditation.UserMeditationEntity;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import lombok.Getter;
@@ -30,6 +32,12 @@ public class MeditationEntity implements app.entity.Entity {
     @OneToMany(cascade = CascadeType.PERSIST)
     private List<TagEntity> tags;
 
+    @OneToMany(
+            mappedBy = "meditationFromPlatform",
+            orphanRemoval = true
+    )
+    private List<UserMeditationEntity> userMeditationEntities;
+
     @Column
     private String title;
 
@@ -49,6 +57,12 @@ public class MeditationEntity implements app.entity.Entity {
     private String author;
 
     private boolean promoted;
+
+    @ManyToMany(
+            mappedBy = "meditationsFromPlatform",
+            cascade = {CascadeType.PERSIST, CascadeType.REFRESH}
+    )
+    private List<MeditationPlatformAlbumEntity> albumEntities;
 
     @Column
     private MeditationStatus status;

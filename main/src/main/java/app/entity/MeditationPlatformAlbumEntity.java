@@ -26,8 +26,13 @@ public class MeditationPlatformAlbumEntity {
     @Column
     private String description;
 
-    @OneToMany(cascade = CascadeType.REFRESH)
-    private List<MeditationEntity> meditationFromPlatform;
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(
+            name = "meditation_platform_albums_meditation_from_platform",
+            joinColumns = @JoinColumn(name = "album_id"),
+            inverseJoinColumns = @JoinColumn(name = "meditation_from_platform_id")
+    )
+    private List<MeditationEntity> meditationsFromPlatform;
 
     @ManyToOne
     private UserEntity userEntity;

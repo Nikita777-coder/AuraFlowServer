@@ -31,6 +31,7 @@ public interface MeditationMapper {
     @Mapping(target = "description", expression = "java(request.getTitle() != null ? request.getDescription() : oldEntity.getDescription())")
     @Mapping(target = "videoLink", expression = "java(request.getVideoLink() != null ? request.getVideoLink() : oldEntity.getVideoLink())")
     @Mapping(target = "updateAt", expression = "java(request.getUpdatedAt() != null ? request.getUpdatedAt() : oldEntity.getUpdateAt())")
+    @Mapping(target = "tags", ignore = true)
     MeditationEntity updateMeditationEntity(MeditationEntity oldEntity, MeditationUpdateRequest request);
     Meditation meditationEntityToMeditation(MeditationEntity meditation);
 
@@ -52,9 +53,6 @@ public interface MeditationMapper {
     @Mapping(target = "uploadResponse.data.status", source = "status")
     @Mapping(target = "uploadResponse.data.embedLink", source = "videoLink")
     UploadResponseFull meditationEntityToUploadResponseFull(MeditationEntity meditation);
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "meditationFromPlatform", source = "entity")
-    UserMeditationEntity meditationEntityToUserMeditationEntity(MeditationEntity entity);
 
     default Tag tagEntityToTag(TagEntity entity) {
         if (entity == null || entity.getTag() == null) {
