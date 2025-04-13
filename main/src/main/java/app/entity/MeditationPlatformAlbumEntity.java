@@ -1,9 +1,8 @@
 package app.entity;
 
-import app.entity.usermeditation.UserMeditationEntity;
+import app.entity.meditation.MeditationEntity;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,12 +11,11 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "meditation_albums")
+@Table(name = "meditation_platform_albums")
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-public class MeditationAlbumEntity {
+public class MeditationPlatformAlbumEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -30,12 +28,12 @@ public class MeditationAlbumEntity {
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
-            name = "meditation_albums_meditation_from_user",
+            name = "meditation_platform_albums_meditation_from_platform",
             joinColumns = @JoinColumn(name = "album_id"),
-            inverseJoinColumns = @JoinColumn(name = "meditation_from_user_id")
+            inverseJoinColumns = @JoinColumn(name = "meditation_from_platform_id")
     )
-    private List<UserMeditationEntity> meditations;
+    private List<MeditationEntity> meditationsFromPlatform;
 
     @ManyToOne
-    private UserEntity user;
+    private UserEntity userEntity;
 }
