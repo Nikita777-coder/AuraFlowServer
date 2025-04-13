@@ -24,8 +24,16 @@ public interface MeditationMapper {
     @Mapping(target = "description", source = "uploadResponse.data.description")
     @Mapping(target = "createdAt", source = "uploadResponse.data.createdAt")
     MeditationEntity uploadResponseDataToMeditationEntity(UploadResponseFull response);
-
     List<Meditation> meditationEntitiesToMeditations(List<MeditationEntity> meditationEntities);
+    @Mapping(target = "author", expression = "java(request.getAuthor() != null ? request.getAuthor() : oldEntity.getAuthor())")
+    @Mapping(target = "id", source = "oldEntity.id")
+    @Mapping(target = "title", expression = "java(request.getTitle() != null ? request.getTitle() : oldEntity.getTitle())")
+    @Mapping(target = "description", expression = "java(request.getTitle() != null ? request.getDescription() : oldEntity.getDescription())")
+    @Mapping(target = "videoLink", expression = "java(request.getVideoLink() != null ? request.getVideoLink() : oldEntity.getVideoLink())")
+    @Mapping(target = "updateAt", expression = "java(request.getUpdatedAt() != null ? request.getUpdatedAt() : oldEntity.getUpdateAt())")
+    @Mapping(target = "tags", ignore = true)
+    MeditationEntity updateMeditationEntity(MeditationEntity oldEntity, MeditationUpdateRequest request);
+    Meditation meditationEntityToMeditation(MeditationEntity meditation);
 
     @Mapping(target = "videoId", source = "oldEntity.videoId")
     @Mapping(target = "id", source = "oldEntity.id")
@@ -45,9 +53,6 @@ public interface MeditationMapper {
     @Mapping(target = "uploadResponse.data.status", source = "status")
     @Mapping(target = "uploadResponse.data.embedLink", source = "videoLink")
     UploadResponseFull meditationEntityToUploadResponseFull(MeditationEntity meditation);
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "meditationFromPlatform", source = "entity")
-    UserMeditationEntity meditationEntityToUserMeditationEntity(MeditationEntity entity);
 
     default Tag tagEntityToTag(TagEntity entity) {
         if (entity == null || entity.getTag() == null) {
