@@ -4,20 +4,20 @@ import app.dto.meditationalbum.MeditationAlbum;
 import app.dto.meditationalbum.MeditationAlbumPlatform;
 import app.dto.meditationalbum.MeditationAlbumRequest;
 import app.entity.MeditationAlbumEntity;
+import app.entity.MeditationPlatformAlbumEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring",
-        uses = MeditationMapper.class)
+        uses = UserMeditationMapper.class)
 public interface MeditationAlbumMapper {
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "meditations", ignore = true)
     MeditationAlbumEntity meditationAlbumRequestToMeditationAlbumEntity(MeditationAlbumRequest meditationAlbumRequest);
+    @Mapping(target = "ownerId", source = "entity.user.id")
     MeditationAlbum meditationAlbumEntityToMeditationAlbum(MeditationAlbumEntity entity);
-    MeditationAlbumPlatform meditationAlbumEntityToMeditationAlbumPlatform(MeditationAlbumEntity entity);
-    List<MeditationAlbumPlatform> meditationAlbumEntitiesToMeditationAlbumsPlatform(List<MeditationAlbumEntity> entities);
     List<MeditationAlbum> meditationAlbumEntitiesToMeditationAlbums(List<MeditationAlbumEntity> entities);
     @Mapping(target = "title", expression = "java(title(request, entity))")
     @Mapping(target = "description", expression = "java(description(request, entity))")

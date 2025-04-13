@@ -1,13 +1,16 @@
 package app.entity;
 
 import app.entity.userattributes.Role;
+import app.entity.usermeditation.UserMeditationEntity;
 import jakarta.persistence.*;
+import jakarta.persistence.Entity;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -50,6 +53,14 @@ public class UserEntity implements UserDetails {
 
     @Column
     private Boolean isPremium;
+
+    @OneToMany(orphanRemoval = true,
+                cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
+    private List<UserMeditationEntity> userMeditations;
+
+    @OneToMany(orphanRemoval = true,
+            cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
+    private List<MeditationAlbumEntity> meditationAlbumEntities;
 
     @Column
     @Enumerated(value = EnumType.STRING)
