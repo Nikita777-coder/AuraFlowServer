@@ -32,6 +32,7 @@ public class MeditationPlatformAlbumService {
     public UUID createPlatformAlbum(UserDetails userDetails,
                                     MeditationAlbumRequest meditationAlbumRequest) {
         UserEntity userEntity = userService.getUserByEmail(userDetails.getUsername());
+        checkPlatformTitleAlbums(meditationAlbumRequest.getTitle());
 
         List<MeditationEntity> platformMeditations = programCommons.getAlbumMeditationsByIds(
                 meditationAlbumRequest.getMeditations(),
@@ -41,7 +42,7 @@ public class MeditationPlatformAlbumService {
         MeditationPlatformAlbumEntity meditationPlatformAlbumEntity = meditationPlatformAlbumMapper
                 .meditationAlbumRequestToMeditationPlatformAlbumEntity(meditationAlbumRequest);
         meditationPlatformAlbumEntity.setUserEntity(userEntity);
-        meditationPlatformAlbumEntity.setMeditationFromPlatform(platformMeditations);
+        meditationPlatformAlbumEntity.setMeditationsFromPlatform(platformMeditations);
 
         return meditationPlatformAlbumRepository.save(meditationPlatformAlbumEntity).getId();
     }
@@ -55,13 +56,21 @@ public class MeditationPlatformAlbumService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void deletePlatformAlbumById(UserDetails userDetails, UUID id) {
         MeditationPlatformAlbumEntity entity = getPlatformAlbumWithAdminCheck(id, userDetails);
+
+        List<MeditationEntity> albums = entity.getMeditationsFromPlatform();
+
+        for (MeditationEntity album : albums) {
+            album.getAlbumEntities().remove(entity);
+        }
+
+        meditationRepository.saveAll(albums);
         meditationPlatformAlbumRepository.delete(entity);
     }
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public MeditationAlbumPlatform updatePlatformAlbum(UserDetails userDetails, UUID id, MeditationAlbumRequest meditationAlbumRequest) {
         MeditationPlatformAlbumEntity entity = getPlatformAlbumWithAdminCheck(id, userDetails);
 
-        List<MeditationEntity> userAlbumMeditationEntities = entity.getMeditationFromPlatform();
+        List<MeditationEntity> userAlbumMeditationEntities = entity.getMeditationsFromPlatform();
         if (meditationAlbumRequest.getMeditations() != null) {
             userAlbumMeditationEntities = programCommons.getAlbumMeditationsByIds(
                     meditationAlbumRequest.getMeditations(),
@@ -77,7 +86,7 @@ public class MeditationPlatformAlbumService {
 
         MeditationPlatformAlbumEntity updatedEntity = meditationPlatformAlbumMapper.meditationAlbumRequestToMeditationPlatformAlbumEntity(albumRequest);
         updatedEntity.setUserEntity(userService.getUserByEmail(userDetails.getUsername()));
-        updatedEntity.setMeditationFromPlatform(userAlbumMeditationEntities);
+        updatedEntity.setMeditationsFromPlatform(userAlbumMeditationEntities);
         updatedEntity.setId(entity.getId());
 
         return meditationPlatformAlbumMapper.meditationPlatformAlbumEntityToMeditationAlbumPlatform(meditationPlatformAlbumRepository.save(updatedEntity));

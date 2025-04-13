@@ -11,7 +11,7 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring",
-        uses = MeditationMapper.class)
+        uses = UserMeditationMapper.class)
 public interface MeditationAlbumMapper {
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "meditations", ignore = true)

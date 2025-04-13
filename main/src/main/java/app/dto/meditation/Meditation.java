@@ -17,5 +17,5 @@ public class Meditation {
     private String videoLink;
     private List<Tag> tags;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private LocalDateTime updateAt;
 }

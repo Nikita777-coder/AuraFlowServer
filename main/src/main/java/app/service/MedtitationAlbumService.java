@@ -4,6 +4,7 @@ import app.dto.meditationalbum.MeditationAlbum;
 import app.dto.meditationalbum.MeditationAlbumRequest;
 import app.entity.MeditationAlbumEntity;
 import app.entity.UserEntity;
+import app.entity.meditation.MeditationEntity;
 import app.entity.userattributes.Role;
 import app.entity.usermeditation.UserMeditationEntity;
 import app.extra.ProgramCommons;
@@ -78,6 +79,13 @@ public class MedtitationAlbumService {
             throw new IllegalArgumentException("нелья удалить альбом по умолчанию");
         }
 
+        List<UserMeditationEntity> albums = entity.getMeditations();
+
+        for (UserMeditationEntity album : albums) {
+            album.getAlbumEntities().remove(entity);
+        }
+
+        userMeditationRepository.saveAll(albums);
         meditationAlbumRepository.delete(entity);
     }
 

@@ -1,6 +1,7 @@
 package app.dto.meditation;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +12,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class MeditationUpdateRequest {
-    @NotBlank
+    @NotNull
     private UUID id;
     private String author;
     private String title;
