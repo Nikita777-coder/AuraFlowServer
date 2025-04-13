@@ -1,6 +1,5 @@
 package app.dto.meditation;
 
-import app.entity.usermeditation.StatusEntity;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -16,5 +15,5 @@ public class UserMeditationUpdateRequest {
     private UUID id;
     @Min(value = 0, message = "must be equal or greater then zero")
     private double pauseTime;
-    private List<StatusEntity> statuses;
+    private List<Status> statuses;
 }

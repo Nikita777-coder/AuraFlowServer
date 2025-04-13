@@ -28,7 +28,12 @@ public class MeditationAlbumEntity {
     @Column
     private String description;
 
-    @OneToMany(cascade = {CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(
+            name = "meditation_albums_meditation_from_user",
+            joinColumns = @JoinColumn(name = "album_id"),
+            inverseJoinColumns = @JoinColumn(name = "meditation_from_user_id")
+    )
     private List<UserMeditationEntity> meditations;
 
     @ManyToOne
