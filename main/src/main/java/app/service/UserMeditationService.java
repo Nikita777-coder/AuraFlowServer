@@ -6,7 +6,6 @@ import app.entity.MeditationAlbumEntity;
 import app.entity.usermeditation.StatusEntity;
 import app.entity.usermeditation.UserMeditationEntity;
 import app.extra.ProgramCommons;
-import app.mapper.StatusMapper;
 import app.mapper.UserMeditationMapper;
 import app.repository.MeditationAlbumRepository;
 import app.repository.MeditationRepository;
