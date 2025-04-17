@@ -11,7 +11,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface MeditationPlatformAlbumMapper {
     MeditationPlatformAlbumEntity meditationAlbumRequestToMeditationPlatformAlbumEntity(MeditationAlbumRequest meditationAlbumRequest);
-//    @Mapping(target = "meditations", source = "entity.meditationFromPlatform")
+    @Mapping(target = "meditations", source = "entity.meditationsFromPlatform")
     @Mapping(target = "ownerId", source = "entity.userEntity.id")
     MeditationAlbumPlatform meditationPlatformAlbumEntityToMeditationAlbumPlatform(MeditationPlatformAlbumEntity entity);
     List<MeditationAlbumPlatform> meditationPlatformAlbumEntitiesToMeditationAlbumsPlatform(List<MeditationPlatformAlbumEntity> entities);
