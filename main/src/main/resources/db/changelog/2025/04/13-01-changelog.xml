@@ -77,18 +77,18 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1744517167125-7" author="Xiaomi (generated)">
-        <createTable tableName="premiums">
-            <column name="id" type="UUID">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_premiums"/>
-            </column>
-            <column name="buyer_email" type="VARCHAR(255)"/>
-            <column name="transaction_status" type="SMALLINT"/>
-            <column name="transaction_time" type="DATETIME"/>
-            <column name="expired_time" type="DATETIME"/>
-            <column name="transaction_id" type="UUID"/>
-        </createTable>
-    </changeSet>
+<!--    <changeSet id="1744517167125-7" author="Xiaomi (generated)">-->
+<!--        <createTable tableName="premiums">-->
+<!--            <column name="id" type="UUID">-->
+<!--                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_premiums"/>-->
+<!--            </column>-->
+<!--            <column name="buyer_email" type="VARCHAR(255)"/>-->
+<!--            <column name="transaction_status" type="SMALLINT"/>-->
+<!--            <column name="transaction_time" type="DATETIME"/>-->
+<!--            <column name="expired_time" type="DATETIME"/>-->
+<!--            <column name="transaction_id" type="UUID"/>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
     <changeSet id="1744517167125-8" author="Xiaomi (generated)">
         <createTable tableName="statuses">
             <column name="id" type="UUID">
