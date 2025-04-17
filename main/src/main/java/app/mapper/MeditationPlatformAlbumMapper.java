@@ -8,7 +8,10 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        uses = {MeditationMapper.class}
+)
 public interface MeditationPlatformAlbumMapper {
     MeditationPlatformAlbumEntity meditationAlbumRequestToMeditationPlatformAlbumEntity(MeditationAlbumRequest meditationAlbumRequest);
     @Mapping(target = "meditations", source = "entity.meditationsFromPlatform")
