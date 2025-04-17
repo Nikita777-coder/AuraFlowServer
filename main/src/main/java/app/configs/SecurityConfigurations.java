@@ -33,7 +33,8 @@ public class SecurityConfigurations {
                                 antMatcher("/swagger-ui.html"),
                                 antMatcher("/actuator/health/**"),
                                 antMatcher("/h2-console/**"),
-                                antMatcher("/meditation/all")
+                                antMatcher("/meditation/all"),
+                                antMatcher("/platform-meditation-album/**")
                         )
                         .permitAll()
                         .anyRequest()
