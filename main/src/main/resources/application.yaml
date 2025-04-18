@@ -56,7 +56,7 @@ server:
   oauth:
     grand-type: "client_credentials"
   web-client:
-    time-response: 15
+    time-response: 50
   integration:
     base-url: ${INTEGRATION_SERVICE_BASE_URL}
     video-storage:

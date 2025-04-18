@@ -23,8 +23,6 @@ public class ModelMeditationRequest {
     private String topic;
 
     @NotBlank
+    @JsonProperty("melody")
     private String melodyDescription;
-
-    @NotBlank
-    private String title;
 }

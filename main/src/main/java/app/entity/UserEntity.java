@@ -5,6 +5,7 @@ import app.entity.usermeditation.UserMeditationEntity;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import lombok.*;
+import org.hibernate.annotations.Check;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -23,6 +24,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Check(constraints = "generation_meditation_count <= 3")
 public class UserEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -55,7 +57,7 @@ public class UserEntity implements UserDetails {
     private Boolean isPremium;
 
     @OneToMany(orphanRemoval = true,
-                cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
+            cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
     private List<UserMeditationEntity> userMeditations;
 
     @OneToMany(orphanRemoval = true,
@@ -67,8 +69,7 @@ public class UserEntity implements UserDetails {
     private Role role = Role.USER;
 
     @Column(
-            name = "generation_meditation_count",
-            columnDefinition = "INT CHECK (generation_meditation_count <= 3)"
+            name = "generation_meditation_count"
     )
     private int countOfGenerations;
 
