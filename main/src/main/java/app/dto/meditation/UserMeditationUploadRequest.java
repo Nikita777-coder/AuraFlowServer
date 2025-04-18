@@ -9,6 +9,6 @@ import java.util.UUID;
 @Getter
 @Setter
 public class UserMeditationUploadRequest {
-    @NotBlank
     private UUID id;
+    private String videoUrl;
 }

@@ -66,6 +66,12 @@ public class UserEntity implements UserDetails {
     @Enumerated(value = EnumType.STRING)
     private Role role = Role.USER;
 
+    @Column(
+            name = "generation_meditation_count",
+            columnDefinition = "INT CHECK (generation_meditation_count <= 3)"
+    )
+    private int countOfGenerations;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getAuthorities();
