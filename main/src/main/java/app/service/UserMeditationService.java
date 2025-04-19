@@ -7,11 +7,11 @@ import app.entity.usermeditation.StatusEntity;
 import app.entity.usermeditation.UserMeditationEntity;
 import app.extra.ProgramCommons;
 import app.mapper.UserMeditationMapper;
-import app.repository.MeditationAlbumRepository;
-import app.repository.MeditationRepository;
-import app.repository.StatusRepository;
-import app.repository.UserMeditationRepository;
+import app.repository.*;
+import io.netty.handler.timeout.ReadTimeoutException;
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -33,27 +33,64 @@ public class UserMeditationService {
     private final UserMeditationRepository userMeditationRepository;
     private final UserMeditationMapper userMeditationMapper;
     private final UserService userService;
+    private final UserRepository userRepository;
     private final StatusRepository statusRepository;
+    private final WebClientRestService webClientRestService;
 
-    public GeneratedMeditation generatedMeditation(String text) {
-        List<String> topics = extractMeditationThemesFromText(text);
-        throw new RuntimeException();
+    @Value("${server.integration.base-url}")
+    private String integrationBaseUrl;
+    @Value("${server.integration.meditation-ai-path}")
+    private String integrationGeneratePath;
+    public GeneratedMeditation generatedMeditation(UserDetails userDetails,
+                                                   ModelMeditationRequest modelMeditationRequest) {
+        var user = userService.getUserByEmail(userDetails.getUsername());
+        user.setCountOfGenerations(user.getCountOfGenerations() + 1);
+        userRepository.save(user);
+        GeneratedMeditation generatedMeditation;
+
+        try {
+            generatedMeditation = webClientRestService.post(
+                    integrationBaseUrl,
+                    integrationGeneratePath,
+                    modelMeditationRequest,
+                    GeneratedMeditation.class
+            );
+        } catch (ReadTimeoutException ex) {
+            user.setCountOfGenerations(user.getCountOfGenerations() - 1);
+            userRepository.save(user);
+            throw ex;
+        }
+
+        return generatedMeditation;
     }
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public UUID addMeditationToUser(UserDetails userDetails, UUID meditationId) {
-        var meditation = meditationRepository.findById(meditationId);
-        if (meditation.isEmpty()) {
-            throw new IllegalArgumentException("no such meditation");
+    public UUID addMeditationToUser(UserDetails userDetails, UserMeditationUploadRequest userMeditationUploadRequest) {
+        if (userMeditationUploadRequest.getId() == null && userMeditationUploadRequest.getVideoUrl() == null) {
+            throw new IllegalArgumentException("you must specify meditationPlatformId or generatedVideoUrl");
         }
 
         UserMeditationEntity userMeditationEntity = new UserMeditationEntity();
         userMeditationEntity.setUser(userService.getUserByEmail(userDetails.getUsername()));
-        userMeditationEntity.setMeditationFromPlatform(meditation.get());
-
-        StatusEntity statusEntity = new StatusEntity();
-        statusEntity.setStatus(Status.UNWATCHED);
         List<StatusEntity> statusEntities = new ArrayList<>();
-        statusEntities.add(statusEntity);
+
+        var status = new StatusEntity();
+        status.setStatus(Status.UNWATCHED);
+        statusEntities.add(status);
+
+        if (userMeditationUploadRequest.getId() != null) {
+            var meditation = meditationRepository.findById(userMeditationUploadRequest.getId());
+            if (meditation.isEmpty()) {
+                throw new IllegalArgumentException("no such meditation");
+            }
+
+            userMeditationEntity.setMeditationFromPlatform(meditation.get());
+        } else if (userMeditationUploadRequest.getVideoUrl() != null) {
+            userMeditationEntity.setGeneratedMeditationLink(userMeditationUploadRequest.getVideoUrl());
+            var status2 = new StatusEntity();
+            status2.setStatus(Status.GENERATED);
+
+            statusEntities.add(status2);
+        }
 
         userMeditationEntity.setStatuses(statusEntities);
         userMeditationEntity = userMeditationRepository.save(userMeditationEntity);
@@ -117,8 +154,5 @@ public class UserMeditationService {
     }
     private UserMeditationEntity getMeditation(UUID id) {
         return userMeditationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("meditation not found"));
-    }
-    private List<String> extractMeditationThemesFromText(String text) {
-        throw new RuntimeException();
     }
 }

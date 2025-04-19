@@ -56,7 +56,7 @@ server:
   oauth:
     grand-type: "client_credentials"
   web-client:
-    time-response: 15
+    time-response: 50
   integration:
     base-url: ${INTEGRATION_SERVICE_BASE_URL}
     video-storage:
@@ -64,4 +64,5 @@ server:
       type: ${VIDEO_STORAGE_TYPE}
       kinescope-uri: ${KINESCOPE_URI}
       upload-path: ${UPLOAD_PATH}
+    meditation-ai-path: ${INTEGRATION_MEDITATION_AI_PATH}
     fixed-rate-time: 60000

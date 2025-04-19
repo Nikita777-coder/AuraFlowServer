@@ -27,6 +27,9 @@ public class UserMeditationEntity implements app.entity.Entity {
     @ManyToOne(cascade = {CascadeType.PERSIST})
     private MeditationEntity meditationFromPlatform;
 
+    @Column(name = "generated_meditation_link")
+    private String generatedMeditationLink;
+
     @ManyToOne
     private UserEntity user;
 
