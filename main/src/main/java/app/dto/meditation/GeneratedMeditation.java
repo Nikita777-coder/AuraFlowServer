@@ -9,10 +9,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class GeneratedMeditation {
-    private UUID newMeditationId;
-
-    @JsonProperty("audio_link")
-    private String audioLink;
-
-    private String videoLink;
+    private String status;
+    private String url;
+    private String wasUsed;
 }

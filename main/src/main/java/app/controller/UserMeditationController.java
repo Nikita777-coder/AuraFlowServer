@@ -36,16 +36,6 @@ public class UserMeditationController {
         );
     }
 
-    @PostMapping("/generate")
-    @ResponseBody
-    public GeneratedMeditation generateNewMeditation(@AuthenticationPrincipal UserDetails currentUser,
-                                                     @Valid @RequestBody ModelMeditationRequest modelMeditationRequest) {
-        return userMeditationService.generatedMeditation(
-                currentUser,
-                modelMeditationRequest
-        );
-    }
-
     @PatchMapping
     @ResponseBody
     public UserMeditation update(@AuthenticationPrincipal UserDetails currentUser,
