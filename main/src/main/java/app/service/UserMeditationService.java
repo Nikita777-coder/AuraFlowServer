@@ -33,36 +33,8 @@ public class UserMeditationService {
     private final UserMeditationRepository userMeditationRepository;
     private final UserMeditationMapper userMeditationMapper;
     private final UserService userService;
-    private final UserRepository userRepository;
     private final StatusRepository statusRepository;
-    private final WebClientRestService webClientRestService;
 
-    @Value("${server.integration.base-url}")
-    private String integrationBaseUrl;
-    @Value("${server.integration.meditation-ai-path}")
-    private String integrationGeneratePath;
-    public GeneratedMeditation generatedMeditation(UserDetails userDetails,
-                                                   ModelMeditationRequest modelMeditationRequest) {
-        var user = userService.getUserByEmail(userDetails.getUsername());
-        user.setCountOfGenerations(user.getCountOfGenerations() + 1);
-        userRepository.save(user);
-        GeneratedMeditation generatedMeditation;
-
-        try {
-            generatedMeditation = webClientRestService.post(
-                    integrationBaseUrl,
-                    integrationGeneratePath,
-                    modelMeditationRequest,
-                    GeneratedMeditation.class
-            );
-        } catch (ReadTimeoutException ex) {
-            user.setCountOfGenerations(user.getCountOfGenerations() - 1);
-            userRepository.save(user);
-            throw ex;
-        }
-
-        return generatedMeditation;
-    }
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public UUID addMeditationToUser(UserDetails userDetails, UserMeditationUploadRequest userMeditationUploadRequest) {
         if (userMeditationUploadRequest.getId() == null && userMeditationUploadRequest.getVideoUrl() == null) {
