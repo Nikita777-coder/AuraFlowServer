@@ -38,6 +38,13 @@ public class WebClientRestService {
                 })
 //                .header("Authorization", "Bearer " + token)
                 .retrieve()
+                .onStatus(status -> status.is4xxClientError(), clientResponse -> {
+                    return clientResponse.bodyToMono(String.class)
+                            .flatMap(responseBody -> {
+                                System.out.println("Error Response Body: " + responseBody);
+                                return Mono.error(new IllegalArgumentException());
+                            });
+                })
                 .bodyToMono(tClass);
 
         var res = response.block();
