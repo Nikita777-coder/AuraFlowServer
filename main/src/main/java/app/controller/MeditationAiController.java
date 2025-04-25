@@ -18,7 +18,7 @@ public class MeditationAiController {
     private final MeditationAiService meditationAiService;
     @PostMapping
     @ResponseBody
-    public UUID generateNewMeditation(@AuthenticationPrincipal UserDetails currentUser,
+    public String generateNewMeditation(@AuthenticationPrincipal UserDetails currentUser,
                                       @Valid @RequestBody ModelMeditationRequest modelMeditationRequest) {
         return meditationAiService.generatedMeditation(
                 currentUser,
@@ -28,7 +28,7 @@ public class MeditationAiController {
 
     @GetMapping
     @ResponseBody
-    public GeneratedMeditation getGeneratedMeditationData(@RequestParam UUID id) {
+    public GeneratedMeditation getGeneratedMeditationData(String id) {
         return meditationAiService.getMeditation(id);
     }
 }

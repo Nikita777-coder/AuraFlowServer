@@ -23,19 +23,19 @@ public class MeditationAiService {
     private String integrationBaseUrl;
     @Value("${server.integration.meditation-ai-path}")
     private String integrationGeneratePath;
-    public UUID generatedMeditation(UserDetails userDetails,
+    public String generatedMeditation(UserDetails userDetails,
                                     ModelMeditationRequest modelMeditationRequest) {
         var user = userService.getUserByEmail(userDetails.getUsername());
         user.setCountOfGenerations(user.getCountOfGenerations() + 1);
         userRepository.save(user);
-        UUID generatedMeditation;
+        String generatedMeditation;
 
         try {
             generatedMeditation = webClientRestService.post(
                     integrationBaseUrl,
                     integrationGeneratePath,
                     modelMeditationRequest,
-                    UUID.class
+                    String.class
             );
         } catch (ReadTimeoutException ex) {
             user.setCountOfGenerations(user.getCountOfGenerations() - 1);
@@ -45,11 +45,11 @@ public class MeditationAiService {
 
         return generatedMeditation;
     }
-    public GeneratedMeditation getMeditation(UUID id) {
+    public GeneratedMeditation getMeditation(String id) {
         return webClientRestService.get(
               integrationBaseUrl,
-              integrationBaseUrl,
-              Map.of("id", id.toString()),
+              integrationGeneratePath,
+              Map.of("id", id),
               GeneratedMeditation.class
         );
     }
