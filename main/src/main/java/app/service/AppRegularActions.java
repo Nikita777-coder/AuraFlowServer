@@ -89,6 +89,8 @@ public class AppRegularActions {
                             meditationMapper.meditationEntityToUploadResponseFull(video),
                             String.class
                     );
+
+
                 }
 
                 updatedEntities.add(meditationMapper.meditationServiceDataToMeditationEntity(
@@ -167,16 +169,18 @@ public class AppRegularActions {
                 user.getStartTimeOfBreathPractise().isBefore(LocalTime.now())
                         && user.getStopTimeOfBreathPractise().isAfter(LocalTime.now())).toList();
 
-        NotificationRequest notificationRequest = new NotificationRequest(
-              userEntities.stream().map(user -> user.getOneSignalId().toString()).toList(),
-              notificationMessage
-        );
+        if (!userEntities.isEmpty()) {
+            NotificationRequest notificationRequest = new NotificationRequest(
+                    userEntities.stream().map(user -> user.getOneSignalId().toString()).toList(),
+                    notificationMessage
+            );
 
-        webClientRestService.post(
-                integrationServiceBaseUrl,
-                notificationUri,
-                notificationRequest,
-                void.class
-        );
+            webClientRestService.post(
+                    integrationServiceBaseUrl,
+                    notificationUri,
+                    notificationRequest,
+                    void.class
+            );
+        }
     }
 }
