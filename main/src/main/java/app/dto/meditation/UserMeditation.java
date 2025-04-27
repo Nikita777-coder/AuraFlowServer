@@ -15,4 +15,6 @@ public class UserMeditation {
     private Meditation meditation;
     private List<StatusEntity> statuses;
     private double pauseTime;
+    private String generatedMeditationLink;
+    private String title;
 }

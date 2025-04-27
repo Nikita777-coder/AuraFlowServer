@@ -24,6 +24,9 @@ public class UserMeditationEntity implements app.entity.Entity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column
+    private String title;
+
     @ManyToOne(cascade = {CascadeType.PERSIST})
     private MeditationEntity meditationFromPlatform;
 
