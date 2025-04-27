@@ -2,10 +2,13 @@ package app.service;
 
 import app.dto.meditation.MeditationServiceDataWrapper;
 import app.dto.meditation.MeditationStatus;
+import app.dto.notificationservice.NotificationRequest;
+import app.entity.UserEntity;
 import app.entity.meditation.MeditationEntity;
 import app.extra.ProgramCommons;
 import app.mapper.MeditationMapper;
 import app.repository.MeditationRepository;
+import app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +31,7 @@ public class AppRegularActions {
     private final WebClientRestService webClientRestService;
     private final MeditationMapper meditationMapper;
     private final ProgramCommons storageParamsManager;
+    private final UserRepository userRepository;
 
     @Value("${server.integration.video-storage.type}")
     private String videoStorageType;
@@ -45,6 +50,12 @@ public class AppRegularActions {
 
     @Value("${server.integration.video-storage.kinescope-uri}")
     private String kinescopeUri;
+
+    @Value("${server.integration.notification-service.message}")
+    private String notificationMessage;
+
+    @Value("${server.integration.notification-service.uri}")
+    private String notificationUri;
     @Async
     @Scheduled(fixedRateString = "${server.integration.fixed-rate-time}")
     @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -146,5 +157,26 @@ public class AppRegularActions {
     @Async
     public void deleteUselessMeditations(List<MeditationEntity> entities) {
         meditationRepository.deleteAllByIdInBatch(entities.stream().map(MeditationEntity::getId).toList());
+    }
+
+    @Async
+    @Scheduled(fixedRateString = "${server.integration.fixed-update}")
+    public void notificateUsers() {
+        List<UserEntity> userEntities = userRepository.getAllByHasPractiseBreathOpt(true);
+        userEntities = userEntities.stream().filter(user ->
+                user.getStartTimeOfBreathPractise().isBefore(LocalTime.now())
+                        && user.getStopTimeOfBreathPractise().isAfter(LocalTime.now())).toList();
+
+        NotificationRequest notificationRequest = new NotificationRequest(
+              userEntities.stream().map(user -> user.getOneSignalId().toString()).toList(),
+              notificationMessage
+        );
+
+        webClientRestService.post(
+                integrationServiceBaseUrl,
+                notificationUri,
+                notificationRequest,
+                void.class
+        );
     }
 }

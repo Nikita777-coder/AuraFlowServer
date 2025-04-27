@@ -64,4 +64,9 @@ server:
       type: ${VIDEO_STORAGE_TYPE}
       kinescope-uri: ${KINESCOPE_URI}
       upload-path: ${UPLOAD_PATH}
+    notification-service:
+      uri: ${NOTIFICATION_SERVICE_URI}
+      message: ${NOTIFICATION_SERVICE_USER_MESSAGE}
+    meditation-ai-path: ${INTEGRATION_MEDITATION_AI_PATH}
     fixed-rate-time: 60000
+    fixed-update: 3600000

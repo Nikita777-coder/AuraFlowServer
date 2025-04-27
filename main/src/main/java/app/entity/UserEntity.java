@@ -42,6 +42,8 @@ public class UserEntity implements UserDetails {
     @Column(name = "isOpenApplicationOptionTurned")
     private Boolean hasOpenAppOpt = false;
 
+    private UUID oneSignalId;
+
     @Column
     private LocalTime startTimeOfBreathPractise = LocalTime.of(8, 0);
 
