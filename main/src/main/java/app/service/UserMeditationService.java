@@ -64,6 +64,10 @@ public class UserMeditationService {
             statusEntities.add(status2);
         }
 
+        if (userMeditationUploadRequest.getTitle() != null) {
+            userMeditationEntity.setTitle(userMeditationUploadRequest.getTitle());
+        }
+
         userMeditationEntity.setStatuses(statusEntities);
         userMeditationEntity = userMeditationRepository.save(userMeditationEntity);
 
