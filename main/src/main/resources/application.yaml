@@ -34,7 +34,7 @@ server:
     email: ${ADMIN_EMAIL}
     password: ${ADMIN_PASSWORD}
     name: ${ADMIN_NAME}
-    onesignal-id: ${ADMIN_ONESIGNAL_ID
+    onesignal-id: ${ADMIN_ONESIGNAL_ID}
   web:
     max-count-requests: ${MAX_COUNT_REQUESTS}
   jwt:
