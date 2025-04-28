@@ -34,6 +34,7 @@ server:
     email: ${ADMIN_EMAIL}
     password: ${ADMIN_PASSWORD}
     name: ${ADMIN_NAME}
+    onesignal-id: ${ADMIN_ONESIGNAL_ID
   web:
     max-count-requests: ${MAX_COUNT_REQUESTS}
   jwt:
@@ -69,5 +70,5 @@ server:
       message: ${NOTIFICATION_SERVICE_USER_MESSAGE}
     meditation-ai-path: ${INTEGRATION_MEDITATION_AI_PATH}
     fixed-rate-time: 60000
-    fixed-update: 3600000
+    fixed-update: 30000
 

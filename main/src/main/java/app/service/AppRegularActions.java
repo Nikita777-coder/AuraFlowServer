@@ -170,10 +170,9 @@ public class AppRegularActions {
                         && user.getStopTimeOfBreathPractise().isAfter(LocalTime.now())).toList();
 
         if (!userEntities.isEmpty()) {
-            NotificationRequest notificationRequest = new NotificationRequest(
-                    userEntities.stream().map(user -> user.getOneSignalId().toString()).toList(),
-                    notificationMessage
-            );
+            NotificationRequest notificationRequest = new NotificationRequest();
+            notificationRequest.setListTo(userEntities.stream().map(user -> user.getOneSignalId().toString()).toList());
+            notificationRequest.setMessage(notificationMessage);
 
             webClientRestService.post(
                     integrationServiceBaseUrl,
