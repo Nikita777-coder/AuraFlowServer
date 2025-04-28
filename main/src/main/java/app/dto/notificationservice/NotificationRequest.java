@@ -2,12 +2,14 @@ package app.dto.notificationservice;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@AllArgsConstructor
+@Setter
 @Getter
 public class NotificationRequest {
-    private List<String> to;
+    private List<String> listTo;
+    private String to;
     private String message;
 }

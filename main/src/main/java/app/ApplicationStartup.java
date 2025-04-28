@@ -13,6 +13,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalTime;
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 public class ApplicationStartup
@@ -26,12 +29,18 @@ public class ApplicationStartup
     private String adminPassword;
     @Value("${server.admin.name}")
     private String adminName;
+    @Value("${server.admin.onesignal-id}")
+    private String adminOneSignalId;
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void onApplicationEvent(final ApplicationReadyEvent event) {
         if (userRepository.findByEmail(adminEmail).isEmpty()) {
             userRepository.save(UserEntity
                     .builder()
+                    .hasPractiseBreathOpt(true)
+                    .oneSignalId(UUID.fromString(adminOneSignalId))
+                            .startTimeOfBreathPractise(LocalTime.of(1, 0))
+                            .stopTimeOfBreathPractise(LocalTime.of(23, 59))
                     .countBreathPractiseReminderPerDay(4)
                     .email(adminEmail)
                     .isPremium(true)
