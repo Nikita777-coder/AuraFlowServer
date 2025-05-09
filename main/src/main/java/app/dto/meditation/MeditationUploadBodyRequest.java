@@ -14,16 +14,14 @@ import java.util.UUID;
 @Setter
 public class MeditationUploadBodyRequest {
     private String author;
-    private String sourceLink;
-    private UUID parentId;
 
-    @Null
-    private MultipartFile uploadVideoPath;
+    @NotBlank(message = "can't be null")
+    private String sourceLink;
 
     @NotBlank(message = "can't be null")
     private String title;
 
     private boolean isPromoted = false;
     private String description;
-    private List<Tag> tags;
+    private List<String> tags;
 }

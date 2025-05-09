@@ -29,8 +29,8 @@ public class MeditationEntity implements app.entity.Entity {
 
     private UUID videoId;
 
-    @OneToMany(cascade = CascadeType.PERSIST)
-    private List<TagEntity> tags;
+    @Column(name = "tags")
+    private String jsonTags;
 
     @OneToMany(
             mappedBy = "meditationFromPlatform",

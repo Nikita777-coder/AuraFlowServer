@@ -10,7 +10,7 @@ import java.util.List;
 
 @Mapper(
         componentModel = "spring",
-        uses = {MeditationMapper.class}
+        uses = {MeditationMapper.class, TagMapper.class}
 )
 public interface MeditationPlatformAlbumMapper {
     MeditationPlatformAlbumEntity meditationAlbumRequestToMeditationPlatformAlbumEntity(MeditationAlbumRequest meditationAlbumRequest);

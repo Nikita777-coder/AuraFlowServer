@@ -3,7 +3,6 @@ package app.controller;
 import app.dto.meditation.Meditation;
 import app.dto.meditation.MeditationUpdateRequest;
 import app.dto.meditation.MeditationUploadBodyRequest;
-import app.dto.meditation.Tag;
 import app.service.MeditationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +55,7 @@ public class MeditationController {
                                     @RequestParam("upload-video") MultipartFile file,
                                     @RequestParam(required = false) String description,
                                     @RequestParam(required = false) String author,
-                                    @RequestParam(required = false) List<Tag> tags,
+                                    @RequestParam(required = false) List<String> tags,
                                     @RequestParam(name = "need-to-promote", required = false) boolean isPromoted) {
         return meditationService.uploadMeditationByUploadVideo(
                 userDetails, file, title, description, author, tags, isPromoted

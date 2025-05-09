@@ -19,5 +19,5 @@ public class MeditationUpdateRequest {
     private String description;
     private String videoLink;
     private LocalDateTime updatedAt;
-    private List<Tag> tags;
+    private List<String> tags;
 }

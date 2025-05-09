@@ -15,7 +15,7 @@ public class Meditation {
     private String title;
     private String description;
     private String videoLink;
-    private List<Tag> tags;
+    private List<String> tags;
     private LocalDateTime createdAt;
     private LocalDateTime updateAt;
 }
