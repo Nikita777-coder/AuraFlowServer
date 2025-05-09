@@ -1,14 +1,33 @@
 package app.mapper;
 
-import app.dto.meditation.Tag;
-import app.entity.meditation.TagEntity;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface TagMapper {
-    List<TagEntity> tagsToTagsEntities(List<Tag> tags);
+    ObjectMapper objectMapper = new ObjectMapper();
+    default String tagsToJsonStringTags(List<String> tags) {
+        try {
+            return objectMapper.writeValueAsString(tags);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to convert tags to JSON", e);
+        }
+    }
+    default List<String> jsonTagsToTags(String jsonTags) {
+        StringBuilder sb = new StringBuilder();
+
+        for (char s: jsonTags.toCharArray()) {
+            if (s != '\\' && s != '[' && s != ']' && s != '\"') {
+                sb.append(s);
+            }
+        }
+
+        return Arrays.asList(sb.toString().split(","));
+    }
 }

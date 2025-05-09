@@ -50,7 +50,7 @@ public class MeditationService {
                                               String title,
                                               String description,
                                               String author,
-                                              List<Tag> tags,
+                                              List<String> tags,
                                               boolean isPromoted) {
         programCommons.checkUserRole(userDetails);
         UploadResponseFull ans = webClientRestService.postVideo(
@@ -73,7 +73,7 @@ public class MeditationService {
         }
 
         if (tags != null && !tags.isEmpty()) {
-            entity.setTags(tagMapper.tagsToTagsEntities(tags));
+            entity.setJsonTags(tagMapper.tagsToJsonStringTags(tags));
         }
 
         entity.setPromoted(isPromoted);
@@ -92,7 +92,7 @@ public class MeditationService {
         }
 
         if (meditationUploadBodyRequest.getTags() != null && !meditationUploadBodyRequest.getTags().isEmpty()) {
-            entity.setTags(tagMapper.tagsToTagsEntities(meditationUploadBodyRequest.getTags()));
+            entity.setJsonTags(tagMapper.tagsToJsonStringTags(meditationUploadBodyRequest.getTags()));
         }
 
         return meditationRepository.save(entity).getId();
@@ -143,7 +143,7 @@ public class MeditationService {
         );
 
         if (request.getTags() != null) {
-            meditation.setTags(tagMapper.tagsToTagsEntities(request.getTags()));
+            meditation.setJsonTags(tagMapper.tagsToJsonStringTags(request.getTags()));
         }
 
         var en = meditationRepository.save(
