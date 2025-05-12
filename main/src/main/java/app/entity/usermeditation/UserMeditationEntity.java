@@ -36,8 +36,7 @@ public class UserMeditationEntity implements app.entity.Entity {
     @ManyToOne
     private UserEntity user;
 
-    @OneToMany(cascade = CascadeType.PERSIST)
-    private List<StatusEntity> statuses;
+    private String statuses;
 
     @Column(name = "pause_time")
     private double pauseTime = 0.0;

@@ -1,11 +1,12 @@
 package app.controller;
 
-import app.dto.meditation.*;
-import app.entity.usermeditation.StatusEntity;
+import app.dto.meditation.Status;
+import app.dto.meditation.UserMeditation;
+import app.dto.meditation.UserMeditationUpdateRequest;
+import app.dto.meditation.UserMeditationUploadRequest;
 import app.service.UserMeditationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +28,8 @@ public class UserMeditationController {
     }
     @GetMapping("/all")
     @ResponseBody
-    public List<UserMeditation> getUserMeditations(@AuthenticationPrincipal UserDetails currentUser
-//                                                   @RequestParam  List<Status> statuses
+    public List<UserMeditation> getUserMeditations(@AuthenticationPrincipal UserDetails currentUser,
+                                                   @RequestParam  List<Status> statuses
                                                    ) {
         return userMeditationService.getUserAll(
                 currentUser,
