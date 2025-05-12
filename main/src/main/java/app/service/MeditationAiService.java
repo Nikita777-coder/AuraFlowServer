@@ -26,6 +26,11 @@ public class MeditationAiService {
     public String generatedMeditation(UserDetails userDetails,
                                     ModelMeditationRequest modelMeditationRequest) {
         var user = userService.getUserByEmail(userDetails.getUsername());
+
+        if (!user.getIsPremium() && user.getCountOfGenerations() == 3) {
+            throw new IllegalArgumentException("ваш лимит на генерацию закончился!");
+        }
+
         user.setCountOfGenerations(user.getCountOfGenerations() + 1);
         userRepository.save(user);
         String generatedMeditation;
