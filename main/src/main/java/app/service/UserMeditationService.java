@@ -1,17 +1,19 @@
 package app.service;
 
-import app.dto.meditation.*;
+import app.dto.meditation.Status;
+import app.dto.meditation.UserMeditation;
+import app.dto.meditation.UserMeditationUpdateRequest;
+import app.dto.meditation.UserMeditationUploadRequest;
 import app.dto.meditationalbum.MeditationAlbumRequest;
 import app.entity.MeditationAlbumEntity;
-import app.entity.usermeditation.StatusEntity;
 import app.entity.usermeditation.UserMeditationEntity;
 import app.extra.ProgramCommons;
+import app.mapper.StatusMapper;
 import app.mapper.UserMeditationMapper;
-import app.repository.*;
-import io.netty.handler.timeout.ReadTimeoutException;
-import jakarta.validation.ConstraintViolationException;
+import app.repository.MeditationAlbumRepository;
+import app.repository.MeditationRepository;
+import app.repository.UserMeditationRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -33,7 +35,7 @@ public class UserMeditationService {
     private final UserMeditationRepository userMeditationRepository;
     private final UserMeditationMapper userMeditationMapper;
     private final UserService userService;
-    private final StatusRepository statusRepository;
+    private final StatusMapper statusMapper;
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public UUID addMeditationToUser(UserDetails userDetails, UserMeditationUploadRequest userMeditationUploadRequest) {
@@ -43,11 +45,8 @@ public class UserMeditationService {
 
         UserMeditationEntity userMeditationEntity = new UserMeditationEntity();
         userMeditationEntity.setUser(userService.getUserByEmail(userDetails.getUsername()));
-        List<StatusEntity> statusEntities = new ArrayList<>();
-
-        var status = new StatusEntity();
-        status.setStatus(Status.UNWATCHED);
-        statusEntities.add(status);
+        List<Status> statuses = new ArrayList<>();
+        statuses.add(Status.UNWATCHED);
 
         if (userMeditationUploadRequest.getId() != null) {
             var meditation = meditationRepository.findById(userMeditationUploadRequest.getId());
@@ -58,17 +57,14 @@ public class UserMeditationService {
             userMeditationEntity.setMeditationFromPlatform(meditation.get());
         } else if (userMeditationUploadRequest.getVideoUrl() != null) {
             userMeditationEntity.setGeneratedMeditationLink(userMeditationUploadRequest.getVideoUrl());
-            var status2 = new StatusEntity();
-            status2.setStatus(Status.GENERATED);
-
-            statusEntities.add(status2);
+            statuses.add(Status.GENERATED);
         }
 
         if (userMeditationUploadRequest.getTitle() != null) {
             userMeditationEntity.setTitle(userMeditationUploadRequest.getTitle());
         }
 
-        userMeditationEntity.setStatuses(statusEntities);
+        userMeditationEntity.setStatuses(statusMapper.listOfStatusesToString(statuses));
         userMeditationEntity = userMeditationRepository.save(userMeditationEntity);
 
         var album = medtitationAlbumService.getAlbum("Мои медитации").orElseGet(() -> {
@@ -88,13 +84,30 @@ public class UserMeditationService {
 
         return userMeditationEntity.getId();
     }
-    public List<UserMeditation> getUserAll(UserDetails userDetails, List<Status> meditationRequest) {
+    public List<UserMeditation> getUserAll(UserDetails userDetails, List<Status> statuses) {
         var entities = userMeditationRepository.findAllByUser_Email(
                 userDetails.getUsername()
         );
 
+        List<UserMeditationEntity> newEntities = new ArrayList<>();
+
+        for (var status : statuses) {
+            newEntities.addAll(
+                    entities.stream().filter(
+                                    el -> statusMapper
+                                            .stringStatusesToSetOfStatuses(el
+                                                    .getStatuses())
+                                            .contains(status))
+                            .toList()
+            );
+        }
+
+        if (newEntities.isEmpty()) {
+            newEntities = entities;
+        }
+
         return userMeditationMapper.userMeditationEntitiesToUserMeditations(
-                entities
+                newEntities
         );
     }
     public UserMeditation update(UserDetails userDetails, UserMeditationUpdateRequest meditationUpdateRequest) {
@@ -102,7 +115,7 @@ public class UserMeditationService {
 
         userMeditationEntity = userMeditationMapper.updateEntity(meditationUpdateRequest, userMeditationEntity);
         if (meditationUpdateRequest.getStatuses() != null) {
-            userMeditationEntity.setStatuses(statusRepository.findAllByStatusIn(meditationUpdateRequest.getStatuses()));
+            userMeditationEntity.setStatuses(statusMapper.listOfStatusesToString(meditationUpdateRequest.getStatuses()));
         }
 
         return userMeditationMapper.userMeditationEntityToUserMeditation(userMeditationRepository.save(userMeditationEntity));

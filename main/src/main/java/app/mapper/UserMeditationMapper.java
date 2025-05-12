@@ -2,16 +2,17 @@ package app.mapper;
 
 import app.dto.meditation.UserMeditation;
 import app.dto.meditation.UserMeditationUpdateRequest;
-import app.entity.usermeditation.StatusEntity;
 import app.entity.usermeditation.UserMeditationEntity;
-import app.repository.StatusRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring",
-        uses = {MeditationMapper.class}
+        uses = {
+                MeditationMapper.class,
+                StatusMapper.class
+        }
 )
 public interface UserMeditationMapper {
     @Mapping(target = "meditation", source = "meditationFromPlatform")

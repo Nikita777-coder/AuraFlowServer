@@ -1,11 +1,9 @@
 package app.dto.meditation;
 
-import app.dto.meditationalbum.MeditationAlbum;
-import app.entity.usermeditation.StatusEntity;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -13,7 +11,7 @@ import java.util.UUID;
 public class UserMeditation {
     private UUID id;
     private Meditation meditation;
-    private List<StatusEntity> statuses;
+    private Set<Status> statuses;
     private double pauseTime;
     private String generatedMeditationLink;
     private String title;
