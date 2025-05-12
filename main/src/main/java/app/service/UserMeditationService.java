@@ -114,6 +114,16 @@ public class UserMeditationService {
         UserMeditationEntity userMeditationEntity = checkAccessAndGet(meditationUpdateRequest.getId(), userDetails);
 
         userMeditationEntity = userMeditationMapper.updateEntity(meditationUpdateRequest, userMeditationEntity);
+
+        if (meditationUpdateRequest.getPauseTime() < 0.0) {
+            throw new IllegalArgumentException("invalid pause time value");
+        }
+
+        if (meditationUpdateRequest.getStatuses().stream().filter(el -> el == Status.INPROGRESS).findFirst().isEmpty() &&
+                (userMeditationEntity.getPauseTime() > 0.0 || meditationUpdateRequest.getPauseTime() > 0.0)) {
+            meditationUpdateRequest.getStatuses().add(Status.INPROGRESS);
+        }
+
         if (meditationUpdateRequest.getStatuses() != null) {
             userMeditationEntity.setStatuses(statusMapper.listOfStatusesToString(meditationUpdateRequest.getStatuses()));
         }
