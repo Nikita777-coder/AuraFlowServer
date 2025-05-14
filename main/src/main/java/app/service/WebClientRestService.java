@@ -90,6 +90,32 @@ public class WebClientRestService {
 
         return ans;
     }
+    public <T> T post(String baseUrl, String uri, Class<T> tClass) {
+        return webClient
+                .mutate()
+                .baseUrl(baseUrl)
+                .build()
+                .post()
+                .uri(uri)
+                //                .header("Authorization", "Bearer " + token)
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError(), clientResponse -> {
+                    return clientResponse.bodyToMono(String.class)
+                            .flatMap(responseBody -> {
+                                System.out.println("Error Response Body: " + responseBody);
+                                return Mono.error(new IllegalArgumentException());
+                            });
+                })
+                .onStatus(status -> status.is5xxServerError(), clientResponse -> {
+                    return clientResponse.bodyToMono(String.class)
+                            .flatMap(responseBody -> {
+                                System.out.println("Error Response Body: " + responseBody);
+                                return Mono.error(new IllegalArgumentException());
+                            });
+                })
+                .bodyToMono(tClass)
+                .block();
+    }
 
     public <T> T postVideo(String baseUrl, String uri, String title, MultipartFile file, String description, Class<T> tClass) {
 //        String token = getToken();

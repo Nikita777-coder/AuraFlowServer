@@ -35,14 +35,13 @@ public class PremiumController {
 
     @PostMapping
     public UUID buyPremium(@AuthenticationPrincipal UserDetails userDetails) {
-        throw new RuntimeException();
-//        return premiumService.buyPremium(userDetails);
+        return premiumService.buyPremium(userDetails);
     }
 
     @GetMapping("/status-payment")
     public TransactionStatus getTransactionStatus(@AuthenticationPrincipal UserDetails userDetails,
                                                   @RequestParam("payment-id") UUID id) {
-        throw new RuntimeException();
+        return premiumService.getTransactionStatus(userDetails, id);
     }
 
     @GetMapping("/history")
