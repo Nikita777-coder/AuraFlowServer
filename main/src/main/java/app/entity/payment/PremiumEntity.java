@@ -16,7 +16,6 @@ import java.util.UUID;
 @Setter
 public class PremiumEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne(targetEntity = UserEntity.class)
