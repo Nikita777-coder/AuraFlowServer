@@ -21,6 +21,9 @@ public class PremiumEntity {
     @ManyToOne(targetEntity = UserEntity.class)
     private UserEntity userEntity;
 
+    @Column
+    private String paymentUrl;
+
     @Column(name = "transaction_status")
     private TransactionStatus transactionStatus;
 
