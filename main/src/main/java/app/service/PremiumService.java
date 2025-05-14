@@ -1,5 +1,6 @@
 package app.service;
 
+import app.dto.payment.PaymentNotification;
 import app.dto.premium.PremiumData;
 import app.entity.payment.TransactionStatus;
 import app.mapper.PremiumMapper;
@@ -25,5 +26,14 @@ public class PremiumService {
         return premiumMapper.premiumEntitiesToPremiumDatas(premiumRepository.getPremiumEntitiesByUserEmail(
                 userDetails.getUsername()
         ));
+    }
+    public void logPaymentNotification(PaymentNotification paymentNotification) {
+        var payment = premiumRepository.findById(paymentNotification.getObject().getId());
+
+        if (payment.isPresent()) {
+           var p = payment.get();
+            p.setTransactionStatus(TransactionStatus.valueOf(paymentNotification.getObject().getStatus()));
+            premiumRepository.save(p);
+        }
     }
 }

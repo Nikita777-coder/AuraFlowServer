@@ -1,5 +1,6 @@
 package app.controller;
 
+import app.dto.payment.PaymentNotification;
 import app.dto.premium.PremiumData;
 import app.entity.payment.TransactionStatus;
 import app.service.PremiumService;
@@ -20,6 +21,16 @@ public class PremiumController {
     @ResponseBody
     public Boolean hasPremium(@AuthenticationPrincipal UserDetails userDetails) {
         return premiumService.hasPremium(userDetails);
+    }
+
+    @PostMapping("/notification/test")
+    public void pushUserTestPaymentNotification(@RequestBody PaymentNotification paymentNotification) {
+        premiumService.logPaymentNotification(paymentNotification);
+    }
+
+    @PostMapping("/notification")
+    public void pushUserPaymentNotification(@RequestBody PaymentNotification paymentNotification) {
+        premiumService.logPaymentNotification(paymentNotification);
     }
 
     @PostMapping
