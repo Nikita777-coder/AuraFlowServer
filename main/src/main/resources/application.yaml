@@ -71,4 +71,5 @@ server:
     meditation-ai-path: ${INTEGRATION_MEDITATION_AI_PATH}
     fixed-rate-time: 60000
     fixed-update: 30000
+    payment-service-path: ${INTEGRATION_PAYMENT_SERVICE_PATH}
 
