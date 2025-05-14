@@ -3,6 +3,7 @@ package app.service;
 import app.dto.payment.PaymentNotification;
 import app.dto.premium.PremiumData;
 import app.dto.premium.PremiumIntegrationServiceResponse;
+import app.dto.premium.PremiumPaymentResponse;
 import app.entity.UserEntity;
 import app.entity.payment.PremiumEntity;
 import app.entity.payment.TransactionStatus;
@@ -48,7 +49,7 @@ public class PremiumService {
             premiumRepository.save(p);
         }
     }
-    public UUID buyPremium(UserDetails userDetails) {
+    public PremiumPaymentResponse buyPremium(UserDetails userDetails) {
         var ans = webClientRestService.post(
                 integrationBaseUrl,
                 paymentServicePath,
@@ -59,7 +60,11 @@ public class PremiumService {
         PremiumEntity premiumEntity = premiumMapper.premiumIntegrationServiceResponseToPremiumEntity(ans);
         premiumEntity.setUserEntity(userEntity);
 
-        return premiumRepository.save(premiumEntity).getId();
+        PremiumPaymentResponse response = new PremiumPaymentResponse();
+        response.setId(premiumRepository.save(premiumEntity).getId());
+        response.setPayLink(premiumEntity.getPaymentUrl());
+
+        return response;
     }
     public TransactionStatus getTransactionStatus(UserDetails userDetails, UUID paymentId) {
         return premiumRepository.getPremiumEntityByIdAndUserEntity_Email(paymentId, userDetails.getUsername())

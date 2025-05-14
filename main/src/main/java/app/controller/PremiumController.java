@@ -2,6 +2,7 @@ package app.controller;
 
 import app.dto.payment.PaymentNotification;
 import app.dto.premium.PremiumData;
+import app.dto.premium.PremiumPaymentResponse;
 import app.entity.payment.TransactionStatus;
 import app.service.PremiumService;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class PremiumController {
     }
 
     @PostMapping
-    public UUID buyPremium(@AuthenticationPrincipal UserDetails userDetails) {
+    public PremiumPaymentResponse buyPremium(@AuthenticationPrincipal UserDetails userDetails) {
         return premiumService.buyPremium(userDetails);
     }
 

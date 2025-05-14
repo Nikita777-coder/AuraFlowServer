@@ -34,7 +34,8 @@ public class SecurityConfigurations {
                                 antMatcher("/actuator/health/**"),
                                 antMatcher("/h2-console/**"),
                                 antMatcher("/meditation/all"),
-                                antMatcher("/platform-meditation-album/**")
+                                antMatcher("/platform-meditation-album/**"),
+                                antMatcher("/premium/notification/test")
                         )
                         .permitAll()
                         .anyRequest()
