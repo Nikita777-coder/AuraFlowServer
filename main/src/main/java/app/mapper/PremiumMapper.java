@@ -11,5 +11,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface PremiumMapper {
     List<PremiumData> premiumEntitiesToPremiumDatas(List<PremiumEntity> premiumEntities);
+    @Mapping(target = "paymentToken", source = "confirmation.paymentToken")
     PremiumEntity premiumIntegrationServiceResponseToPremiumEntity(PremiumIntegrationServiceResponse premiumIntegrationServiceResponse);
 }

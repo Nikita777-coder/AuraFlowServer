@@ -9,5 +9,5 @@ import java.util.UUID;
 @Setter
 public class PremiumPaymentResponse {
     private UUID id;
-    private String payLink;
+    private String payToken;
 }
