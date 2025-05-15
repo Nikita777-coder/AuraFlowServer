@@ -22,7 +22,7 @@ public class PremiumEntity {
     private UserEntity userEntity;
 
     @Column
-    private String paymentUrl;
+    private String paymentToken;
 
     @Column(name = "transaction_status")
     private TransactionStatus transactionStatus;
