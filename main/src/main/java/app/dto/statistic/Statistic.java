@@ -1,6 +1,6 @@
 package app.dto.statistic;
 
-import app.dto.meditation.Meditation;
+import app.dto.meditation.MeditationStatData;
 import jakarta.validation.constraints.Min;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,8 +18,5 @@ public class Statistic {
 
     private LocalDate statisticTimeFixing;
 
-    @Min(value = 0, message = "entranceCountPerDay can't be < 0")
-    private Integer meditationWatchCountPerDay;
-
-    private List<Meditation> watchedMeditationsPerDay;
+    private List<MeditationStatData> watchedMeditationsPerDay;
 }
