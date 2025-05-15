@@ -46,8 +46,9 @@ public class PremiumService {
         if (payment.isPresent()) {
             var p = payment.get();
             p.setTransactionStatus(TransactionStatus.valueOf(paymentNotification.getObject().getStatus().toUpperCase()));
-            System.out.println(p.getTransactionStatus());
             premiumRepository.save(p);
+            p.getUserEntity().setIsPremium(true);
+            userService.updateUser(p.getUserEntity());
         }
     }
     public PremiumPaymentResponse buyPremium(UserDetails userDetails) {
