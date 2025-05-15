@@ -70,6 +70,7 @@ public class UserEntity implements UserDetails {
     private List<MeditationAlbumEntity> meditationAlbumEntities;
 
     @OneToMany(orphanRemoval = true, mappedBy = "userEntity", cascade = {CascadeType.ALL})
+    @ToString.Exclude
     private List<PremiumEntity> premiumEntities;
 
     @Column
