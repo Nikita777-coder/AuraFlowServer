@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -14,11 +15,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class PremiumEntity {
     @Id
     private UUID id;
 
-    @ManyToOne(targetEntity = UserEntity.class)
+    @ManyToOne(targetEntity = UserEntity.class, cascade = {CascadeType.ALL})
     private UserEntity userEntity;
 
     @Column

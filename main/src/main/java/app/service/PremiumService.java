@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +31,7 @@ public class PremiumService {
     @Value("${server.integration.base-url}")
     private String integrationBaseUrl;
     public Boolean hasPremium(UserDetails userDetails) {
+        premiumRepository.findAll().forEach(System.out::println);
         return !premiumRepository.getCurrentPremium(
              userDetails.getUsername(),
                 TransactionStatus.SUCCEEDED
@@ -46,9 +48,13 @@ public class PremiumService {
         if (payment.isPresent()) {
             var p = payment.get();
             p.setTransactionStatus(TransactionStatus.valueOf(paymentNotification.getObject().getStatus().toUpperCase()));
+
+            if (p.getTransactionStatus() == TransactionStatus.SUCCEEDED) {
+                p.setExpiredTime(LocalDateTime.now().plusDays(30));
+                p.getUserEntity().setIsPremium(true);
+            }
+
             premiumRepository.save(p);
-            p.getUserEntity().setIsPremium(true);
-            userService.updateUser(p.getUserEntity());
         }
     }
     public PremiumPaymentResponse buyPremium(UserDetails userDetails) {
@@ -61,6 +67,7 @@ public class PremiumService {
         UserEntity userEntity = userService.getUserByEmail(userDetails.getUsername());
         PremiumEntity premiumEntity = premiumMapper.premiumIntegrationServiceResponseToPremiumEntity(ans);
         premiumEntity.setUserEntity(userEntity);
+        premiumEntity.setTransactionTime(LocalDateTime.now());
 
         PremiumPaymentResponse response = new PremiumPaymentResponse();
         response.setId(premiumRepository.save(premiumEntity).getId());
