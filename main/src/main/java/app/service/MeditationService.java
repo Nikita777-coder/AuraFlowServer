@@ -2,7 +2,7 @@ package app.service;
 
 import app.dto.meditation.*;
 import app.entity.MeditationPlatformAlbumEntity;
-import app.entity.meditation.MeditationEntity;
+import app.entity.MeditationEntity;
 import app.extra.ProgramCommons;
 import app.mapper.MeditationMapper;
 import app.mapper.TagMapper;

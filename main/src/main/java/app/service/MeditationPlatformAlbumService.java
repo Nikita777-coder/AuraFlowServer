@@ -4,7 +4,7 @@ import app.dto.meditationalbum.MeditationAlbumPlatform;
 import app.dto.meditationalbum.MeditationAlbumRequest;
 import app.entity.MeditationPlatformAlbumEntity;
 import app.entity.UserEntity;
-import app.entity.meditation.MeditationEntity;
+import app.entity.MeditationEntity;
 import app.extra.ProgramCommons;
 import app.mapper.MeditationPlatformAlbumMapper;
 import app.repository.MeditationPlatformAlbumRepository;

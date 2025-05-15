@@ -4,7 +4,7 @@ import app.dto.meditation.MeditationServiceDataWrapper;
 import app.dto.meditation.MeditationStatus;
 import app.dto.notificationservice.NotificationRequest;
 import app.entity.UserEntity;
-import app.entity.meditation.MeditationEntity;
+import app.entity.MeditationEntity;
 import app.extra.ProgramCommons;
 import app.mapper.MeditationMapper;
 import app.repository.MeditationRepository;

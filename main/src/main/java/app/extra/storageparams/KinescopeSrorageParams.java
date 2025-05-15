@@ -1,6 +1,6 @@
 package app.extra.storageparams;
 
-import app.entity.meditation.MeditationEntity;
+import app.entity.MeditationEntity;
 
 import java.util.Map;
 

@@ -1,7 +1,7 @@
 package app.mapper;
 
 import app.dto.meditation.*;
-import app.entity.meditation.MeditationEntity;
+import app.entity.MeditationEntity;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
