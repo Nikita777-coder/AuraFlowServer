@@ -47,11 +47,11 @@ public class PremiumService {
         }
 
         if (payment.isPresent()) {
-            System.out.println(1);
+            System.out.println(paymentNotification.getObject().getId());
+            System.out.println(paymentNotification.getObject().getStatus());
             var p = payment.get();
             p.setTransactionStatus(TransactionStatus.valueOf(paymentNotification.getObject().getStatus()));
             premiumRepository.save(p);
-
         }
     }
     public PremiumPaymentResponse buyPremium(UserDetails userDetails) {
