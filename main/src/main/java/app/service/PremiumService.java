@@ -42,15 +42,11 @@ public class PremiumService {
     }
     public void logPaymentNotification(PaymentNotification paymentNotification) {
         var payment = premiumRepository.findById(paymentNotification.getObject().getId());
-        for (var l : premiumRepository.findAll()) {
-            System.out.println(l.getId());
-        }
 
         if (payment.isPresent()) {
-            System.out.println(paymentNotification.getObject().getId());
-            System.out.println(paymentNotification.getObject().getStatus());
             var p = payment.get();
             p.setTransactionStatus(TransactionStatus.valueOf(paymentNotification.getObject().getStatus()));
+            System.out.println(p.getTransactionStatus());
             premiumRepository.save(p);
         }
     }
