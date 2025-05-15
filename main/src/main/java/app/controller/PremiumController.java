@@ -1,6 +1,8 @@
 package app.controller;
 
+import app.dto.payment.PaymentNotification;
 import app.dto.premium.PremiumData;
+import app.dto.premium.PremiumPaymentResponse;
 import app.entity.payment.TransactionStatus;
 import app.service.PremiumService;
 import lombok.RequiredArgsConstructor;
@@ -22,16 +24,25 @@ public class PremiumController {
         return premiumService.hasPremium(userDetails);
     }
 
+    @PostMapping("/notification/test")
+    public void pushUserTestPaymentNotification(@RequestBody PaymentNotification paymentNotification) {
+        premiumService.logPaymentNotification(paymentNotification);
+    }
+
+    @PostMapping("/notification")
+    public void pushUserPaymentNotification(@RequestBody PaymentNotification paymentNotification) {
+        premiumService.logPaymentNotification(paymentNotification);
+    }
+
     @PostMapping
-    public UUID buyPremium(@AuthenticationPrincipal UserDetails userDetails) {
-        throw new RuntimeException();
-//        return premiumService.buyPremium(userDetails);
+    public PremiumPaymentResponse buyPremium(@AuthenticationPrincipal UserDetails userDetails) {
+        return premiumService.buyPremium(userDetails);
     }
 
     @GetMapping("/status-payment")
     public TransactionStatus getTransactionStatus(@AuthenticationPrincipal UserDetails userDetails,
                                                   @RequestParam("payment-id") UUID id) {
-        throw new RuntimeException();
+        return premiumService.getTransactionStatus(userDetails, id);
     }
 
     @GetMapping("/history")

@@ -27,7 +27,7 @@ spring:
       enabled: true
   liquibase:
     change-log: db/changelog/db.changelog-master.xml
-    enabled: true
+    enabled: false
 
 server:
   admin:
@@ -71,4 +71,6 @@ server:
     meditation-ai-path: ${INTEGRATION_MEDITATION_AI_PATH}
     fixed-rate-time: 60000
     fixed-update: 30000
+    payment-service-path: ${INTEGRATION_PAYMENT_SERVICE_PATH}
+  port: ${PORT}
 

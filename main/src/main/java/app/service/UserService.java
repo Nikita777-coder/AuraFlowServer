@@ -39,6 +39,11 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    void updateUser(UserEntity userEntity) {
+        userRepository.save(userEntity);
+    }
+
     public UserOptions getOptions(UserDetails currentUserDetails) {
         return userMapper.userEntityToUserOptions(getUserByEmail(currentUserDetails.getUsername()));
     }
