@@ -32,7 +32,7 @@ public class PremiumService {
     public Boolean hasPremium(UserDetails userDetails) {
         return !premiumRepository.getCurrentPremium(
              userDetails.getUsername(),
-                TransactionStatus.SUCCESS
+                TransactionStatus.SUCCEEDED
         ).isEmpty();
     }
     public List<PremiumData> getHistoryOfPremiums(UserDetails userDetails) {
