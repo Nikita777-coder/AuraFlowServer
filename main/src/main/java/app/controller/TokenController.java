@@ -1,5 +1,6 @@
 package app.controller;
 
+import app.extra.Pair;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 @RequestMapping("/token")
@@ -17,13 +19,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TokenController {
     @Value("${server.oidc.email}")
     private String oidcEmail;
-    private final Map<String, String> tokens = new ConcurrentHashMap<>();
+    private final Map<String, Pair<String, AtomicInteger>> tokens = new ConcurrentHashMap<>();
 
     @GetMapping
     public String getToken(@AuthenticationPrincipal UserDetails userDetails, @RequestParam String time) {
         checkAccess(userDetails);
-        var token = tokens.get(time);
-        tokens.remove(time);
+        var data = tokens.get(time);
+
+        data.getSecond().addAndGet(1);
+        var token = data.getFirst();
+        if (data.getSecond().intValue() > 1) {
+            tokens.remove(time);
+        }
 
         return token;
     }
@@ -31,7 +38,9 @@ public class TokenController {
     public String updateToken(@AuthenticationPrincipal UserDetails userDetails, @RequestBody String token) {
         checkAccess(userDetails);
         var date = LocalDateTime.now().toString();
-        tokens.put(date, token);
+        Pair<String, AtomicInteger> pair = new Pair<>(token, new AtomicInteger(0));
+
+        tokens.put(date, pair);
 
         return date;
     }

@@ -166,7 +166,7 @@ public class StatisticService {
         int thirdQuantile = (int) Math.floor(0.75 * meditationStatEntities.size());
 
         meditationStatEntities.sort(Comparator.comparingDouble(MeditationStatEntity::getAveragePulse));
-        for (int i = firstQuartile - 1; i < thirdQuantile; ++i) {
+        for (int i = firstQuartile - 1; i < thirdQuantile && i > -1; ++i) {
             avgPulse += meditationStatEntities.get(i).getAveragePulse();
             pulseCount++;
         }
