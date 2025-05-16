@@ -51,103 +51,103 @@ public class AppRegularActions {
 
     @Value("${server.integration.notification-service.uri}")
     private String notificationUri;
-//    @Async
-//    @Scheduled(fixedRateString = "${server.integration.fixed-rate-time}")
-//    @Transactional(isolation = Isolation.REPEATABLE_READ)
-//    public void fetchUploadedMeditationsDataInfo() {
-//        List<MeditationEntity> uploadingMeditations = meditationRepository
-//                .findAllByStatusIn(List.of(UploadStatus.PARSED, UploadStatus.PARSING, UploadStatus.LOADING_TO_STORAGE, UploadStatus.SYSTEM_FILE_COPYING))
-//                .stream()
-//                .limit(maxCountRequests)
-//                .toList();
-//
-//        List<MeditationEntity> updatedEntities = new ArrayList<>(maxCountRequests);
-//        List<MeditationEntity> deleteEntities = new ArrayList<>(maxCountRequests);
-//
-//        for (var video: uploadingMeditations) {
-//            try {
-//                UploadResponseFull ans = webClientRestService.get(
-//                        integrationServiceBaseUrl,
-//                        mainUri + "/get-data-info",
-//                        Map.of("task-id", video.getTaskId().toString()),
-//                        UploadResponseFull.class
-//                );
-//
-//                var entity = meditationMapper.meditationServiceDataToMeditationEntity(
-//                        ans,
-//                        video
-//                );
-//                entity.setCountStatusRequests(video.getCountStatusRequests() + 1);
-//                entity.setUpdateAt(LocalDateTime.now());
-//
-//                updatedEntities.add(entity);
-//            } catch (IllegalStateException | IllegalArgumentException ex) {
-//                if (ex.getMessage().equals("already got it or not found") && video.getStatus() != UploadStatus.ERROR && video.getCountStatusRequests() > 0) {
-//                    video.setStatus(UploadStatus.READY);
-//                    video.setCountStatusRequests(video.getCountStatusRequests() + 1);
-//                    video.setUpdateAt(LocalDateTime.now());
-//
-//                    updatedEntities.add(video);
-//                    continue;
-//                }
-//
-//                deleteEntities.add(video);
-//            }
-//        }
-//
-//        deleteUselessMeditations(deleteEntities);
-//        meditationRepository.saveAll(updatedEntities);
-//    }
-//
-//    @Async
-//    @Scheduled(fixedRateString = "${server.integration.fixed-rate-time}")
-//    public void deleteUselessLocalMeditationsFromYandex() {
-//        List<MeditationEntity> uploadingMeditations = meditationRepository.findAll().stream().limit(maxCountRequests).toList();
-//        List<MeditationEntity> deleteEntities = new ArrayList<>(maxCountRequests);
-//
-//        for (var video : uploadingMeditations) {
-//            if (video.getStatus() == UploadStatus.READY || video.getStatus() == UploadStatus.ERROR) {
-//                try {
-//                    webClientRestService.get(
-//                            integrationServiceBaseUrl,
-//                            mainUri,
-//                            Map.of("video-link", video.getVideoLink()),
-//                            String.class);
-//                } catch (IllegalArgumentException | IllegalStateException ex) {
-//                    deleteEntities.add(video);
-//                }
-//            }
-//        }
-//
-//        deleteUselessMeditations(deleteEntities);
-//    }
-//
-//    @Async
-//    public void deleteUselessMeditations(List<MeditationEntity> entities) {
-//        meditationRepository.deleteAllByIdInBatch(entities.stream().map(MeditationEntity::getId).toList());
-//    }
-//
-//    @Async
-//    @Scheduled(fixedRateString = "${server.integration.fixed-update}")
-//    public void notificateUsers() {
-//        List<UserEntity> userEntities = userRepository.getAllByHasPractiseBreathOpt(true);
-//        userEntities = userEntities.stream().filter(user ->
-//                user.getStartTimeOfBreathPractise().isBefore(LocalTime.now())
-//                        && user.getStopTimeOfBreathPractise().isAfter(LocalTime.now())).toList();
-//
-//        if (!userEntities.isEmpty()) {
-//            NotificationRequest notificationRequest = new NotificationRequest();
-//            notificationRequest.setListTo(userEntities.stream().map(user -> user.getOneSignalId().toString()).toList());
-//            notificationRequest.setMessage(notificationMessage);
-//
-//            webClientRestService.post(
-//                    integrationServiceBaseUrl,
-//                    notificationUri,
-//                    notificationRequest,
-//                    void.class
-//            );
-//        }
-//    }
+    @Async
+    @Scheduled(fixedRateString = "${server.integration.fixed-rate-time}")
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void fetchUploadedMeditationsDataInfo() {
+        List<MeditationEntity> uploadingMeditations = meditationRepository
+                .findAllByStatusIn(List.of(UploadStatus.PARSED, UploadStatus.PARSING, UploadStatus.LOADING_TO_STORAGE, UploadStatus.SYSTEM_FILE_COPYING))
+                .stream()
+                .limit(maxCountRequests)
+                .toList();
+
+        List<MeditationEntity> updatedEntities = new ArrayList<>(maxCountRequests);
+        List<MeditationEntity> deleteEntities = new ArrayList<>(maxCountRequests);
+
+        for (var video: uploadingMeditations) {
+            try {
+                UploadResponseFull ans = webClientRestService.get(
+                        integrationServiceBaseUrl,
+                        mainUri + "/get-data-info",
+                        Map.of("task-id", video.getTaskId().toString()),
+                        UploadResponseFull.class
+                );
+
+                var entity = meditationMapper.meditationServiceDataToMeditationEntity(
+                        ans,
+                        video
+                );
+                entity.setCountStatusRequests(video.getCountStatusRequests() + 1);
+                entity.setUpdateAt(LocalDateTime.now());
+
+                updatedEntities.add(entity);
+            } catch (IllegalStateException | IllegalArgumentException ex) {
+                if (ex.getMessage().equals("already got it or not found") && video.getStatus() != UploadStatus.ERROR && video.getCountStatusRequests() > 0) {
+                    video.setStatus(UploadStatus.READY);
+                    video.setCountStatusRequests(video.getCountStatusRequests() + 1);
+                    video.setUpdateAt(LocalDateTime.now());
+
+                    updatedEntities.add(video);
+                    continue;
+                }
+
+                deleteEntities.add(video);
+            }
+        }
+
+        deleteUselessMeditations(deleteEntities);
+        meditationRepository.saveAll(updatedEntities);
+    }
+
+    @Async
+    @Scheduled(fixedRateString = "${server.integration.fixed-rate-time}")
+    public void deleteUselessLocalMeditationsFromYandex() {
+        List<MeditationEntity> uploadingMeditations = meditationRepository.findAll().stream().limit(maxCountRequests).toList();
+        List<MeditationEntity> deleteEntities = new ArrayList<>(maxCountRequests);
+
+        for (var video : uploadingMeditations) {
+            if (video.getStatus() == UploadStatus.READY || video.getStatus() == UploadStatus.ERROR) {
+                try {
+                    webClientRestService.get(
+                            integrationServiceBaseUrl,
+                            mainUri,
+                            Map.of("video-link", video.getVideoLink()),
+                            String.class);
+                } catch (IllegalArgumentException | IllegalStateException ex) {
+                    deleteEntities.add(video);
+                }
+            }
+        }
+
+        deleteUselessMeditations(deleteEntities);
+    }
+
+    @Async
+    public void deleteUselessMeditations(List<MeditationEntity> entities) {
+        meditationRepository.deleteAllByIdInBatch(entities.stream().map(MeditationEntity::getId).toList());
+    }
+
+    @Async
+    @Scheduled(fixedRateString = "${server.integration.fixed-update}")
+    public void notificateUsers() {
+        List<UserEntity> userEntities = userRepository.getAllByHasPractiseBreathOpt(true);
+        userEntities = userEntities.stream().filter(user ->
+                user.getStartTimeOfBreathPractise().isBefore(LocalTime.now())
+                        && user.getStopTimeOfBreathPractise().isAfter(LocalTime.now())).toList();
+
+        if (!userEntities.isEmpty()) {
+            NotificationRequest notificationRequest = new NotificationRequest();
+            notificationRequest.setListTo(userEntities.stream().map(user -> user.getOneSignalId().toString()).toList());
+            notificationRequest.setMessage(notificationMessage);
+
+            webClientRestService.post(
+                    integrationServiceBaseUrl,
+                    notificationUri,
+                    notificationRequest,
+                    void.class
+            );
+        }
+    }
 
     @Async
     @Scheduled(fixedRateString = "${server.integration.fixed-update}")
