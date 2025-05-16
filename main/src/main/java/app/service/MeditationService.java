@@ -121,6 +121,23 @@ public class MeditationService {
                                                 .map(MeditationEntity::getStatus)
                                 )
                 );
+        UploadResponseFull ans = webClientRestService.get(
+                integrationServiceBaseUrl,
+                        videoStorageUri + "/get-data-info",
+                Map.of("task-id", meditation.getTaskId().toString()
+                ),
+                UploadResponseFull.class);
+
+        var entity = meditationMapper.meditationServiceDataToMeditationEntity(
+                ans,
+                meditation
+        );
+        entity.setCountStatusRequests(meditation.getCountStatusRequests() + 1);
+        entity.setUpdateAt(LocalDateTime.now());
+
+        meditationRepository.save(entity);
+
+        return entity.getStatus();
     }
     public Mono<UUID> uploadMeditationByUrl(UserDetails userDetails,
                                             MeditationUploadBodyRequest meditationUploadBodyRequest) {

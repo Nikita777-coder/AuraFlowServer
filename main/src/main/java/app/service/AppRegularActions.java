@@ -19,7 +19,10 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -126,47 +129,6 @@ public class AppRegularActions {
                 .subscribe();
     }
 
-
-    @Scheduled(fixedRateString = "${server.integration.fixed-update}")
-    public void loadMeditations() {
-        meditationService.getAllPlatformMeditations()
-                .doOnSubscribe(s -> System.out.println("🚀 Запрос уходит..."))
-                .doOnNext(list -> System.out.println("📦 Получено " + list.size() + " медитаций"))
-                .zipWith(
-                        Mono.fromCallable(meditationRepository::findAll)
-                                .subscribeOn(Schedulers.boundedElastic())
-                )
-                .map(tuple -> {
-                    List<String> allPlatformMeditations = tuple.getT1();
-                    List<MeditationEntity> allLocalMeditations = tuple.getT2();
-
-                    Set<String> localVideoLinks = allLocalMeditations.stream()
-                            .map(MeditationEntity::getVideoLink)
-                            .collect(Collectors.toSet());
-
-                    List<MeditationEntity> newEntities = new ArrayList<>();
-
-                    for (String platformLink : allPlatformMeditations) {
-                        if (!localVideoLinks.contains(platformLink)) {
-                            MeditationEntity entity = new MeditationEntity();
-                            entity.setCreatedAt(LocalDateTime.now());
-                            entity.setTitle(platformLink.split("/")[5].split("\\.")[0]);
-                            entity.setVideoLink(platformLink);
-                            entity.setStatus(UploadStatus.READY);
-                            newEntities.add(entity);
-                        }
-                    }
-
-                    return newEntities;
-                })
-                .flatMap(entities ->
-                        Mono.fromRunnable(() -> meditationRepository.saveAll(entities))
-                                .subscribeOn(Schedulers.boundedElastic())
-                )
-                .subscribe();
-    }
-
-
     @Scheduled(fixedRateString = "${server.integration.fixed-update}")
     public void notificateUsers() {
         Mono.fromCallable(() -> userRepository.getAllByHasPractiseBreathOpt(true))
@@ -190,5 +152,28 @@ public class AppRegularActions {
                     );
                 })
                 .subscribe();
+    }
+
+    @Async
+    @Scheduled(fixedRateString = "${server.integration.fixed-update}")
+    public void loadMeditations() {
+        List<String> allPlatformMeditations = meditationService.getAllPlatformMeditations();
+        List<MeditationEntity> allLocalMeditations = meditationRepository.findAll();
+        Set<String> meditationLocalVideos = allLocalMeditations.stream().map(MeditationEntity::getVideoLink).collect(Collectors.toSet());
+        List<MeditationEntity> videoLinksForAddingToLocalMeditations = new ArrayList<>();
+
+        for (var meditation: allPlatformMeditations) {
+            if (!meditationLocalVideos.contains(meditation)) {
+                MeditationEntity meditationEntity = new MeditationEntity();
+                meditationEntity.setCreatedAt(LocalDateTime.now());
+                meditationEntity.setTitle(meditation.split("/")[5].split("\\.")[0]);
+                meditationEntity.setVideoLink(meditation);
+                meditationEntity.setStatus(UploadStatus.READY);
+
+                videoLinksForAddingToLocalMeditations.add(meditationEntity);
+            }
+        }
+
+        meditationRepository.saveAll(videoLinksForAddingToLocalMeditations);
     }
 }
