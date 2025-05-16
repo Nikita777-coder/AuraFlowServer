@@ -101,8 +101,8 @@ resilience4j:
         baseConfig: default
 
 web-retry:
-  max-attempts: 3
+  max-attempts: 10
   backoff:
     min-delay: 50
     multiplier: 2
-    max-delay: 150
+    max-delay: 10000
