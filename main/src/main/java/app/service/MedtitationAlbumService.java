@@ -105,21 +105,19 @@ public class MedtitationAlbumService {
 
         return meditationAlbumMapper.meditationAlbumEntityToMeditationAlbum(meditationAlbumRepository.save(updatedEntity));
     }
-    public void updateAlbumCheckedMeditations(UserDetails userDetails, UUID id, List<UserMeditationEntity> userMeditationEntities) {
-        UserMeditationAlbumEntity entity = checkControl(userDetails, id);
-
-        List<UserMeditationEntity> userAlbumMeditationEntities = entity.getMeditations();
+    public void updateAlbumCheckedMeditations(UserMeditationAlbumEntity album, List<UserMeditationEntity> userMeditationEntities) {
+        List<UserMeditationEntity> userAlbumMeditationEntities = album.getMeditations();
         if (userMeditationEntities != null) {
             userAlbumMeditationEntities = userMeditationEntities;
         }
 
-        entity.setMeditations(userAlbumMeditationEntities);
-        meditationAlbumRepository.save(entity);
+        album.setMeditations(userAlbumMeditationEntities);
+        meditationAlbumRepository.save(album);
     }
     private UserMeditationAlbumEntity checkControl(UserDetails userDetails, UUID id) {
         UserMeditationAlbumEntity entity = programCommons.getAlbumById(id, meditationAlbumRepository);
 
-        if (!entity.getUser().getEmail().equals(userDetails.getUsername())) {
+        if (!programCommons.isUserAdmin(userDetails) && !entity.getUser().getEmail().equals(userDetails.getUsername())) {
             throw new AccessDeniedException("access deny");
         }
 

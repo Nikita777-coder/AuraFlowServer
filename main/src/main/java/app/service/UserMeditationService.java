@@ -79,7 +79,7 @@ public class UserMeditationService {
 
         List<UserMeditationEntity> albumMeditations = album.getMeditations();
         albumMeditations.add(userMeditationEntity);
-        medtitationAlbumService.updateAlbumCheckedMeditations(userDetails, album.getId(), albumMeditations);
+        medtitationAlbumService.updateAlbumCheckedMeditations(album, albumMeditations);
 
         return userMeditationEntity.getId();
     }
