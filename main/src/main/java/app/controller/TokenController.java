@@ -32,6 +32,8 @@ public class TokenController {
             tokens.remove(time);
         }
 
+        System.out.printf("%s:%s\n", time, token);
+
         return token;
     }
     @PatchMapping
