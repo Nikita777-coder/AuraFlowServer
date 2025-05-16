@@ -10,6 +10,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/user")
@@ -38,6 +40,24 @@ public class UserController {
     public String updatePassword(@AuthenticationPrincipal UserDetails userDetails,
                                  @RequestBody UpdatePasswordData updatePasswordData) {
         userService.updatePassword(userDetails, updatePasswordData);
+        return "Success";
+    }
+
+    @PatchMapping("/block")
+    public String blockUser(@AuthenticationPrincipal UserDetails userDetails,
+                          @RequestParam String email) {
+        userService.blockUser(userDetails, email);
+        return "Success";
+    }
+    @PatchMapping("/unlock")
+    public String unlockUser(@AuthenticationPrincipal UserDetails userDetails,
+                            @RequestParam String email) {
+        userService.unlockUser(userDetails, email);
+        return "Success";
+    }
+    @DeleteMapping
+    public String delete(@AuthenticationPrincipal UserDetails userDetails) {
+        userService.delete(userDetails);
         return "Success";
     }
 }
