@@ -4,10 +4,13 @@ package app.service;
 import app.extra.AuthorizedRequestBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,7 +31,23 @@ import java.util.stream.Collectors;
 public class WebClientRestService {
     private final WebClient webClient;
     private final AuthorizedRequestBuilder authorizedRequestBuilder;
+    @Value("${web-retry.max-attempts}")
+    private int maxAttempts;
+    @Value("${web-retry.backoff.min-delay}")
+    private long minDelay;
+    @Value("${web-retry.backoff.max-delay}")
+    private long maxDelay;
+    @Value("${web-retry.backoff.multiplier}")
+    private int multiplier;
 
+    @Retryable(
+            maxAttemptsExpression = "maxAttempts",
+            backoff = @Backoff(
+                    delayExpression = "minDelay",
+                    multiplierExpression = "multiplier",
+                    maxDelayExpression = "maxDelay"
+            )
+    )
     public <T> T get(String baseUrl, String uri, Map<String, String> params, Class<T> tClass) {
         String fullUri = UriComponentsBuilder.fromUriString(baseUrl + uri)
                 .queryParams(CollectionUtils.toMultiValueMap(
@@ -67,6 +86,14 @@ public class WebClientRestService {
                 .block();
     }
 
+    @Retryable(
+            maxAttemptsExpression = "maxAttempts",
+            backoff = @Backoff(
+                    delayExpression = "minDelay",
+                    multiplierExpression = "multiplier",
+                    maxDelayExpression = "maxDelay"
+            )
+    )
     public <T> T get(String baseUrl, String uri, ParameterizedTypeReference<T> type) {
         String fullUri = UriComponentsBuilder.fromUriString(baseUrl + uri)
                 .build()
@@ -98,6 +125,14 @@ public class WebClientRestService {
                 .block();
     }
 
+    @Retryable(
+            maxAttemptsExpression = "maxAttempts",
+            backoff = @Backoff(
+                    delayExpression = "minDelay",
+                    multiplierExpression = "multiplier",
+                    maxDelayExpression = "maxDelay"
+            )
+    )
     public <T> T post(String baseUrl, String uri, Class<T> tClass) {
         ClientRequest request = ClientRequest.create(HttpMethod.POST, URI.create(baseUrl + uri))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -128,7 +163,14 @@ public class WebClientRestService {
                 .block();
     }
 
-
+    @Retryable(
+            maxAttemptsExpression = "maxAttempts",
+            backoff = @Backoff(
+                    delayExpression = "minDelay",
+                    multiplierExpression = "multiplier",
+                    maxDelayExpression = "maxDelay"
+            )
+    )
     public <T, R> T post(String baseUrl, String uri, R body, Class<T> tClass) {
         ClientRequest request = ClientRequest.create(HttpMethod.POST, URI.create(baseUrl + uri))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -161,6 +203,14 @@ public class WebClientRestService {
                 .block();
     }
 
+    @Retryable(
+            maxAttemptsExpression = "maxAttempts",
+            backoff = @Backoff(
+                    delayExpression = "minDelay",
+                    multiplierExpression = "multiplier",
+                    maxDelayExpression = "maxDelay"
+            )
+    )
     public <T> T postVideo(String baseUrl, String uri, String title, MultipartFile file, String description, Class<T> tClass) {
         var bodyInserter = BodyInserters.fromMultipartData("title", title)
                 .with("upload-video", file.getResource());
@@ -200,6 +250,14 @@ public class WebClientRestService {
                 .block();
     }
 
+    @Retryable(
+            maxAttemptsExpression = "maxAttempts",
+            backoff = @Backoff(
+                    delayExpression = "minDelay",
+                    multiplierExpression = "multiplier",
+                    maxDelayExpression = "maxDelay"
+            )
+    )
     public void delete(String baseUrl, String uri, Map<String, String> params) {
         String fullUri = UriComponentsBuilder.fromUriString(baseUrl + uri)
                 .queryParams(CollectionUtils.toMultiValueMap(
@@ -223,6 +281,7 @@ public class WebClientRestService {
                 .uri(authorizedRequest.url())
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<>() {})
+
                 .block();
     }
 }

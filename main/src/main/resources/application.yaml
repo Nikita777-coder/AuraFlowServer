@@ -79,7 +79,7 @@ management:
     circuitbreakers:
       enabled: true
     ratelimiters:
-      enabled: true
+      enabled: false
   endpoint:
     health:
       show-details: always
@@ -99,3 +99,10 @@ resilience4j:
     instances:
       convert-service:
         baseConfig: default
+
+web-retry:
+  max-attempts: 3
+  backoff:
+    min-delay: 50
+    multiplier: 2
+    max-delay: 150
