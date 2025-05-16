@@ -24,7 +24,6 @@ import reactor.core.scheduler.Schedulers;
 import reactor.netty.http.client.HttpClient;
 
 import java.time.Duration;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Configuration
 @RequiredArgsConstructor
@@ -96,29 +95,27 @@ public class ZitadelWebClientConfigs {
                     return manager.authorize(authorizeRequest)
                             .flatMap(client -> {
                                 String token = client.getAccessToken().getTokenValue();
-                                System.out.println("👉 Запрос с токеном: " + token);
+//                                System.out.println("👉 Запрос с токеном: " + token);
 
-                                // Получаем дату обновления токена в реактивном стиле
                                 return Mono.fromCallable(() -> userRepository.findByEmail(oidcEmail))
                                         .subscribeOn(Schedulers.boundedElastic())
                                         .flatMap(userOpt -> {
                                             if (userOpt.isPresent()) {
                                                 var date = tokenController.updateToken(userOpt.get(), token);
-                                                System.out.println("🕒 Обновлённый токен: " + token);
-                                                System.out.println("📅 Дата обновления токена: " + date);
+//                                                System.out.println("🕒 Обновлённый токен: " + token);
+//                                                System.out.println("📅 Дата обновления токена: " + date);
 
-                                                // Можно передать дату как дополнительный заголовок
+
                                                 ClientRequest authorizedRequest = ClientRequest.from(request)
                                                         .headers(headers -> {
                                                             headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-                                                            headers.set("X-Token-Date", date); // <- безопасно!
+                                                            headers.set("X-Token-Date", date);
                                                         })
                                                         .build();
 
                                                 return next.exchange(authorizedRequest);
                                             }
 
-                                            // Если пользователь не найден — продолжаем без обновления
                                             ClientRequest authorizedRequest = ClientRequest.from(request)
                                                     .headers(headers -> headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                                                     .build();
@@ -127,12 +124,12 @@ public class ZitadelWebClientConfigs {
                                         });
                             });
                 })
-                .filter((request, next) -> {
-                    System.out.println("🚀 Отправка запроса");
-                    return next.exchange(request)
-                            .doOnNext(response ->
-                                    System.out.println("📦 Ответ получен, статус: " + response.statusCode()));
-                })
+//                .filter((request, next) -> {
+//                    System.out.println("🚀 Отправка запроса");
+//                    return next.exchange(request)
+//                            .doOnNext(response ->
+//                                    System.out.println("📦 Ответ получен, статус: " + response.statusCode()));
+//                })
                 .clientConnector(new ReactorClientHttpConnector(
                         HttpClient.create().responseTimeout(Duration.ofSeconds(responseTimeout))
                 ))
