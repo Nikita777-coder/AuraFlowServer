@@ -1,8 +1,10 @@
 package app.entity.payment;
 
+import lombok.Getter;
+
+@Getter
 public enum TransactionStatus {
-    INITIALIZED,
-    WAITING,
-    SUCCESS,
-    REJECTED
+    WAITING_FOR_CAPTURE,
+    SUCCEEDED,
+    CANCELED
 }

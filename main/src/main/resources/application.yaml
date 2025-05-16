@@ -10,6 +10,12 @@ spring:
       min-idle: 2
       initial-size: 5
       remove-abandoned: true
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: ${MULTIPART_FILE_SIZE_THRESHOLD}
+      max-file-size: ${MULTIPART_MAX_FILE_SIZE}
+      max-request-size: ${MULTIPART_MAX_REQUEST_SIZE}
   jpa:
     hibernate:
       ddl-auto: update
@@ -19,10 +25,24 @@ spring:
   h2:
     console:
       enabled: true
+  liquibase:
+    change-log: db/changelog/db.changelog-master.xml
+    enabled: false
 
 server:
+  admin:
+    email: ${ADMIN_EMAIL}
+    password: ${ADMIN_PASSWORD}
+    name: ${ADMIN_NAME}
+    onesignal-id: ${ADMIN_ONESIGNAL_ID}
   web:
     max-count-requests: ${MAX_COUNT_REQUESTS}
+  zitadel:
+    id: ${REGISTRATION_ID}
+    client-id: ${ZITADEL_CLIENT_ID}
+    client-secret: ${ZITADEL_CLIENT_SECRET}
+    scope: ${ZITADEL_SCOPE}
+    token-uri: ${ZITADEL_TOKEN_URI}
   jwt:
     token:
       signing:
@@ -35,16 +55,19 @@ server:
     protocol: smtps
     debug: false
     verification-code-length: ${VERIFICATION_CODE_LENGTH}
-  keycloak:
-    client-id: ${CLIENT_ID}
-    client-secret: ${CLIENT_SECRET}
-    url: ${KEYCLOAK_URL}
-    realm: ${KEYCLOAK_REALM}
-  oauth:
-    grand-type: "client_credentials"
   web-client:
-    time-response: 8
+    time-response: ${FIXED_RESPONSE}
   integration:
     base-url: ${INTEGRATION_SERVICE_BASE_URL}
-    main-uri: ${MAIN_URI}
-    fixed-rate-time: 60000
+    video-storage:
+      uri: ${VIDEO_STORAGE_URI}
+      type: ${VIDEO_STORAGE_TYPE}
+    notification-service:
+      uri: ${NOTIFICATION_SERVICE_URI}
+      message: ${NOTIFICATION_SERVICE_USER_MESSAGE}
+    meditation-ai-path: ${INTEGRATION_MEDITATION_AI_PATH}
+    fixed-rate-time: ${FIXED_RATE_TIME}
+    fixed-update: ${FIXED_UPDATE}
+    payment-service-path: ${INTEGRATION_PAYMENT_SERVICE_PATH}
+  port: ${PORT}
+

@@ -1,14 +1,11 @@
 package app.entity.payment;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import app.entity.UserEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,13 +15,16 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class PremiumEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "buyer_email")
-    private String userEmail;
+    @ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.PERSIST})
+    private UserEntity userEntity;
+
+    @Column
+    private String paymentToken;
 
     @Column(name = "transaction_status")
     private TransactionStatus transactionStatus;

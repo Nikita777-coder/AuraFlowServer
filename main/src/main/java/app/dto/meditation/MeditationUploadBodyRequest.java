@@ -1,5 +1,8 @@
 package app.dto.meditation;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,10 +13,15 @@ import java.util.UUID;
 @Getter
 @Setter
 public class MeditationUploadBodyRequest {
+    private String author;
+
+    @NotBlank(message = "can't be null")
     private String sourceLink;
-    private UUID parentId;
-    private MultipartFile uploadVideo;
+
+    @NotBlank(message = "can't be null")
     private String title;
+
+    private boolean isPromoted = false;
     private String description;
-    private List<Tag> tags;
+    private List<String> tags;
 }

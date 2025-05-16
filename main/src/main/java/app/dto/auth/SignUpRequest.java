@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @NoArgsConstructor
 @Getter
 @Setter
@@ -18,6 +20,8 @@ public class SignUpRequest {
     private String email;
 
     private String name = "";
+
+    private UUID oneSignalId;
 
     @NotBlank(message = "password can't be empty!")
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",

@@ -6,6 +6,8 @@ import app.service.authservice.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +31,12 @@ public class AuthController {
     @ResponseBody
     public String enter(@Valid @RequestBody SignInRequest request) {
         return authService.signin(request);
+    }
+
+    @DeleteMapping("/logout")
+    public String logout(@AuthenticationPrincipal UserDetails userDetails) {
+        authService.logout(userDetails);
+        return "Success";
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
