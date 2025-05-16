@@ -1,6 +1,7 @@
 package app.controller;
 
 import app.extra.Pair;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
@@ -16,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RestController
 @RequestMapping("/token")
 @RequiredArgsConstructor
+@Hidden
 public class TokenController {
     @Value("${server.oidc.email}")
     private String oidcEmail;
