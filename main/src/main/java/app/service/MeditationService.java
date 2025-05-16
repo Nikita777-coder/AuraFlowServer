@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,22 +51,27 @@ public class MeditationService {
                                               List<String> tags,
                                               boolean isPromoted) {
         programCommons.checkUserRole(userDetails);
-        UploadResponseFull ans = webClientRestService.postVideo(
+        UUID answer = webClientRestService.postVideo(
                 integrationServiceBaseUrl,
                 videoStorageUri + "/by-upload-video",
                 title,
                 file,
                 description,
+                UUID.class
+        );
+        UploadResponseFull ans = webClientRestService.get(
+                integrationServiceBaseUrl,
+                videoStorageUri + "/get-data-info",
+                Map.of("task-id", answer.toString()),
                 UploadResponseFull.class
         );
 
         var entity = meditationMapper.uploadResponseDataToMeditationEntity(ans);
+        entity.setTaskId(answer);
+        entity.setCreatedAt(LocalDateTime.now());
 
-        if (ans.getUploadResponse().getData().getStatus() == null) {
-            entity.setStatus(MeditationStatus.DONE);
-        }
-
-        if (author != null) {
+        entity.setAuthor("service");
+        if (entity.getAuthor() == null) {
             entity.setAuthor(author);
         }
 
@@ -77,15 +83,51 @@ public class MeditationService {
 
         return meditationRepository.save(entity).getId();
     }
+    public UploadStatus getMeditationUploadStatus(UserDetails userDetails, UUID meditationId) {
+        programCommons.checkUserRole(userDetails);
+        var meditation = meditationRepository.findById(meditationId).orElseThrow(()
+                -> new IllegalArgumentException("meditation not found"));
+
+        var ans =  webClientRestService.get(
+                integrationServiceBaseUrl,
+                        videoStorageUri + "/get-data-info",
+                Map.of("task-id", meditation.getTaskId().toString()
+                ),
+                UploadResponseFull.class);
+
+        var entity = meditationMapper.meditationServiceDataToMeditationEntity(
+                ans,
+                meditation
+        );
+        entity.setCountStatusRequests(meditation.getCountStatusRequests() + 1);
+        entity.setUpdateAt(LocalDateTime.now());
+
+        meditationRepository.save(entity);
+
+        return entity.getStatus();
+    }
     public UUID uploadMeditationByUrl(UserDetails userDetails,
                             MeditationUploadBodyRequest meditationUploadBodyRequest) {
         programCommons.checkUserRole(userDetails);
-        UploadResponseFull ans = webClientRestService.post(integrationServiceBaseUrl, videoStorageUri + "/by-url", meditationUploadBodyRequest, UploadResponseFull.class);
+        UUID answer = webClientRestService.post(integrationServiceBaseUrl, videoStorageUri + "/by-url", meditationUploadBodyRequest, UUID.class);
+        UploadResponseFull ans = webClientRestService.get(
+                integrationServiceBaseUrl,
+                videoStorageUri + "/get-data-info",
+                Map.of("task-id", answer.toString()),
+                UploadResponseFull.class
+        );
 
         var entity = meditationMapper.uploadResponseDataToMeditationEntity(ans);
+        entity.setTaskId(answer);
+        entity.setTitle(meditationUploadBodyRequest.getTitle());
+        entity.setCreatedAt(LocalDateTime.now());
 
         if (meditationUploadBodyRequest.getAuthor() != null) {
             entity.setAuthor(meditationUploadBodyRequest.getAuthor());
+        }
+
+        if (meditationUploadBodyRequest.getDescription() != null) {
+            entity.setDescription(meditationUploadBodyRequest.getDescription());
         }
 
         if (meditationUploadBodyRequest.getTags() != null && !meditationUploadBodyRequest.getTags().isEmpty()) {
@@ -96,7 +138,7 @@ public class MeditationService {
     }
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<Meditation> getAll() {
-        return meditationMapper.meditationEntitiesToMeditations(meditationRepository.findAllByStatusIn(List.of(MeditationStatus.DONE)));
+        return meditationMapper.meditationEntitiesToMeditations(meditationRepository.findAllByStatusIn(List.of(UploadStatus.READY)));
     }
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<Meditation> getRecommended() {
@@ -108,16 +150,13 @@ public class MeditationService {
         return meditationMapper.meditationEntitiesToMeditations(meditationRepository
                 .findAllByCreatedAtAfterAndStatus(
                         LocalDateTime.now().minusDays(14),
-                        MeditationStatus.DONE)
+                        UploadStatus.READY)
         );
     }
     public void delete(UserDetails userDetails, UUID id) {
         programCommons.checkUserRole(userDetails);
         MeditationEntity meditation = getMeditation(id);
-
-        webClientRestService.delete(integrationServiceBaseUrl, videoStorageUri, storageParamsManager.getParams().
-                get(type.toLowerCase()).getParams(meditation)
-        );
+        webClientRestService.delete(integrationServiceBaseUrl, videoStorageUri);
 
         List<MeditationPlatformAlbumEntity> albums = meditation.getAlbumEntities();
         for (MeditationPlatformAlbumEntity album : albums) {
@@ -147,11 +186,9 @@ public class MeditationService {
                 meditation
         );
 
-        var upd = meditationMapper.meditationEntityToMeditation(
+        return meditationMapper.meditationEntityToMeditation(
              en
         );
-
-        return upd;
     }
     private MeditationEntity getMeditation(UUID id) {
         Optional<MeditationEntity> meditation = meditationRepository.findById(id);

@@ -23,12 +23,16 @@ public interface StatusMapper {
     default Set<Status> stringStatusesToSetOfStatuses(String jsonTags) {
         StringBuilder sb = new StringBuilder();
 
-        for (char s: jsonTags.toCharArray()) {
-            if (s != '\\' && s != '[' && s != ']' && s != '\"') {
-                sb.append(s);
+        if (jsonTags != null) {
+            for (char s : jsonTags.toCharArray()) {
+                if (s != '\\' && s != '[' && s != ']' && s != '\"') {
+                    sb.append(s);
+                }
             }
+
+            return Arrays.stream(sb.toString().split(",")).map(Status::valueOf).collect(Collectors.toSet());
         }
 
-        return Arrays.stream(sb.toString().split(",")).map(Status::valueOf).collect(Collectors.toSet());
+        return null;
     }
 }

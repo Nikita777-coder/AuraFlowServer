@@ -41,15 +41,15 @@ public class WebClientRestService {
                 .onStatus(status -> status.is4xxClientError(), clientResponse -> {
                     return clientResponse.bodyToMono(String.class)
                             .flatMap(responseBody -> {
-                                System.out.println("Error Response Body: " + responseBody);
-                                return Mono.error(new IllegalArgumentException());
+                                System.out.println("Error Response Body get 400: " + responseBody);
+                                return Mono.error(new IllegalArgumentException(responseBody));
                             });
                 })
                 .onStatus(status -> status.is5xxServerError(), clientResponse -> {
                     return clientResponse.bodyToMono(String.class)
                             .flatMap(responseBody -> {
-                                System.out.println("Error Response Body: " + responseBody);
-                                return Mono.error(new IllegalArgumentException());
+                                System.out.println("Error Response Body get 500: " + responseBody);
+                                return Mono.error(new IllegalArgumentException(responseBody));
                             });
                 })
                 .bodyToMono(tClass);
@@ -74,15 +74,15 @@ public class WebClientRestService {
                 .onStatus(status -> status.is4xxClientError(), clientResponse -> {
                     return clientResponse.bodyToMono(String.class)
                             .flatMap(responseBody -> {
-                                System.out.println("Error Response Body: " + responseBody);
-                                return Mono.error(new IllegalArgumentException());
+                                System.out.println("Error Response Body post 400: " + responseBody);
+                                return Mono.error(new IllegalArgumentException(responseBody));
                             });
                 })
                 .onStatus(status -> status.is5xxServerError(), clientResponse -> {
             return clientResponse.bodyToMono(String.class)
                     .flatMap(responseBody -> {
-                        System.out.println("Error Response Body: " + responseBody);
-                        return Mono.error(new IllegalArgumentException());
+                        System.out.println("Error Response Body post 500 " + responseBody);
+                        return Mono.error(new IllegalArgumentException(responseBody));
                     });
         })
                 .bodyToMono(tClass)
@@ -102,15 +102,15 @@ public class WebClientRestService {
                 .onStatus(status -> status.is4xxClientError(), clientResponse -> {
                     return clientResponse.bodyToMono(String.class)
                             .flatMap(responseBody -> {
-                                System.out.println("Error Response Body: " + responseBody);
-                                return Mono.error(new IllegalArgumentException());
+                                System.out.println("Error Response Body post 400: " + responseBody);
+                                return Mono.error(new IllegalArgumentException(responseBody));
                             });
                 })
                 .onStatus(status -> status.is5xxServerError(), clientResponse -> {
                     return clientResponse.bodyToMono(String.class)
                             .flatMap(responseBody -> {
-                                System.out.println("Error Response Body: " + responseBody);
-                                return Mono.error(new IllegalArgumentException());
+                                System.out.println("Error Response Body post 500: " + responseBody);
+                                return Mono.error(new IllegalArgumentException(responseBody));
                             });
                 })
                 .bodyToMono(tClass)
@@ -140,15 +140,15 @@ public class WebClientRestService {
                 .onStatus(status -> status.is4xxClientError(), clientResponse -> {
                     return clientResponse.bodyToMono(String.class)
                             .flatMap(responseBody -> {
-                                System.out.println("Error Response Body: " + responseBody);
-                                return Mono.error(new IllegalArgumentException());
+                                System.out.println("Error Response Body postVideo 400: " + responseBody);
+                                return Mono.error(new IllegalArgumentException(responseBody));
                             });
                 })
                 .onStatus(status -> status.is5xxServerError(), clientResponse -> {
                     return clientResponse.bodyToMono(String.class)
                             .flatMap(responseBody -> {
-                                System.out.println("Error Response Body: " + responseBody);
-                                return Mono.error(new IllegalArgumentException());
+                                System.out.println("Error Response Body postVideo 500: " + responseBody);
+                                return Mono.error(new IllegalArgumentException(responseBody));
                             });
                 })
                 .bodyToMono(tClass)
@@ -157,16 +157,13 @@ public class WebClientRestService {
         return ans;
     }
 
-    public void delete(String baseUrl, String uri, Map<String, String> params) {
+    public void delete(String baseUrl, String uri) {
         webClient
                 .mutate()
                 .baseUrl(baseUrl)
                 .build()
                 .delete()
-                .uri(uriBuilder -> {
-                    params.forEach(uriBuilder::queryParam);
-                    return uriBuilder.path(uri).build();
-                })
+                .uri(uri)
 //                .header("Authorization", "Bearer " + getToken())
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<>() {})
