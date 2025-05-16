@@ -6,10 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
-<<<<<<< HEAD
-=======
 import org.springframework.http.HttpMethod;
->>>>>>> 96ceadb (zitadel tested)
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -44,48 +41,6 @@ public class WebClientRestService {
                 .build()
                 .toUriString();
 
-
-        return response;
-    }
-
-    public <T> Mono<T> get(String baseUrl, String uri, ParameterizedTypeReference<T> typeReference) {
-        Mono<T> response = webClient
-                .mutate()
-                .baseUrl(baseUrl)
-                .build()
-                .get()
-                .uri(uri)
-                .headers(h -> System.out.println("👉 Запрос с токеном: " + h.getFirst(HttpHeaders.AUTHORIZATION)))
-                .retrieve()
-                .onStatus(status -> status.is4xxClientError(), clientResponse -> {
-                    return clientResponse.bodyToMono(String.class)
-                            .flatMap(responseBody -> {
-                                System.out.println("Error Response Body get 400: " + responseBody);
-                                return Mono.error(new IllegalArgumentException(responseBody));
-                            });
-                })
-                .onStatus(status -> status.is5xxServerError(), clientResponse -> {
-                    return clientResponse.bodyToMono(String.class)
-                            .flatMap(responseBody -> {
-                                System.out.println("Error Response Body get 500: " + responseBody);
-                                return Mono.error(new IllegalArgumentException(responseBody));
-                            });
-                })
-                .bodyToMono(typeReference)
-                .doOnSubscribe(sub -> System.out.println("🚀 Отправка запроса"))
-                .doOnNext(result -> System.out.println("✅ Получен ответ: " + result));
-
-        return response;
-    }
-
-    public <T, R> Mono<T> post(String baseUrl, String uri, R body, Class<T> tClass) {
-        var ans = webClient
-                .mutate()
-                .baseUrl(baseUrl)
-                .build()
-                .post()
-                .uri(uri)
-                .bodyValue(body);
         ClientRequest request = ClientRequest.create(HttpMethod.GET, URI.create(fullUri)).build();
         ClientRequest authorizedRequest = authorizedRequestBuilder.withAuthHeaders(request);
 
@@ -102,12 +57,6 @@ public class WebClientRestService {
                             });
                 })
                 .onStatus(status -> status.is5xxServerError(), clientResponse -> {
-
-    }
-    public <T> Mono<T> post(String baseUrl, String uri, Class<T> tClass) {
-        return webClient
-                .mutate()
-                .baseUrl(baseUrl)
                     return clientResponse.bodyToMono(String.class)
                             .flatMap(responseBody -> {
                                 System.out.println("Error Response Body post 500: " + responseBody);
@@ -208,10 +157,11 @@ public class WebClientRestService {
                                 return Mono.error(new IllegalArgumentException(responseBody));
                             });
                 })
-                .bodyToMono(tClass);
+                .bodyToMono(tClass)
+                .block();
     }
 
-    public <T> Mono<T> postVideo(String baseUrl, String uri, String title, MultipartFile file, String description, Class<T> tClass) {
+    public <T> T postVideo(String baseUrl, String uri, String title, MultipartFile file, String description, Class<T> tClass) {
         var bodyInserter = BodyInserters.fromMultipartData("title", title)
                 .with("upload-video", file.getResource());
 
@@ -246,15 +196,6 @@ public class WebClientRestService {
                                 return Mono.error(new IllegalArgumentException(responseBody));
                             });
                 })
-                .bodyToMono(tClass);
-
-        return ans;
-    }
-
-    public Mono<Void> delete(String baseUrl, String uri, Map<String, String> params) {
-        return webClient
-                .mutate()
-                .baseUrl(baseUrl)
                 .bodyToMono(tClass)
                 .block();
     }
@@ -281,7 +222,8 @@ public class WebClientRestService {
                 .method(authorizedRequest.method())
                 .uri(authorizedRequest.url())
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<>() {});
+                .bodyToMono(new ParameterizedTypeReference<>() {})
+                .block();
     }
 }
 
