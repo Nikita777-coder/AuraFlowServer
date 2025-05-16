@@ -31,6 +31,7 @@ public class MeditationPlatformAlbumService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public UUID createPlatformAlbum(UserDetails userDetails,
                                     MeditationAlbumRequest meditationAlbumRequest) {
+        programCommons.checkUserRole(userDetails);
         UserEntity userEntity = userService.getUserByEmail(userDetails.getUsername());
         checkPlatformTitleAlbums(meditationAlbumRequest.getTitle());
 
