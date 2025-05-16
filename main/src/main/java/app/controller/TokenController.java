@@ -32,7 +32,7 @@ public class TokenController {
             tokens.remove(time);
         }
 
-        System.out.printf("%s:%s\n", time, token);
+//        System.out.printf("%s:%s\n", time, token);
 
         return token;
     }
@@ -43,6 +43,8 @@ public class TokenController {
         Pair<String, AtomicInteger> pair = new Pair<>(token, new AtomicInteger(0));
 
         tokens.put(date, pair);
+
+//        System.out.printf("%s:%s\n", date, token);
 
         return date;
     }
