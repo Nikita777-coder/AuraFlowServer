@@ -1,10 +1,12 @@
 package app.service;
 
 import app.dto.meditation.*;
+import app.entity.MeditationPlatformAlbumEntity;
 import app.entity.MeditationEntity;
 import app.extra.ProgramCommons;
 import app.mapper.MeditationMapper;
 import app.mapper.TagMapper;
+import app.repository.MeditationPlatformAlbumRepository;
 import app.repository.MeditationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,14 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +39,7 @@ public class MeditationService {
     @Value("${server.integration.video-storage.type}")
     private String type;
 
-    public Mono<UUID> uploadMeditationByUploadVideo(UserDetails userDetails,
+    public UUID uploadMeditationByUploadVideo(UserDetails userDetails,
                                               MultipartFile file,
                                               String title,
                                               String description,
@@ -50,46 +47,41 @@ public class MeditationService {
                                               List<String> tags,
                                               boolean isPromoted) {
         programCommons.checkUserRole(userDetails);
-        return webClientRestService.postVideo(
-                        integrationServiceBaseUrl,
-                        videoStorageUri + "/by-upload-video",
-                        title,
-                        file,
-                        description,
-                        UUID.class
-                )
-                .flatMap(taskId ->
-                        webClientRestService.get(
-                                        integrationServiceBaseUrl,
-                                        videoStorageUri + "/get-data-info",
-                                        Map.of("task-id", taskId.toString()),
-                                        UploadResponseFull.class
-                                )
-                                .map(ans -> {
-                                    var entity = meditationMapper.uploadResponseDataToMeditationEntity(ans);
-                                    entity.setTaskId(taskId);
-                                    entity.setCreatedAt(LocalDateTime.now());
-                                    entity.setAuthor("service");
+        UUID answer = webClientRestService.postVideo(
+                integrationServiceBaseUrl,
+                videoStorageUri + "/by-upload-video",
+                title,
+                file,
+                description,
+                UUID.class
+        );
+        UploadResponseFull ans = webClientRestService.get(
+                integrationServiceBaseUrl,
+                videoStorageUri + "/get-data-info",
+                Map.of("task-id", answer.toString()),
+                UploadResponseFull.class
+        );
 
-                                    if (entity.getAuthor() == null || entity.getAuthor().isBlank()) {
-                                        entity.setAuthor(author);
-                                    }
+        var entity = meditationMapper.uploadResponseDataToMeditationEntity(ans);
+        entity.setTaskId(answer);
+        entity.setCreatedAt(LocalDateTime.now());
 
-                                    if (tags != null && !tags.isEmpty()) {
-                                        entity.setJsonTags(tagMapper.tagsToJsonStringTags(tags));
-                                    }
+        entity.setAuthor("service");
+        if (entity.getAuthor() == null) {
+            entity.setAuthor(author);
+        }
 
-                                    entity.setPromoted(isPromoted);
+        if (tags != null && !tags.isEmpty()) {
+            entity.setJsonTags(tagMapper.tagsToJsonStringTags(tags));
+        }
 
-                                    return entity;
-                                })
-                )
-                .flatMap(entity -> Mono.fromCallable(() -> meditationRepository.save(entity))
-                        .subscribeOn(Schedulers.boundedElastic()))
-                .map(MeditationEntity::getId);
+        entity.setPromoted(isPromoted);
+
+        return meditationRepository.save(entity).getId();
     }
-    public Mono<List<String>> getAllPlatformMeditations() {
-        ParameterizedTypeReference<List<String>> p = new ParameterizedTypeReference<>() {};
+    public List<String> getAllPlatformMeditations() {
+
+        ParameterizedTypeReference<List<String>> p = new ParameterizedTypeReference<List<String>>() {};
 
         return webClientRestService.get(
                 integrationServiceBaseUrl,
@@ -97,33 +89,14 @@ public class MeditationService {
                 p
         );
     }
-    public Mono<UploadStatus> getMeditationUploadStatus(UserDetails userDetails, UUID meditationId) {
+    public UploadStatus getMeditationUploadStatus(UserDetails userDetails, UUID meditationId) {
         programCommons.checkUserRole(userDetails);
+        var meditation = meditationRepository.findById(meditationId).orElseThrow(()
+                -> new IllegalArgumentException("meditation not found"));
 
-        return Mono.fromCallable(() -> meditationRepository.findById(meditationId)
-                        .orElseThrow(() -> new IllegalArgumentException("meditation not found")))
-                .subscribeOn(Schedulers.boundedElastic())
-                .flatMap(meditation ->
-                        webClientRestService.get(
-                                        integrationServiceBaseUrl,
-                                        videoStorageUri + "/get-data-info",
-                                        Map.of("task-id", meditation.getTaskId().toString()),
-                                        UploadResponseFull.class
-                                ).map(ans -> {
-                                    var entity = meditationMapper.meditationServiceDataToMeditationEntity(ans, meditation);
-                                    entity.setCountStatusRequests(meditation.getCountStatusRequests() + 1);
-                                    entity.setUpdateAt(LocalDateTime.now());
-                                    return entity;
-                                })
-                                .flatMap(updatedEntity ->
-                                        Mono.fromCallable(() -> meditationRepository.save(updatedEntity))
-                                                .subscribeOn(Schedulers.boundedElastic())
-                                                .map(MeditationEntity::getStatus)
-                                )
-                );
         UploadResponseFull ans = webClientRestService.get(
                 integrationServiceBaseUrl,
-                        videoStorageUri + "/get-data-info",
+                videoStorageUri + "/get-data-info",
                 Map.of("task-id", meditation.getTaskId().toString()
                 ),
                 UploadResponseFull.class);
@@ -139,47 +112,35 @@ public class MeditationService {
 
         return entity.getStatus();
     }
-    public Mono<UUID> uploadMeditationByUrl(UserDetails userDetails,
-                                            MeditationUploadBodyRequest meditationUploadBodyRequest) {
+    public UUID uploadMeditationByUrl(UserDetails userDetails,
+                                      MeditationUploadBodyRequest meditationUploadBodyRequest) {
         programCommons.checkUserRole(userDetails);
+        UUID answer = webClientRestService.post(integrationServiceBaseUrl, videoStorageUri + "/by-url", meditationUploadBodyRequest, UUID.class);
+        UploadResponseFull ans = webClientRestService.get(
+                integrationServiceBaseUrl,
+                videoStorageUri + "/get-data-info",
+                Map.of("task-id", answer.toString()),
+                UploadResponseFull.class
+        );
 
-        return webClientRestService.post(
-                        integrationServiceBaseUrl,
-                        videoStorageUri + "/by-url",
-                        meditationUploadBodyRequest,
-                        UUID.class
-                )
-                .flatMap(taskId ->
-                        webClientRestService.get(
-                                        integrationServiceBaseUrl,
-                                        videoStorageUri + "/get-data-info",
-                                        Map.of("task-id", taskId.toString()),
-                                        UploadResponseFull.class
-                                )
-                                .map(ans -> {
-                                    var entity = meditationMapper.uploadResponseDataToMeditationEntity(ans);
-                                    entity.setTaskId(taskId);
-                                    entity.setTitle(meditationUploadBodyRequest.getTitle());
-                                    entity.setCreatedAt(LocalDateTime.now());
+        var entity = meditationMapper.uploadResponseDataToMeditationEntity(ans);
+        entity.setTaskId(answer);
+        entity.setTitle(meditationUploadBodyRequest.getTitle());
+        entity.setCreatedAt(LocalDateTime.now());
 
-                                    if (meditationUploadBodyRequest.getAuthor() != null) {
-                                        entity.setAuthor(meditationUploadBodyRequest.getAuthor());
-                                    }
+        if (meditationUploadBodyRequest.getAuthor() != null) {
+            entity.setAuthor(meditationUploadBodyRequest.getAuthor());
+        }
 
-                                    if (meditationUploadBodyRequest.getDescription() != null) {
-                                        entity.setDescription(meditationUploadBodyRequest.getDescription());
-                                    }
+        if (meditationUploadBodyRequest.getDescription() != null) {
+            entity.setDescription(meditationUploadBodyRequest.getDescription());
+        }
 
-                                    if (meditationUploadBodyRequest.getTags() != null && !meditationUploadBodyRequest.getTags().isEmpty()) {
-                                        entity.setJsonTags(tagMapper.tagsToJsonStringTags(meditationUploadBodyRequest.getTags()));
-                                    }
+        if (meditationUploadBodyRequest.getTags() != null && !meditationUploadBodyRequest.getTags().isEmpty()) {
+            entity.setJsonTags(tagMapper.tagsToJsonStringTags(meditationUploadBodyRequest.getTags()));
+        }
 
-                                    return entity;
-                                })
-                )
-                .flatMap(entity -> Mono.fromCallable(() -> meditationRepository.save(entity))
-                        .subscribeOn(Schedulers.boundedElastic()))
-                .map(MeditationEntity::getId);
+        return meditationRepository.save(entity).getId();
     }
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<Meditation> getAll() {
@@ -198,18 +159,17 @@ public class MeditationService {
                         UploadStatus.READY)
         );
     }
-    public Mono<Void> delete(UserDetails userDetails, UUID id) {
+    public void delete(UserDetails userDetails, UUID id) {
         programCommons.checkUserRole(userDetails);
-        var meditation = getMeditation(id);
+        MeditationEntity meditation = getMeditation(id);
 
-        return webClientRestService.delete(
-                        integrationServiceBaseUrl,
-                        videoStorageUri,
-                        Map.of("video-link", meditation.getVideoLink())
-                )
-                .then(Mono.fromRunnable(() -> meditationRepository.delete(meditation))
-                        .subscribeOn(Schedulers.boundedElastic())
-                        .then());
+        webClientRestService.delete(
+                integrationServiceBaseUrl,
+                videoStorageUri,
+                Map.of("video-link", meditation.getVideoLink())
+        );
+
+        meditationRepository.delete(meditation);
     }
     public Meditation update(UserDetails userDetails, MeditationUpdateRequest request) {
         programCommons.checkUserRole(userDetails);
@@ -228,7 +188,7 @@ public class MeditationService {
         );
 
         return meditationMapper.meditationEntityToMeditation(
-             en
+                en
         );
     }
     private MeditationEntity getMeditation(UUID id) {
