@@ -45,6 +45,8 @@ public class ApplicationStartup
             userRepository.save(UserEntity
                     .builder()
                     .hasPractiseBreathOpt(true)
+                    .isBlocked(false)
+                    .isExitButtonPressed(false)
                     .oneSignalId(UUID.fromString(adminOneSignalId))
                             .startTimeOfBreathPractise(LocalTime.of(1, 0))
                             .stopTimeOfBreathPractise(LocalTime.of(23, 59))
