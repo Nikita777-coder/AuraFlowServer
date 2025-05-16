@@ -19,8 +19,11 @@ public class MeditationStatEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     private UserMeditationEntity meditationEntity;
+
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+    private StatisticEntity statisticEntity;
 
     private double averagePulse;
 }

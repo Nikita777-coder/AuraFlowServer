@@ -1,5 +1,6 @@
 package app.configs;
 
+import app.entity.UserEntity;
 import app.service.JwtService;
 import app.service.UserService;
 import jakarta.servlet.FilterChain;
@@ -23,7 +24,6 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-    private final UserService userService;
 
     @Override
     protected void doFilterInternal(
@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        if (request.getServletPath().contains("/auth")) {
+        if (request.getServletPath().contains("/auth") && !request.getServletPath().contains("/logout")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -47,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (userLogin != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(userLogin);
-            var user = userService.getUserByEmail(userDetails.getUsername());
+            var user = (UserEntity) userDetails;
 
             if (jwtService.isTokenValid(jwt, userDetails) && !user.getIsBlocked() && !user.getIsExitButtonPressed()) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

@@ -69,12 +69,12 @@ public class MeditationController {
         );
     }
 
-//    @DeleteMapping
-//    @ResponseStatus(HttpStatus.OK)
-//    public void deleteMeditation(@AuthenticationPrincipal UserDetails userDetails,
-//                                 @RequestParam UUID id) {
-//        meditationService.delete(userDetails, id);
-//    }
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteMeditation(@AuthenticationPrincipal UserDetails userDetails,
+                                 @RequestParam UUID id) {
+        meditationService.delete(userDetails, id);
+    }
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody

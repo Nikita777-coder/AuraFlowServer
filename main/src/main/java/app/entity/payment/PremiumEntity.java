@@ -20,7 +20,7 @@ public class PremiumEntity {
     @Id
     private UUID id;
 
-    @ManyToOne(targetEntity = UserEntity.class, cascade = {CascadeType.ALL})
+    @ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.PERSIST})
     private UserEntity userEntity;
 
     @Column

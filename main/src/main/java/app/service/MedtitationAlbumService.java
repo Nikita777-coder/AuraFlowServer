@@ -2,7 +2,7 @@ package app.service;
 
 import app.dto.meditationalbum.MeditationAlbum;
 import app.dto.meditationalbum.MeditationAlbumRequest;
-import app.entity.MeditationAlbumEntity;
+import app.entity.UserMeditationAlbumEntity;
 import app.entity.UserEntity;
 import app.entity.usermeditation.UserMeditationEntity;
 import app.extra.ProgramCommons;
@@ -34,8 +34,8 @@ public class MedtitationAlbumService {
                                        MeditationAlbumRequest meditationAlbumRequest) {
         return createNewAlbum(userDetails, meditationAlbumRequest).getId();
     }
-    public MeditationAlbumEntity createNewAlbum(UserDetails userDetails,
-                                                MeditationAlbumRequest meditationAlbumRequest) {
+    public UserMeditationAlbumEntity createNewAlbum(UserDetails userDetails,
+                                                    MeditationAlbumRequest meditationAlbumRequest) {
         UserEntity userEntity = userService.getUserByEmail(userDetails.getUsername());
         checkUserTitleAlbums(userDetails, meditationAlbumRequest.getTitle());
 
@@ -44,7 +44,7 @@ public class MedtitationAlbumService {
                 userMeditationRepository
         );
 
-        MeditationAlbumEntity entity = meditationAlbumMapper.meditationAlbumRequestToMeditationAlbumEntity(meditationAlbumRequest);
+        UserMeditationAlbumEntity entity = meditationAlbumMapper.meditationAlbumRequestToMeditationAlbumEntity(meditationAlbumRequest);
         entity.setUser(userEntity);
         entity.setMeditations(userAlbumMeditationEntities);
 
@@ -52,7 +52,7 @@ public class MedtitationAlbumService {
     }
     public MeditationAlbum getAlbum(UserDetails userDetails,
                                     UUID id) {
-        MeditationAlbumEntity meditationAlbumEntity = programCommons.getAlbumById(id, meditationAlbumRepository);
+        UserMeditationAlbumEntity meditationAlbumEntity = programCommons.getAlbumById(id, meditationAlbumRepository);
 
         if (!programCommons.isUserAdmin(userDetails) && !meditationAlbumEntity.getUser().getEmail().equals(userDetails.getUsername())) {
             throw new AccessDeniedException("access deny");
@@ -60,7 +60,7 @@ public class MedtitationAlbumService {
 
         return meditationAlbumMapper.meditationAlbumEntityToMeditationAlbum(meditationAlbumEntity);
     }
-    public Optional<MeditationAlbumEntity> getAlbum(String name) {
+    public Optional<UserMeditationAlbumEntity> getAlbum(String name) {
         return meditationAlbumRepository.findByTitle(name);
     }
     public List<MeditationAlbum> getAllUser(UserDetails userDetails) {
@@ -71,7 +71,7 @@ public class MedtitationAlbumService {
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void deleteAlbumById(UserDetails userDetails, UUID id) {
-        MeditationAlbumEntity entity = checkControl(userDetails, id);
+        UserMeditationAlbumEntity entity = checkControl(userDetails, id);
 
         if (entity.getTitle().equals("Мои медитации")) {
             throw new IllegalArgumentException("нелья удалить альбом по умолчанию");
@@ -89,7 +89,7 @@ public class MedtitationAlbumService {
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public MeditationAlbum updateAlbum(UserDetails userDetails, UUID id, MeditationAlbumRequest meditationAlbumRequest) {
-        MeditationAlbumEntity entity = checkControl(userDetails, id);
+        UserMeditationAlbumEntity entity = checkControl(userDetails, id);
 
         List<UserMeditationEntity> userAlbumMeditationEntities = entity.getMeditations();
         if (meditationAlbumRequest.getMeditations() != null) {
@@ -105,7 +105,7 @@ public class MedtitationAlbumService {
 
         MeditationAlbumRequest albumRequest = meditationAlbumMapper.prepareMeditationAlbumRequestFromOldMeditationAlbumEntity(meditationAlbumRequest, entity);
 
-        MeditationAlbumEntity updatedEntity = meditationAlbumMapper.meditationAlbumRequestToMeditationAlbumEntity(albumRequest);
+        UserMeditationAlbumEntity updatedEntity = meditationAlbumMapper.meditationAlbumRequestToMeditationAlbumEntity(albumRequest);
         updatedEntity.setUser(userService.getUserByEmail(userDetails.getUsername()));
         updatedEntity.setMeditations(userAlbumMeditationEntities);
         updatedEntity.setId(entity.getId());
@@ -113,7 +113,7 @@ public class MedtitationAlbumService {
         return meditationAlbumMapper.meditationAlbumEntityToMeditationAlbum(meditationAlbumRepository.save(updatedEntity));
     }
     public void updateAlbumCheckedMeditations(UserDetails userDetails, UUID id, List<UserMeditationEntity> userMeditationEntities) {
-        MeditationAlbumEntity entity = checkControl(userDetails, id);
+        UserMeditationAlbumEntity entity = checkControl(userDetails, id);
 
         List<UserMeditationEntity> userAlbumMeditationEntities = entity.getMeditations();
         if (userMeditationEntities != null) {
@@ -123,8 +123,8 @@ public class MedtitationAlbumService {
         entity.setMeditations(userAlbumMeditationEntities);
         meditationAlbumRepository.save(entity);
     }
-    private MeditationAlbumEntity checkControl(UserDetails userDetails, UUID id) {
-        MeditationAlbumEntity entity = programCommons.getAlbumById(id, meditationAlbumRepository);
+    private UserMeditationAlbumEntity checkControl(UserDetails userDetails, UUID id) {
+        UserMeditationAlbumEntity entity = programCommons.getAlbumById(id, meditationAlbumRepository);
 
         if (!programCommons.isUserAdmin(userDetails) && !entity.getUser().getEmail().equals(userDetails.getUsername())) {
             throw new AccessDeniedException("Access deny");
@@ -133,7 +133,7 @@ public class MedtitationAlbumService {
         return entity;
     }
     private void checkUserTitleAlbums(UserDetails userDetails, String title) {
-        List<MeditationAlbumEntity> albums = meditationAlbumRepository.findAllByUser_Email(
+        List<UserMeditationAlbumEntity> albums = meditationAlbumRepository.findAllByUser_Email(
                 userDetails.getUsername()
         );
 
