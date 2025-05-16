@@ -4,6 +4,7 @@ import app.dto.payment.PaymentNotification;
 import app.dto.premium.PremiumData;
 import app.dto.premium.PremiumIntegrationServiceResponse;
 import app.dto.premium.PremiumPaymentResponse;
+import app.entity.UserEntity;
 import app.entity.payment.PremiumEntity;
 import app.entity.payment.TransactionStatus;
 import app.mapper.PremiumMapper;
@@ -12,8 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,7 +33,7 @@ public class PremiumService {
     public Boolean hasPremium(UserDetails userDetails) {
         premiumRepository.findAll().forEach(System.out::println);
         return !premiumRepository.getCurrentPremium(
-             userDetails.getUsername(),
+                userDetails.getUsername(),
                 TransactionStatus.SUCCEEDED
         ).isEmpty();
     }
@@ -58,30 +57,23 @@ public class PremiumService {
             premiumRepository.save(p);
         }
     }
-    public Mono<PremiumPaymentResponse> buyPremium(UserDetails userDetails) {
-        return webClientRestService.post(
-                        integrationBaseUrl,
-                        paymentServicePath,
-                        PremiumIntegrationServiceResponse.class
-                )
-                .flatMap(ans ->
-                        Mono.fromCallable(() -> userService.getUserByEmail(userDetails.getUsername()))
-                                .subscribeOn(Schedulers.boundedElastic())
-                                .flatMap(userEntity -> {
-                                    PremiumEntity premiumEntity = premiumMapper.premiumIntegrationServiceResponseToPremiumEntity(ans);
-                                    premiumEntity.setUserEntity(userEntity);
-                                    premiumEntity.setTransactionTime(LocalDateTime.now());
+    public PremiumPaymentResponse buyPremium(UserDetails userDetails) {
+        var ans = webClientRestService.post(
+                integrationBaseUrl,
+                paymentServicePath,
+                PremiumIntegrationServiceResponse.class
+        );
 
-                                    return Mono.fromCallable(() -> premiumRepository.save(premiumEntity))
-                                            .subscribeOn(Schedulers.boundedElastic())
-                                            .map(savedEntity -> {
-                                                PremiumPaymentResponse response = new PremiumPaymentResponse();
-                                                response.setId(savedEntity.getId());
-                                                response.setPayToken(savedEntity.getPaymentToken());
-                                                return response;
-                                            });
-                                })
-                );
+        UserEntity userEntity = userService.getUserByEmail(userDetails.getUsername());
+        PremiumEntity premiumEntity = premiumMapper.premiumIntegrationServiceResponseToPremiumEntity(ans);
+        premiumEntity.setUserEntity(userEntity);
+        premiumEntity.setTransactionTime(LocalDateTime.now());
+
+        PremiumPaymentResponse response = new PremiumPaymentResponse();
+        response.setId(premiumRepository.save(premiumEntity).getId());
+        response.setPayToken(premiumEntity.getPaymentToken());
+
+        return response;
     }
     public TransactionStatus getTransactionStatus(UserDetails userDetails, UUID paymentId) {
         return premiumRepository.getPremiumEntityByIdAndUserEntity_Email(paymentId, userDetails.getUsername())

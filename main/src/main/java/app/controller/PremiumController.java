@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +35,7 @@ public class PremiumController {
     }
 
     @PostMapping
-    public Mono<PremiumPaymentResponse> buyPremium(@AuthenticationPrincipal UserDetails userDetails) {
+    public PremiumPaymentResponse buyPremium(@AuthenticationPrincipal UserDetails userDetails) {
         return premiumService.buyPremium(userDetails);
     }
 

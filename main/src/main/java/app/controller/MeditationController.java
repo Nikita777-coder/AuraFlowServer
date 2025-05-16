@@ -12,7 +12,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.UUID;
@@ -36,13 +35,13 @@ public class MeditationController {
     @PostMapping("by-url")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public Mono<UUID> uploadNewMeditation(@AuthenticationPrincipal UserDetails userDetails,
+    public UUID uploadNewMeditation(@AuthenticationPrincipal UserDetails userDetails,
                                     @Valid @RequestBody MeditationUploadBodyRequest meditationUploadBodyRequest) {
         return meditationService.uploadMeditationByUrl(userDetails, meditationUploadBodyRequest);
     }
 
     @GetMapping("/meditation-upload-status")
-    public Mono<UploadStatus> getMeditationUploadStatus(@AuthenticationPrincipal UserDetails userDetails,
+    public UploadStatus getMeditationUploadStatus(@AuthenticationPrincipal UserDetails userDetails,
                                                   @RequestParam("meditation-id") UUID meditationId) {
         return meditationService.getMeditationUploadStatus(userDetails, meditationId);
     }
@@ -58,7 +57,7 @@ public class MeditationController {
     )
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public Mono<UUID> uploadNewMeditation(@AuthenticationPrincipal UserDetails userDetails,
+    public UUID uploadNewMeditation(@AuthenticationPrincipal UserDetails userDetails,
                                          @RequestParam String title,
                                          @RequestParam("upload-video") MultipartFile file,
                                          @RequestParam(required = false) String description,
@@ -72,9 +71,9 @@ public class MeditationController {
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
-    public Mono<Void> deleteMeditation(@AuthenticationPrincipal UserDetails userDetails,
+    public void deleteMeditation(@AuthenticationPrincipal UserDetails userDetails,
                                  @RequestParam UUID id) {
-        return meditationService.delete(userDetails, id);
+        meditationService.delete(userDetails, id);
     }
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)

@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.Map;
 import java.util.UUID;
@@ -25,39 +23,39 @@ public class MeditationAiService {
     private String integrationBaseUrl;
     @Value("${server.integration.meditation-ai-path}")
     private String integrationGeneratePath;
-    public Mono<String> generatedMeditation(UserDetails userDetails,
-                                            ModelMeditationRequest modelMeditationRequest) {
-        return Mono.fromCallable(() -> userService.getUserByEmail(userDetails.getUsername()))
-                .subscribeOn(Schedulers.boundedElastic())
-                .flatMap(user -> {
-                    if (!user.getIsPremium() && user.getCountOfGenerations() == 3) {
-                        return Mono.error(new IllegalArgumentException("ваш лимит на генерацию закончился!"));
-                    }
+    public String generatedMeditation(UserDetails userDetails,
+                                      ModelMeditationRequest modelMeditationRequest) {
+        var user = userService.getUserByEmail(userDetails.getUsername());
 
-                    user.setCountOfGenerations(user.getCountOfGenerations() + 1);
-                    return Mono.fromCallable(() -> userRepository.save(user))
-                            .subscribeOn(Schedulers.boundedElastic())
-                            .then(webClientRestService.post(
-                                    integrationBaseUrl,
-                                    integrationGeneratePath,
-                                    modelMeditationRequest,
-                                    String.class
-                            ).onErrorResume(ReadTimeoutException.class, ex ->
-                                    Mono.fromRunnable(() -> {
-                                                user.setCountOfGenerations(user.getCountOfGenerations() - 1);
-                                                userRepository.save(user);
-                                            })
-                                            .subscribeOn(Schedulers.boundedElastic())
-                                            .then(Mono.error(ex))
-                            ));
-                });
+        if (!user.getIsPremium() && user.getCountOfGenerations() == 3) {
+            throw new IllegalArgumentException("ваш лимит на генерацию закончился!");
+        }
+
+        user.setCountOfGenerations(user.getCountOfGenerations() + 1);
+        userRepository.save(user);
+        String generatedMeditation;
+
+        try {
+            generatedMeditation = webClientRestService.post(
+                    integrationBaseUrl,
+                    integrationGeneratePath,
+                    modelMeditationRequest,
+                    String.class
+            );
+        } catch (ReadTimeoutException ex) {
+            user.setCountOfGenerations(user.getCountOfGenerations() - 1);
+            userRepository.save(user);
+            throw ex;
+        }
+
+        return generatedMeditation;
     }
-    public Mono<GeneratedMeditation> getMeditation(String id) {
+    public GeneratedMeditation getMeditation(String id) {
         return webClientRestService.get(
-              integrationBaseUrl,
-              integrationGeneratePath,
-              Map.of("id", id),
-              GeneratedMeditation.class
+                integrationBaseUrl,
+                integrationGeneratePath,
+                Map.of("id", id),
+                GeneratedMeditation.class
         );
     }
 }
