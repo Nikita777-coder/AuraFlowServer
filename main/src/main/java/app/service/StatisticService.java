@@ -2,14 +2,15 @@ package app.service;
 
 import app.dto.meditation.MeditationStatData;
 import app.dto.meditation.Status;
-import app.dto.statistic.Period;
-import app.dto.statistic.Statistic;
+import app.dto.statistic.*;
 import app.entity.MeditationStatEntity;
 import app.entity.StatisticEntity;
 import app.extra.ProgramCommons;
+import app.mapper.StatisticMapper;
 import app.mapper.StatusMapper;
 import app.mapper.TagMapper;
-import app.repository.MeditationRepository;
+import app.repository.StatisticRepository;
+import app.repository.UserMeditationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,9 +24,8 @@ import java.util.*;
 public class StatisticService {
     private final UserService userService;
     private final ProgramCommons programCommons;
-    private final MeditationRepository meditationRepository;
+    private final UserMeditationRepository meditationRepository;
     private final StatisticRepository statisticRepository;
-    private final MeditationStatRepository meditationStatRepository;
     private final StatisticMapper statisticMapper;
     private final PremiumService premiumService;
     private final TagMapper tagMapper;
@@ -39,11 +39,12 @@ public class StatisticService {
         var user = userService.getUserByEmail(statistic.getUserEmail());
 
         List<MeditationStatEntity> meditationStatEntities = null;
-        if (statistic.getWatchedMeditationsPerDay() != null && !statistic.getWatchedMeditationsPerDay().isEmpty()) {
-            meditationStatEntities = new ArrayList<>(statistic.getWatchedMeditationsPerDay().size());
+        if (statistic.getWatchedMeditations() != null && !statistic.getWatchedMeditations().isEmpty()) {
+            meditationStatEntities = new ArrayList<>(statistic.getWatchedMeditations().size());
 
-            for (MeditationStatData data : statistic.getWatchedMeditationsPerDay()) {
-                if (meditationRepository.findById(data.getMeditationId()).isEmpty()) {
+            for (MeditationStatData data : statistic.getWatchedMeditations()) {
+                var userMeditationEntity = meditationRepository.findById(data.getMeditationId());
+                if (userMeditationEntity.isEmpty()) {
                     throw new IllegalArgumentException(String.format("meditation with id %s not found", data.getMeditationId()));
                 }
 
@@ -53,10 +54,11 @@ public class StatisticService {
                 }
 
                 meditationStatEntities.add(statisticMapper.meditationStatDataToMeditationStatEntity(data));
+                meditationStatEntities.get(meditationStatEntities.size() - 1).setMeditationEntity(userMeditationEntity.get());
             }
         }
 
-        return statisticRepository.save(statisticMapper.dataToStatisticEntity(user, statistic, meditationStatEntities)).getId();
+        return statisticRepository.save(statisticMapper.dataToStatisticEntity(user, meditationStatEntities, statistic)).getId();
     }
 
     public UserStatistic getUserStatistic(UserDetails userDetails, Period period) {
@@ -75,6 +77,8 @@ public class StatisticService {
         userStatisticOut.setMeditationStat(getMeditationStat(userStatistic));
         // userStatisticOut.setBreathePractiseStat(getBreathePractiseStat(userStatistic))
         userStatisticOut.setPeriod(period);
+
+        return userStatisticOut;
     }
     private EnteranceStat getEnterenceStat(List<StatisticEntity> userStatistic) {
         EnteranceStat enteranceStat = new EnteranceStat();
@@ -107,23 +111,24 @@ public class StatisticService {
         int watchedMeditationCount = 0;
         Map<String, Integer> theMostPrefferedAuthors = new HashMap<>();
 
-        // targetPulse
-        // avgPulse
-        // theLowestValue
         PulseStat pulseStat = new PulseStat();
-        double avgPulse = 0.0;
-        int theLowestPulse = Integer.MAX_VALUE, pulseCount = 0;
+        double avgPulse = 0.0, theLowestPulse = Double.MAX_VALUE;
+        int pulseCount = 0;
         LocalDate theLowestPulseData = null;
+        List<MeditationStatEntity> meditationStatEntities = new ArrayList<>();
+        Map<LocalDate, List<Double>> pulseData = new HashMap<>(userStatistic.size());
 
         for (StatisticEntity stat: userStatistic) {
             boolean theLowest = false;
+
+            pulseData.put(stat.getFixedTime(), new ArrayList<>(stat.getWatchedMeditationsPerDay().size()));
             for (MeditationStatEntity data: stat.getWatchedMeditationsPerDay()) {
                 for (String tag: tagMapper.jsonTagsToTags(data.getMeditationEntity().getMeditationFromPlatform().getJsonTags())) {
                     meditationStatTags.putIfAbsent(tag, 0);
                     meditationStatTags.put(tag, meditationStatTags.get(tag) + 1);
                 }
 
-                if (statisticMapper.stringStatusesToSetOfStatuses(data.getMeditationEntity().getStatuses()).containsKey(Status.WATCHED)) {
+                if (statusMapper.stringStatusesToSetOfStatuses(data.getMeditationEntity().getStatuses()).contains(Status.WATCHED)) {
                     overwatchedMeditations.putIfAbsent(data.getMeditationEntity().getTitle(), 0);
                     meditationStatTags.put(
                             data.getMeditationEntity().getTitle(),
@@ -139,13 +144,13 @@ public class StatisticService {
                         theMostPrefferedAuthors.get(data.getMeditationEntity().getMeditationFromPlatform().getAuthor()) + 1
                 );
 
-                avgPulse += data.getPulse();
-                pulseCount++;
-
-                if (Math.min(theLowestPulse, data.getPulse()) == data.getPulse()) {
+                if (Math.min(theLowestPulse, data.getAveragePulse()) == data.getAveragePulse()) {
                     theLowest = true;
-                    theLowestPulse = data.getPulse();
+                    theLowestPulse = data.getAveragePulse();
                 }
+
+                meditationStatEntities.add(data);
+                pulseData.get(stat.getFixedTime()).add(data.getAveragePulse());
             }
 
             if (theLowest) {
@@ -153,10 +158,20 @@ public class StatisticService {
             }
         }
 
+        int firstQuartile = (int) Math.ceil(0.25 * meditationStatEntities.size());
+        int thirdQuantile = (int) Math.floor(0.75 * meditationStatEntities.size());
+
+        meditationStatEntities.sort(Comparator.comparingDouble(MeditationStatEntity::getAveragePulse));
+        for (int i = firstQuartile - 1; i < thirdQuantile; ++i) {
+            avgPulse += meditationStatEntities.get(i).getAveragePulse();
+            pulseCount++;
+        }
+
         avgPulse /= pulseCount;
         pulseStat.setAvgPulse(avgPulse);
         pulseStat.setTheLowestPulseData(theLowestPulseData);
         pulseStat.setTheLowestPulse(theLowestPulse);
+        pulseStat.setPulseData(pulseData);
 
         meditationStat.setMeditationStatTags(meditationStatTags);
         meditationStat.setOverwatchedMeditations(overwatchedMeditations);

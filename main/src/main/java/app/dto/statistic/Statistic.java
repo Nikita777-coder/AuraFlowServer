@@ -23,5 +23,5 @@ public class Statistic {
 
     private LocalDate statisticTimeFixing = LocalDate.now();
 
-    private List<MeditationStatData> watchedMeditationsPerDay;
+    private List<MeditationStatData> watchedMeditations;
 }
