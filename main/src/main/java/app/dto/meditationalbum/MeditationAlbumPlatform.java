@@ -1,7 +1,6 @@
 package app.dto.meditationalbum;
 
 import app.dto.meditation.Meditation;
-import app.entity.meditation.MeditationEntity;
 import lombok.Getter;
 import lombok.Setter;
 

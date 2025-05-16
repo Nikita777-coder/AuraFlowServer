@@ -37,6 +37,12 @@ server:
     onesignal-id: ${ADMIN_ONESIGNAL_ID}
   web:
     max-count-requests: ${MAX_COUNT_REQUESTS}
+  zitadel:
+    id: ${REGISTRATION_ID}
+    client-id: ${ZITADEL_CLIENT_ID}
+    client-secret: ${ZITADEL_CLIENT_SECRET}
+    scope: ${ZITADEL_SCOPE}
+    token-uri: ${ZITADEL_TOKEN_URI}
   jwt:
     token:
       signing:
@@ -49,28 +55,19 @@ server:
     protocol: smtps
     debug: false
     verification-code-length: ${VERIFICATION_CODE_LENGTH}
-  keycloak:
-    client-id: ${CLIENT_ID}
-    client-secret: ${CLIENT_SECRET}
-    url: ${KEYCLOAK_URL}
-    realm: ${KEYCLOAK_REALM}
-  oauth:
-    grand-type: "client_credentials"
   web-client:
-    time-response: 15
+    time-response: ${FIXED_RESPONSE}
   integration:
     base-url: ${INTEGRATION_SERVICE_BASE_URL}
     video-storage:
       uri: ${VIDEO_STORAGE_URI}
       type: ${VIDEO_STORAGE_TYPE}
-      kinescope-uri: ${KINESCOPE_URI}
-      upload-path: ${UPLOAD_PATH}
     notification-service:
       uri: ${NOTIFICATION_SERVICE_URI}
       message: ${NOTIFICATION_SERVICE_USER_MESSAGE}
     meditation-ai-path: ${INTEGRATION_MEDITATION_AI_PATH}
-    fixed-rate-time: 60000
-    fixed-update: 30000
+    fixed-rate-time: ${FIXED_RATE_TIME}
+    fixed-update: ${FIXED_UPDATE}
     payment-service-path: ${INTEGRATION_PAYMENT_SERVICE_PATH}
   port: ${PORT}
 

@@ -3,6 +3,7 @@ package app.controller;
 import app.dto.meditation.Meditation;
 import app.dto.meditation.MeditationUpdateRequest;
 import app.dto.meditation.MeditationUploadBodyRequest;
+import app.dto.meditation.UploadStatus;
 import app.service.MeditationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,12 @@ public class MeditationController {
         return meditationService.uploadMeditationByUrl(userDetails, meditationUploadBodyRequest);
     }
 
+    @GetMapping("/meditation-upload-status")
+    public UploadStatus getMeditationUploadStatus(@AuthenticationPrincipal UserDetails userDetails,
+                                                  @RequestParam("meditation-id") UUID meditationId) {
+        return meditationService.getMeditationUploadStatus(userDetails, meditationId);
+    }
+
     @GetMapping("/recommended")
     public List<Meditation> getRecommended() {
         return meditationService.getRecommended();
@@ -62,12 +69,12 @@ public class MeditationController {
         );
     }
 
-//    @DeleteMapping
-//    @ResponseStatus(HttpStatus.OK)
-//    public void deleteMeditation(@AuthenticationPrincipal UserDetails userDetails,
-//                                 @RequestParam UUID id) {
-//        meditationService.delete(userDetails, id);
-//    }
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteMeditation(@AuthenticationPrincipal UserDetails userDetails,
+                                 @RequestParam UUID id) {
+        meditationService.delete(userDetails, id);
+    }
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody

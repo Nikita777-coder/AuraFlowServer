@@ -5,6 +5,7 @@ import app.dto.user.UserData;
 import app.dto.user.UserOptions;
 import app.entity.UserEntity;
 import app.entity.userattributes.Role;
+import app.extra.ProgramCommons;
 import app.mapper.UserMapper;
 import app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +26,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final ProgramCommons programCommons;
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public UserDetails createUser(UserEntity entity) {
         if (userRepository.findByEmail(entity.getEmail()).isPresent()) {
@@ -31,18 +34,24 @@ public class UserService {
         }
         entity.setRole(Role.USER);
         entity.setPassword(passwordEncoder.encode(entity.getPassword()));
+        entity.setIsBlocked(false);
+        entity.setIsPremium(false);
 
         return userRepository.save(entity);
     }
-    public UserDetails getUser(String email) {
+    public UserEntity getUser(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
-
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    void updateUser(UserEntity userEntity) {
-        userRepository.save(userEntity);
+    public UserEntity updateUser(UserEntity updatedUser) {
+        return userRepository.save(updatedUser);
     }
+
+//    @Transactional(isolation = Isolation.REPEATABLE_READ)
+//    void updateUser(UserEntity userEntity) {
+//        userRepository.save(userEntity);
+//    }
 
     public UserOptions getOptions(UserDetails currentUserDetails) {
         return userMapper.userEntityToUserOptions(getUserByEmail(currentUserDetails.getUsername()));
@@ -77,9 +86,31 @@ public class UserService {
         Optional<UserEntity> currentUser = userRepository.findByEmail(email);
 
         if (currentUser.isEmpty()) {
-            throw new RuntimeException("get current user error!");
+            throw new IllegalArgumentException("user not found!");
         }
 
         return currentUser.get();
+    }
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void blockUser(UserDetails userDetails,
+                          String email) {
+        programCommons.checkUserRole(userDetails);
+        var user = getUserByEmail(email);
+        user.setIsBlocked(true);
+
+        userRepository.save(user);
+    }
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void unlockUser(UserDetails userDetails,
+                           String email) {
+        programCommons.checkUserRole(userDetails);
+        var user = getUserByEmail(email);
+        user.setIsBlocked(false);
+
+        userRepository.save(user);
+    }
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void delete(UserDetails userDetails) {
+        userRepository.delete(getUserByEmail(userDetails.getUsername()));
     }
 }
