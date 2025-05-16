@@ -66,6 +66,13 @@ public class MeditationEntity implements app.entity.Entity {
     )
     private List<MeditationPlatformAlbumEntity> albumEntities;
 
+    @PreRemove
+    private void preRemove() {
+        for (MeditationPlatformAlbumEntity album : albumEntities) {
+            album.getMeditationsFromPlatform().remove(this);
+        }
+    }
+
     @Column
     private UploadStatus status;
 

@@ -77,13 +77,6 @@ public class MedtitationAlbumService {
             throw new IllegalArgumentException("нелья удалить альбом по умолчанию");
         }
 
-        List<UserMeditationEntity> albums = entity.getMeditations();
-
-        for (UserMeditationEntity album : albums) {
-            album.getAlbumEntities().remove(entity);
-        }
-
-        userMeditationRepository.saveAll(albums);
         meditationAlbumRepository.delete(entity);
     }
 

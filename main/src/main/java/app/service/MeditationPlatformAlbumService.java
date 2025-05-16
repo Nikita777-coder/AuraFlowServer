@@ -56,14 +56,6 @@ public class MeditationPlatformAlbumService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void deletePlatformAlbumById(UserDetails userDetails, UUID id) {
         MeditationPlatformAlbumEntity entity = getPlatformAlbumWithAdminCheck(id, userDetails);
-
-        List<MeditationEntity> albums = entity.getMeditationsFromPlatform();
-
-        for (MeditationEntity album : albums) {
-            album.getAlbumEntities().remove(entity);
-        }
-
-        meditationRepository.saveAll(albums);
         meditationPlatformAlbumRepository.delete(entity);
     }
     @Transactional(isolation = Isolation.REPEATABLE_READ)

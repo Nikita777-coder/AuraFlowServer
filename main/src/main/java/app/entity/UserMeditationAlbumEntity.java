@@ -38,4 +38,11 @@ public class UserMeditationAlbumEntity {
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     private UserEntity user;
+
+    @PreRemove
+    private void preRemove() {
+        for (UserMeditationEntity album : meditations) {
+            album.getAlbumEntities().remove(this);
+        }
+    }
 }

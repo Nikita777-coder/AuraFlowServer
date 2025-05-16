@@ -31,7 +31,6 @@ public class UserMeditationService {
     private final ProgramCommons programCommons;
     private final MeditationRepository meditationRepository;
     private final MedtitationAlbumService medtitationAlbumService;
-    private final MeditationAlbumRepository meditationAlbumRepository;
     private final UserMeditationRepository userMeditationRepository;
     private final UserMeditationMapper userMeditationMapper;
     private final UserService userService;
@@ -132,14 +131,6 @@ public class UserMeditationService {
     }
     public void delete(UserDetails userDetails, UUID id) {
         var entity = checkAccessAndGet(id, userDetails);
-
-        List<UserMeditationAlbumEntity> albums = entity.getAlbumEntities();
-
-        for (UserMeditationAlbumEntity album : albums) {
-            album.getMeditations().remove(entity);
-        }
-
-        meditationAlbumRepository.saveAll(albums);
         userMeditationRepository.delete(entity);
     }
     private UserMeditationEntity checkAccessAndGet(UUID id, UserDetails userDetails) {

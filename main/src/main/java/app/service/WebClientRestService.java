@@ -189,13 +189,16 @@ public class WebClientRestService {
         return ans;
     }
 
-    public void delete(String baseUrl, String uri) {
+    public void delete(String baseUrl, String uri, Map<String, String> params) {
         webClient
                 .mutate()
                 .baseUrl(baseUrl)
                 .build()
                 .delete()
-                .uri(uri)
+                .uri(uriBuilder -> {
+                    params.forEach(uriBuilder::queryParam);
+                    return uriBuilder.path(uri).build();
+                })
 //                .header("Authorization", "Bearer " + getToken())
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<>() {})
