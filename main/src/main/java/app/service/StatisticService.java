@@ -32,30 +32,12 @@ public class StatisticService {
     private final StatusMapper statusMapper;
     public UUID create(UserDetails userDetails,
                        Statistic statistic) {
-        if (!programCommons.isUserAdmin(userDetails)) {
-            throw new AccessDeniedException("Access denied");
-        }
-
+        programCommons.checkUserRole(userDetails);
         var user = userService.getUserByEmail(statistic.getUserEmail());
 
         List<MeditationStatEntity> meditationStatEntities = null;
         if (statistic.getWatchedMeditations() != null && !statistic.getWatchedMeditations().isEmpty()) {
-            meditationStatEntities = new ArrayList<>(statistic.getWatchedMeditations().size());
-
-            for (MeditationStatData data : statistic.getWatchedMeditations()) {
-                var userMeditationEntity = meditationRepository.findById(data.getMeditationId());
-                if (userMeditationEntity.isEmpty()) {
-                    throw new IllegalArgumentException(String.format("meditation with id %s not found", data.getMeditationId()));
-                }
-
-                if (data.getAveragePulse() < 40) {
-                    throw new IllegalArgumentException(String.format("meditation with id %s oops, person pulse can't be < 40, " +
-                            "in this state person fill oxygen starvation", data.getMeditationId()));
-                }
-
-                meditationStatEntities.add(statisticMapper.meditationStatDataToMeditationStatEntity(data));
-                meditationStatEntities.get(meditationStatEntities.size() - 1).setMeditationEntity(userMeditationEntity.get());
-            }
+            meditationStatEntities = parseMeditationStats(statistic);
         }
 
         return statisticRepository.save(statisticMapper.dataToStatisticEntity(user, meditationStatEntities, statistic)).getId();
@@ -79,6 +61,28 @@ public class StatisticService {
         userStatisticOut.setPeriod(period);
 
         return userStatisticOut;
+    }
+    public Statistic update(UserDetails userDetails, StatisticUpdate statisticUpdate) {
+        programCommons.checkUserRole(userDetails);
+
+        var statisticEntity = statisticRepository.findById(statisticUpdate.getStatId());
+        if (statisticEntity.isEmpty()) {
+            throw new IllegalArgumentException("statistic by specified id not found");
+        }
+
+        var user = userService.getUserByEmail(statisticUpdate.getUpdData().getUserEmail());
+        var stat = statisticEntity.get();
+        stat.setUser(user);
+
+        if (statisticUpdate.getUpdData().getEntranceCountPerDay() > 0 && statisticUpdate.getUpdData().getEntranceCountPerDay() != stat.getEntranceCountPerDay()) {
+            stat.setEntranceCountPerDay(statisticUpdate.getUpdData().getEntranceCountPerDay());
+        }
+
+        if (statisticUpdate.getUpdData().getWatchedMeditations() != null) {
+            stat.setWatchedMeditationsPerDay(parseMeditationStats(statisticUpdate.getUpdData()));
+        }
+
+        return statisticMapper.statisticEntityToStatistic(statisticRepository.save(stat));
     }
     private EnteranceStat getEnterenceStat(List<StatisticEntity> userStatistic) {
         EnteranceStat enteranceStat = new EnteranceStat();
@@ -180,5 +184,26 @@ public class StatisticService {
         meditationStat.setPulseStat(pulseStat);
 
         return meditationStat;
+    }
+
+    private List<MeditationStatEntity> parseMeditationStats(Statistic statistic) {
+        List<MeditationStatEntity> meditationStatEntities = new ArrayList<>(statistic.getWatchedMeditations().size());
+
+        for (MeditationStatData data : statistic.getWatchedMeditations()) {
+            var userMeditationEntity = meditationRepository.findById(data.getMeditationId());
+            if (userMeditationEntity.isEmpty()) {
+                throw new IllegalArgumentException(String.format("meditation with id %s not found", data.getMeditationId()));
+            }
+
+            if (data.getAveragePulse() < 40) {
+                throw new IllegalArgumentException(String.format("meditation with id %s oops, person pulse can't be < 40, " +
+                        "in this state person fill oxygen starvation", data.getMeditationId()));
+            }
+
+            meditationStatEntities.add(statisticMapper.meditationStatDataToMeditationStatEntity(data));
+            meditationStatEntities.get(meditationStatEntities.size() - 1).setMeditationEntity(userMeditationEntity.get());
+        }
+
+        return meditationStatEntities;
     }
 }

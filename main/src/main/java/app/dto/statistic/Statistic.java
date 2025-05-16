@@ -19,7 +19,7 @@ public class Statistic {
     private String userEmail;
 
     @Min(value = 1, message = "entranceCountPerDay can't be < 1")
-    private Integer entranceCountPerDay;
+    private int entranceCountPerDay;
 
     private LocalDate statisticTimeFixing = LocalDate.now();
 

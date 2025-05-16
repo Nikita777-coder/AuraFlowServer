@@ -31,10 +31,10 @@ public class StatisticController {
                                           @Valid @RequestBody Period timePeriod) {
         return statisticService.getUserStatistic(userDetails, timePeriod);
     }
-//    @PatchMapping
-//    @ResponseBody
-//    public Statistic updateUserStatistic(@AuthenticationPrincipal UserDetails userDetails,
-//                                         @Valid @RequestBody StatisticUpdate statistic) {
-//        return statisticService.updateUserStatistic(statistic);
-//    }
+    @PatchMapping
+    @ResponseBody
+    public Statistic updateUserStatistic(@AuthenticationPrincipal UserDetails userDetails,
+                                         @Valid @RequestBody StatisticUpdate statistic) {
+        return statisticService.update(userDetails, statistic);
+    }
 }
