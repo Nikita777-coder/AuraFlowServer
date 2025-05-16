@@ -10,6 +10,7 @@ import app.repository.MeditationPlatformAlbumRepository;
 import app.repository.MeditationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -17,10 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +29,6 @@ public class MeditationService {
     private final WebClientRestService webClientRestService;
     private final MeditationRepository meditationRepository;
     private final MeditationMapper meditationMapper;
-    private final ProgramCommons storageParamsManager;
     private final MeditationPlatformAlbumRepository meditationPlatformAlbumRepository;
 
     @Value("${server.integration.video-storage.uri}")
@@ -82,6 +79,16 @@ public class MeditationService {
         entity.setPromoted(isPromoted);
 
         return meditationRepository.save(entity).getId();
+    }
+    public List<String> getAllPlatformMeditations() {
+
+        ParameterizedTypeReference<List<String>> p = new ParameterizedTypeReference<List<String>>() {};
+
+        return webClientRestService.get(
+                integrationServiceBaseUrl,
+                videoStorageUri + "/all",
+                p
+        );
     }
     public UploadStatus getMeditationUploadStatus(UserDetails userDetails, UUID meditationId) {
         programCommons.checkUserRole(userDetails);
