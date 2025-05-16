@@ -12,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,13 +36,13 @@ public class MeditationController {
     @PostMapping("by-url")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public UUID uploadNewMeditation(@AuthenticationPrincipal UserDetails userDetails,
+    public Mono<UUID> uploadNewMeditation(@AuthenticationPrincipal UserDetails userDetails,
                                     @Valid @RequestBody MeditationUploadBodyRequest meditationUploadBodyRequest) {
         return meditationService.uploadMeditationByUrl(userDetails, meditationUploadBodyRequest);
     }
 
     @GetMapping("/meditation-upload-status")
-    public UploadStatus getMeditationUploadStatus(@AuthenticationPrincipal UserDetails userDetails,
+    public Mono<UploadStatus> getMeditationUploadStatus(@AuthenticationPrincipal UserDetails userDetails,
                                                   @RequestParam("meditation-id") UUID meditationId) {
         return meditationService.getMeditationUploadStatus(userDetails, meditationId);
     }
@@ -57,13 +58,13 @@ public class MeditationController {
     )
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public UUID uploadNewMeditation(@AuthenticationPrincipal UserDetails userDetails,
-                                    @RequestParam String title,
-                                    @RequestParam("upload-video") MultipartFile file,
-                                    @RequestParam(required = false) String description,
-                                    @RequestParam(required = false) String author,
-                                    @RequestParam(required = false) List<String> tags,
-                                    @RequestParam(name = "need-to-promote", required = false) boolean isPromoted) {
+    public Mono<UUID> uploadNewMeditation(@AuthenticationPrincipal UserDetails userDetails,
+                                         @RequestParam String title,
+                                         @RequestParam("upload-video") MultipartFile file,
+                                         @RequestParam(required = false) String description,
+                                         @RequestParam(required = false) String author,
+                                         @RequestParam(required = false) List<String> tags,
+                                         @RequestParam(name = "need-to-promote", required = false) boolean isPromoted) {
         return meditationService.uploadMeditationByUploadVideo(
                 userDetails, file, title, description, author, tags, isPromoted
         );
@@ -71,9 +72,9 @@ public class MeditationController {
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
-    public void deleteMeditation(@AuthenticationPrincipal UserDetails userDetails,
+    public Mono<Void> deleteMeditation(@AuthenticationPrincipal UserDetails userDetails,
                                  @RequestParam UUID id) {
-        meditationService.delete(userDetails, id);
+        return meditationService.delete(userDetails, id);
     }
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)

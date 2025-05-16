@@ -30,6 +30,9 @@ spring:
     enabled: false
 
 server:
+  oidc:
+    email: ${OIDC_EMAIL}
+    password: ${OIDC_PASSWORD}
   admin:
     email: ${ADMIN_EMAIL}
     password: ${ADMIN_PASSWORD}

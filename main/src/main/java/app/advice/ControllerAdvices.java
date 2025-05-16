@@ -1,5 +1,6 @@
 package app.advice;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.netty.handler.timeout.ReadTimeoutException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @ControllerAdvice
 public class ControllerAdvices {
-    @ExceptionHandler({IllegalArgumentException.class, NullPointerException.class, ConstraintViolationException.class, UsernameNotFoundException.class})
+    @ExceptionHandler({IllegalArgumentException.class, NullPointerException.class, ConstraintViolationException.class, UsernameNotFoundException.class, ExpiredJwtException.class})
     @ResponseBody
     private  ResponseEntity<String> handleBAD_REQUEST(RuntimeException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);

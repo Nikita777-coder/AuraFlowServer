@@ -8,8 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/meditation-generate")
@@ -18,8 +17,8 @@ public class MeditationAiController {
     private final MeditationAiService meditationAiService;
     @PostMapping
     @ResponseBody
-    public String generateNewMeditation(@AuthenticationPrincipal UserDetails currentUser,
-                                      @Valid @RequestBody ModelMeditationRequest modelMeditationRequest) {
+    public Mono<String> generateNewMeditation(@AuthenticationPrincipal UserDetails currentUser,
+                                              @Valid @RequestBody ModelMeditationRequest modelMeditationRequest) {
         return meditationAiService.generatedMeditation(
                 currentUser,
                 modelMeditationRequest
@@ -28,7 +27,7 @@ public class MeditationAiController {
 
     @GetMapping
     @ResponseBody
-    public GeneratedMeditation getGeneratedMeditationData(String id) {
+    public Mono<GeneratedMeditation> getGeneratedMeditationData(String id) {
         return meditationAiService.getMeditation(id);
     }
 }

@@ -4,6 +4,7 @@ package app.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,8 +20,7 @@ import java.util.Map;
 public class WebClientRestService {
     private final WebClient webClient;
 
-    public <T> T get(String baseUrl, String uri, Map<String, String> params, Class<T> tClass) {
-
+    public <T> Mono<T> get(String baseUrl, String uri, Map<String, String> params, Class<T> tClass) {
         Mono<T> response = webClient
                 .mutate()
                 .baseUrl(baseUrl)
@@ -47,18 +47,17 @@ public class WebClientRestService {
                 })
                 .bodyToMono(tClass);
 
-        var res = response.block();
-
-        return res;
+        return response;
     }
 
-    public <T> T get(String baseUrl, String uri, ParameterizedTypeReference<T> typeReference) {
+    public <T> Mono<T> get(String baseUrl, String uri, ParameterizedTypeReference<T> typeReference) {
         Mono<T> response = webClient
                 .mutate()
                 .baseUrl(baseUrl)
                 .build()
                 .get()
                 .uri(uri)
+                .headers(h -> System.out.println("👉 Запрос с токеном: " + h.getFirst(HttpHeaders.AUTHORIZATION)))
                 .retrieve()
                 .onStatus(status -> status.is4xxClientError(), clientResponse -> {
                     return clientResponse.bodyToMono(String.class)
@@ -74,12 +73,14 @@ public class WebClientRestService {
                                 return Mono.error(new IllegalArgumentException(responseBody));
                             });
                 })
-                .bodyToMono(typeReference);
+                .bodyToMono(typeReference)
+                .doOnSubscribe(sub -> System.out.println("🚀 Отправка запроса"))
+                .doOnNext(result -> System.out.println("✅ Получен ответ: " + result));
 
-        return response.block();
+        return response;
     }
 
-    public <T, R> T post(String baseUrl, String uri, R body, Class<T> tClass) {
+    public <T, R> Mono<T> post(String baseUrl, String uri, R body, Class<T> tClass) {
         var ans = webClient
                 .mutate()
                 .baseUrl(baseUrl)
@@ -102,12 +103,11 @@ public class WebClientRestService {
                         return Mono.error(new IllegalArgumentException(responseBody));
                     });
         })
-                .bodyToMono(tClass)
-                .block();
+                .bodyToMono(tClass);
 
         return ans;
     }
-    public <T> T post(String baseUrl, String uri, Class<T> tClass) {
+    public <T> Mono<T> post(String baseUrl, String uri, Class<T> tClass) {
         return webClient
                 .mutate()
                 .baseUrl(baseUrl)
@@ -129,11 +129,10 @@ public class WebClientRestService {
                                 return Mono.error(new IllegalArgumentException(responseBody));
                             });
                 })
-                .bodyToMono(tClass)
-                .block();
+                .bodyToMono(tClass);
     }
 
-    public <T> T postVideo(String baseUrl, String uri, String title, MultipartFile file, String description, Class<T> tClass) {
+    public <T> Mono<T> postVideo(String baseUrl, String uri, String title, MultipartFile file, String description, Class<T> tClass) {
         var bodyInserter = BodyInserters.fromMultipartData("title", title)
                 .with("upload-video", file.getResource());
 
@@ -164,14 +163,13 @@ public class WebClientRestService {
                                 return Mono.error(new IllegalArgumentException(responseBody));
                             });
                 })
-                .bodyToMono(tClass)
-                .block();
+                .bodyToMono(tClass);
 
         return ans;
     }
 
-    public void delete(String baseUrl, String uri, Map<String, String> params) {
-        webClient
+    public Mono<Void> delete(String baseUrl, String uri, Map<String, String> params) {
+        return webClient
                 .mutate()
                 .baseUrl(baseUrl)
                 .build()
@@ -181,8 +179,7 @@ public class WebClientRestService {
                     return uriBuilder.path(uri).build();
                 })
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<>() {})
-                .block();
+                .bodyToMono(new ParameterizedTypeReference<>() {});
     }
 }
 
