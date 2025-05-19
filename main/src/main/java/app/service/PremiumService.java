@@ -51,6 +51,7 @@ public class PremiumService {
             var p = payment.get();
             p.setTransactionStatus(TransactionStatus.valueOf(paymentNotification.getObject().getStatus()));
             premiumRepository.save(p);
+
         }
     }
     public PremiumPaymentResponse buyPremium(UserDetails userDetails) {
