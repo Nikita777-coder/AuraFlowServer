@@ -11,8 +11,7 @@ import java.util.UUID;
 public class PremiumIntegrationServiceResponse {
     private UUID id;
 
-    @JsonProperty("confirmation.confirmation_token")
-    private String paymentToken;
+    private Confirmation confirmation;
 
     private boolean test;
 }
