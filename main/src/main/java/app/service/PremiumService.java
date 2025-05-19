@@ -62,7 +62,7 @@ public class PremiumService {
 
         PremiumPaymentResponse response = new PremiumPaymentResponse();
         response.setId(premiumRepository.save(premiumEntity).getId());
-        response.setPayLink(premiumEntity.getPaymentUrl());
+        response.setPayLink(premiumEntity.getPaymentToken());
 
         return response;
     }
