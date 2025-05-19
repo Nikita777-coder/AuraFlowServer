@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum TransactionStatus {
-    WAITING("payment.waiting_for_capture"),
-    SUCCESS("payment.succeeded"),
-    CANCELED("payment.canceled");
+    WAITING("waiting_for_capture"),
+    SUCCESS("succeeded"),
+    CANCELED("canceled");
 
     private final String name;
 
