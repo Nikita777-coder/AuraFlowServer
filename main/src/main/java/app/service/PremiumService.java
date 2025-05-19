@@ -41,6 +41,8 @@ public class PremiumService {
         ));
     }
     public void logPaymentNotification(PaymentNotification paymentNotification) {
+        System.out.println(paymentNotification.getObject().getId());
+        System.out.println(paymentNotification.getObject().getStatus());
         var payment = premiumRepository.findById(paymentNotification.getObject().getId());
 
         if (payment.isPresent()) {
