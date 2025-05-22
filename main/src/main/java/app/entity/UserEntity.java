@@ -1,5 +1,6 @@
 package app.entity;
 
+import app.entity.payment.PremiumEntity;
 import app.entity.userattributes.Role;
 import app.entity.usermeditation.UserMeditationEntity;
 import jakarta.persistence.*;
@@ -24,6 +25,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class UserEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -59,11 +61,16 @@ public class UserEntity implements UserDetails {
 
     @OneToMany(orphanRemoval = true,
             cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
+    @ToString.Exclude
     private List<UserMeditationEntity> userMeditations;
 
     @OneToMany(orphanRemoval = true,
             cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
+    @ToString.Exclude
     private List<MeditationAlbumEntity> meditationAlbumEntities;
+
+    @OneToMany(orphanRemoval = true, mappedBy = "userEntity", cascade = {CascadeType.ALL})
+    private List<PremiumEntity> premiumEntities;
 
     @Column
     @Enumerated(value = EnumType.STRING)
