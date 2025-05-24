@@ -4,8 +4,6 @@ import app.dto.meditationalbum.MeditationAlbum;
 import app.dto.meditationalbum.MeditationAlbumRequest;
 import app.entity.MeditationAlbumEntity;
 import app.entity.UserEntity;
-import app.entity.meditation.MeditationEntity;
-import app.entity.userattributes.Role;
 import app.entity.usermeditation.UserMeditationEntity;
 import app.extra.ProgramCommons;
 import app.mapper.MeditationAlbumMapper;

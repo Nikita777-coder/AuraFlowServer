@@ -1,4 +1,4 @@
-package app.entity.meditation;
+package app.entity;
 
 import app.dto.meditation.MeditationStatus;
 import app.entity.MeditationPlatformAlbumEntity;

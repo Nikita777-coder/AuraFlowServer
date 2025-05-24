@@ -1,15 +1,12 @@
 package app.entity.usermeditation;
 
 import app.entity.MeditationAlbumEntity;
-import app.entity.MeditationPlatformAlbumEntity;
 import app.entity.UserEntity;
-import app.entity.meditation.MeditationEntity;
+import app.entity.MeditationEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 import java.util.UUID;
