@@ -3,6 +3,7 @@ package app.controller;
 import app.dto.statistic.Period;
 import app.dto.statistic.Statistic;
 import app.dto.statistic.StatisticUpdate;
+import app.dto.statistic.UserStatistic;
 import app.service.StatisticService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,18 +23,18 @@ public class StatisticController {
     @ResponseBody
     public UUID createUserStatistic(@AuthenticationPrincipal UserDetails userDetails,
                                     @Valid @RequestBody Statistic statistic) {
-        return statisticService.createNewUserStatistic(statistic);
+        return statisticService.create(userDetails, statistic);
     }
     @GetMapping
     @ResponseBody
     public UserStatistic getUserStatistic(@AuthenticationPrincipal UserDetails userDetails,
-                                           @Valid @RequestBody Period timePeriod) {
+                                          @Valid @RequestBody Period timePeriod) {
         return statisticService.getUserStatistic(userDetails, timePeriod);
     }
-    @PatchMapping
-    @ResponseBody
-    public Statistic updateUserStatistic(@AuthenticationPrincipal UserDetails userDetails,
-                                         @Valid @RequestBody StatisticUpdate statistic) {
-        return statisticService.updateUserStatistic(statistic);
-    }
+//    @PatchMapping
+//    @ResponseBody
+//    public Statistic updateUserStatistic(@AuthenticationPrincipal UserDetails userDetails,
+//                                         @Valid @RequestBody StatisticUpdate statistic) {
+//        return statisticService.updateUserStatistic(statistic);
+//    }
 }

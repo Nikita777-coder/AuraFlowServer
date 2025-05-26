@@ -22,5 +22,5 @@ public class MeditationStatEntity {
     @ManyToOne
     private UserMeditationEntity meditationEntity;
 
-    private int pulse;
+    private double averagePulse;
 }
