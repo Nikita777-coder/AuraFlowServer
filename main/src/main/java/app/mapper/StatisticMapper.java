@@ -13,6 +13,9 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface StatisticMapper {
     MeditationStatEntity meditationStatDataToMeditationStatEntity(MeditationStatData data);
+    @Mapping(target = "meditationId", source = "meditationEntity.id")
+    MeditationStatData meditationStatEntityToMeditationStatData(MeditationStatEntity meditationStatEntity);
     @Mapping(target = "id", ignore = true)
     StatisticEntity dataToStatisticEntity(UserEntity user, List<MeditationStatEntity> watchedMeditationsPerDay, Statistic statistic);
+    Statistic statisticEntityToStatistic(StatisticEntity statisticEntity);
 }
