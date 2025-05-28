@@ -3,6 +3,7 @@ package app.controller;
 import app.dto.meditation.Meditation;
 import app.dto.meditation.MeditationUpdateRequest;
 import app.dto.meditation.MeditationUploadBodyRequest;
+import app.dto.meditation.UploadStatus;
 import app.service.MeditationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,12 @@ public class MeditationController {
     public UUID uploadNewMeditation(@AuthenticationPrincipal UserDetails userDetails,
                                     @Valid @RequestBody MeditationUploadBodyRequest meditationUploadBodyRequest) {
         return meditationService.uploadMeditationByUrl(userDetails, meditationUploadBodyRequest);
+    }
+
+    @GetMapping("/meditation-upload-status")
+    public UploadStatus getMeditationUploadStatus(@AuthenticationPrincipal UserDetails userDetails,
+                                                  @RequestParam("meditation-id") UUID meditationId) {
+        return meditationService.getMeditationUploadStatus(userDetails, meditationId);
     }
 
     @GetMapping("/recommended")

@@ -22,12 +22,16 @@ public interface TagMapper {
     default List<String> jsonTagsToTags(String jsonTags) {
         StringBuilder sb = new StringBuilder();
 
-        for (char s: jsonTags.toCharArray()) {
-            if (s != '\\' && s != '[' && s != ']' && s != '\"') {
-                sb.append(s);
+        if (jsonTags != null) {
+            for (char s : jsonTags.toCharArray()) {
+                if (s != '\\' && s != '[' && s != ']' && s != '\"') {
+                    sb.append(s);
+                }
             }
+
+            return Arrays.asList(sb.toString().split(","));
         }
 
-        return Arrays.asList(sb.toString().split(","));
+        return null;
     }
 }

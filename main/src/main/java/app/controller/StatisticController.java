@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,8 +29,10 @@ public class StatisticController {
     @GetMapping
     @ResponseBody
     public UserStatistic getUserStatistic(@AuthenticationPrincipal UserDetails userDetails,
-                                          @Valid @RequestBody Period timePeriod) {
-        return statisticService.getUserStatistic(userDetails, timePeriod);
+                                          @RequestParam LocalDate from,
+                                          @RequestParam LocalDate to) {
+        @Valid Period period = new Period(from, to);
+        return statisticService.getUserStatistic(userDetails, period);
     }
     @PatchMapping
     @ResponseBody

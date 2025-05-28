@@ -1,7 +1,8 @@
 package app.service;
 
 import app.dto.meditation.MeditationServiceDataWrapper;
-import app.dto.meditation.MeditationStatus;
+import app.dto.meditation.UploadResponseFull;
+import app.dto.meditation.UploadStatus;
 import app.dto.notificationservice.NotificationRequest;
 import app.entity.UserEntity;
 import app.entity.MeditationEntity;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,14 +44,8 @@ public class AppRegularActions {
     @Value("${server.integration.base-url}")
     private String integrationServiceBaseUrl;
 
-    @Value("${server.integration.video-storage.upload-path}")
-    private String uploadPath;
-
     @Value("${server.web.max-count-requests}")
     private int maxCountRequests;
-
-    @Value("${server.integration.video-storage.kinescope-uri}")
-    private String kinescopeUri;
 
     @Value("${server.integration.notification-service.message}")
     private String notificationMessage;
@@ -61,7 +57,7 @@ public class AppRegularActions {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void fetchUploadedMeditationsDataInfo() {
         List<MeditationEntity> uploadingMeditations = meditationRepository
-                .findAllByStatusIn(List.of(MeditationStatus.UPLOADING, MeditationStatus.PROCESSING))
+                .findAllByStatusIn(List.of(UploadStatus.PARSED, UploadStatus.PARSING, UploadStatus.LOADING_TO_STORAGE, UploadStatus.SYSTEM_FILE_COPYING))
                 .stream()
                 .limit(maxCountRequests)
                 .toList();
@@ -71,33 +67,31 @@ public class AppRegularActions {
 
         for (var video: uploadingMeditations) {
             try {
-                MeditationServiceDataWrapper meditationServiceData =
-                        webClientRestService.get(
-                                integrationServiceBaseUrl,
-                                kinescopeUri,
-                                Map.of("video-id",
-                                        video.getVideoId().toString()
-                                ),
-                                MeditationServiceDataWrapper.class);
-                meditationServiceData.getData().setStatus(meditationServiceData.getData().getStatus().toUpperCase());
+                UploadResponseFull ans = webClientRestService.get(
+                        integrationServiceBaseUrl,
+                        mainUri + "/get-data-info",
+                        Map.of("task-id", video.getTaskId().toString()),
+                        UploadResponseFull.class
+                );
 
-                if (videoStorageType.equalsIgnoreCase("yandexcloud") &&
-                        meditationServiceData.getData().getStatus().equals("DONE")) {
-                    webClientRestService.post(
-                            integrationServiceBaseUrl,
-                            uploadPath,
-                            meditationMapper.meditationEntityToUploadResponseFull(video),
-                            String.class
-                    );
+                var entity = meditationMapper.meditationServiceDataToMeditationEntity(
+                        ans,
+                        video
+                );
+                entity.setCountStatusRequests(video.getCountStatusRequests() + 1);
+                entity.setUpdateAt(LocalDateTime.now());
 
+                updatedEntities.add(entity);
+            } catch (IllegalStateException | IllegalArgumentException ex) {
+                if (ex.getMessage().equals("already got it or not found") && video.getStatus() != UploadStatus.ERROR && video.getCountStatusRequests() > 0) {
+                    video.setStatus(UploadStatus.READY);
+                    video.setCountStatusRequests(video.getCountStatusRequests() + 1);
+                    video.setUpdateAt(LocalDateTime.now());
 
+                    updatedEntities.add(video);
+                    continue;
                 }
 
-                updatedEntities.add(meditationMapper.meditationServiceDataToMeditationEntity(
-                        meditationServiceData.getData(),
-                        video)
-                );
-            } catch (IllegalStateException | IllegalArgumentException ex) {
                 deleteEntities.add(video);
             }
         }
@@ -108,52 +102,25 @@ public class AppRegularActions {
 
     @Async
     @Scheduled(fixedRateString = "${server.integration.fixed-rate-time}")
-    public void deleteUselessLocalMeditations() {
-        if (videoStorageType.equals("kinescope")) {
-            List<MeditationEntity> uploadingMeditations = meditationRepository.findAll().stream().limit(maxCountRequests).toList();
-            List<MeditationEntity> deleteEntities = new ArrayList<>(maxCountRequests);
+    public void deleteUselessLocalMeditationsFromYandex() {
+        List<MeditationEntity> uploadingMeditations = meditationRepository.findAll().stream().limit(maxCountRequests).toList();
+        List<MeditationEntity> deleteEntities = new ArrayList<>(maxCountRequests);
 
-            for (var video : uploadingMeditations) {
+        for (var video : uploadingMeditations) {
+            if (video.getStatus() == UploadStatus.READY || video.getStatus() == UploadStatus.ERROR) {
                 try {
                     webClientRestService.get(
                             integrationServiceBaseUrl,
                             mainUri,
-                            Map.of("video-id",
-                                    video.getVideoId().toString()
-                            ),
-                            MeditationServiceDataWrapper.class);
-                } catch (IllegalStateException | IllegalArgumentException ex) {
+                            Map.of("video-link", video.getVideoLink()),
+                            String.class);
+                } catch (IllegalArgumentException | IllegalStateException ex) {
                     deleteEntities.add(video);
                 }
             }
-
-            deleteUselessMeditations(deleteEntities);
         }
-    }
 
-    @Async
-    @Scheduled(fixedRateString = "${server.integration.fixed-rate-time}")
-    public void deleteUselessLocalMeditationsFromYandex() {
-        if (videoStorageType.equals("yandexcloud")) {
-            List<MeditationEntity> uploadingMeditations = meditationRepository.findAll().stream().limit(maxCountRequests).toList();
-            List<MeditationEntity> deleteEntities = new ArrayList<>(maxCountRequests);
-
-            for (var video : uploadingMeditations) {
-                if (video.getStatus() != MeditationStatus.UPLOADING && video.getStatus() != MeditationStatus.PROCESSING) {
-                    try {
-                        webClientRestService.get(
-                                integrationServiceBaseUrl,
-                                mainUri,
-                                storageParamsManager.getParams().get(videoStorageType).getParams(video),
-                                String.class);
-                    } catch (IllegalArgumentException | IllegalStateException ex) {
-                        deleteEntities.add(video);
-                    }
-                }
-            }
-
-            deleteUselessMeditations(deleteEntities);
-        }
+        deleteUselessMeditations(deleteEntities);
     }
 
     @Async
