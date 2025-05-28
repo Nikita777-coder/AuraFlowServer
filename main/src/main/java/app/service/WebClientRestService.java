@@ -59,6 +59,38 @@ public class WebClientRestService {
         return res;
     }
 
+    public <T> T get(String baseUrl, String uri, ParameterizedTypeReference<T> typeReference) {
+//        String token = getToken();
+
+        Mono<T> response = webClient
+                .mutate()
+                .baseUrl(baseUrl)
+                .build()
+                .get()
+                .uri(uri)
+//                .header("Authorization", "Bearer " + token)
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError(), clientResponse -> {
+                    return clientResponse.bodyToMono(String.class)
+                            .flatMap(responseBody -> {
+                                System.out.println("Error Response Body get 400: " + responseBody);
+                                return Mono.error(new IllegalArgumentException(responseBody));
+                            });
+                })
+                .onStatus(status -> status.is5xxServerError(), clientResponse -> {
+                    return clientResponse.bodyToMono(String.class)
+                            .flatMap(responseBody -> {
+                                System.out.println("Error Response Body get 500: " + responseBody);
+                                return Mono.error(new IllegalArgumentException(responseBody));
+                            });
+                })
+                .bodyToMono(typeReference);
+
+        var res = response.block();
+
+        return res;
+    }
+
     public <T, R> T post(String baseUrl, String uri, R body, Class<T> tClass) {
 //        String token = getToken();
 
