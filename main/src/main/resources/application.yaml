@@ -63,8 +63,6 @@ server:
     video-storage:
       uri: ${VIDEO_STORAGE_URI}
       type: ${VIDEO_STORAGE_TYPE}
-      kinescope-uri: ${KINESCOPE_URI}
-      upload-path: ${UPLOAD_PATH}
     notification-service:
       uri: ${NOTIFICATION_SERVICE_URI}
       message: ${NOTIFICATION_SERVICE_USER_MESSAGE}
