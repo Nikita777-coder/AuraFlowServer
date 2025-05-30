@@ -34,6 +34,8 @@ public class UserService {
         }
         entity.setRole(Role.USER);
         entity.setPassword(passwordEncoder.encode(entity.getPassword()));
+        entity.setIsBlocked(false);
+        entity.setIsPremium(false);
 
         return userRepository.save(entity);
     }

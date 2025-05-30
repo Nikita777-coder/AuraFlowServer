@@ -5,7 +5,7 @@ import app.dto.meditation.UserMeditation;
 import app.dto.meditation.UserMeditationUpdateRequest;
 import app.dto.meditation.UserMeditationUploadRequest;
 import app.dto.meditationalbum.MeditationAlbumRequest;
-import app.entity.MeditationAlbumEntity;
+import app.entity.UserMeditationAlbumEntity;
 import app.entity.usermeditation.UserMeditationEntity;
 import app.extra.ProgramCommons;
 import app.mapper.StatusMapper;
@@ -133,9 +133,9 @@ public class UserMeditationService {
     public void delete(UserDetails userDetails, UUID id) {
         var entity = checkAccessAndGet(id, userDetails);
 
-        List<MeditationAlbumEntity> albums = entity.getAlbumEntities();
+        List<UserMeditationAlbumEntity> albums = entity.getAlbumEntities();
 
-        for (MeditationAlbumEntity album : albums) {
+        for (UserMeditationAlbumEntity album : albums) {
             album.getMeditations().remove(entity);
         }
 

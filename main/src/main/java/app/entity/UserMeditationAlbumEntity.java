@@ -17,7 +17,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MeditationAlbumEntity {
+public class UserMeditationAlbumEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -36,6 +36,6 @@ public class MeditationAlbumEntity {
     )
     private List<UserMeditationEntity> meditations;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     private UserEntity user;
 }

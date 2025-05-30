@@ -20,7 +20,7 @@ public class StatisticEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     private UserEntity user;
 
     private LocalDate fixedTime;
@@ -29,6 +29,10 @@ public class StatisticEntity {
 
     private LocalDate statisticTimeFixing = LocalDate.now();
 
-    @OneToMany
+    @OneToMany(
+            mappedBy = "statisticEntity",
+            cascade = {CascadeType.REFRESH, CascadeType.REMOVE},
+            orphanRemoval = true
+    )
     private List<MeditationStatEntity> watchedMeditationsPerDay;
 }

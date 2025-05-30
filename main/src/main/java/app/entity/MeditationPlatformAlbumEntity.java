@@ -33,6 +33,6 @@ public class MeditationPlatformAlbumEntity {
     )
     private List<MeditationEntity> meditationsFromPlatform;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.PERSIST})
     private UserEntity userEntity;
 }

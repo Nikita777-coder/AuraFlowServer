@@ -42,8 +42,8 @@ public class AuthService {
     }
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void logout(UserDetails userDetails) {
-        UserEntity resultUser = userService.getUser(userDetails.getUsername());
-        resultUser.setIsExitButtonPressed(false);
-        userService.updateUser(resultUser);
+        var user = (UserEntity) userDetails;
+        user.setIsExitButtonPressed(true);
+        userService.updateUser(user);
     }
 }

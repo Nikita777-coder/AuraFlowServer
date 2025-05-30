@@ -171,10 +171,6 @@ public class MeditationService {
         }
 
         meditationPlatformAlbumRepository.saveAll(albums);
-
-//        List<UserMeditationEntity> userMeditations = meditation.getUserMeditationEntities();
-//        userMeditationRepository.deleteAll(userMeditations);
-
         meditationRepository.delete(meditation);
     }
     public Meditation update(UserDetails userDetails, MeditationUpdateRequest request) {

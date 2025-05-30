@@ -1,6 +1,7 @@
 package app.entity.usermeditation;
 
-import app.entity.MeditationAlbumEntity;
+import app.entity.MeditationStatEntity;
+import app.entity.UserMeditationAlbumEntity;
 import app.entity.UserEntity;
 import app.entity.MeditationEntity;
 import jakarta.persistence.*;
@@ -30,7 +31,7 @@ public class UserMeditationEntity implements app.entity.Entity {
     @Column(name = "generated_meditation_link")
     private String generatedMeditationLink;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     private UserEntity user;
 
     private String statuses;
@@ -42,5 +43,12 @@ public class UserMeditationEntity implements app.entity.Entity {
             mappedBy = "meditations",
             cascade = {CascadeType.PERSIST, CascadeType.REFRESH}
     )
-    private List<MeditationAlbumEntity> albumEntities;
+    private List<UserMeditationAlbumEntity> albumEntities;
+
+    @OneToMany(
+            mappedBy = "meditationEntity",
+            cascade = {CascadeType.REFRESH, CascadeType.REMOVE},
+            orphanRemoval = true
+    )
+    private List<MeditationStatEntity> meditationStatEntities;
 }

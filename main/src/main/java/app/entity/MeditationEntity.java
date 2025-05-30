@@ -35,7 +35,8 @@ public class MeditationEntity implements app.entity.Entity {
 
     @OneToMany(
             mappedBy = "meditationFromPlatform",
-            orphanRemoval = true
+            orphanRemoval = true,
+            cascade = {CascadeType.REFRESH, CascadeType.REMOVE}
     )
     private List<UserMeditationEntity> userMeditationEntities;
 
