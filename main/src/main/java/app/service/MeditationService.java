@@ -29,7 +29,6 @@ public class MeditationService {
     private final WebClientRestService webClientRestService;
     private final MeditationRepository meditationRepository;
     private final MeditationMapper meditationMapper;
-    private final MeditationPlatformAlbumRepository meditationPlatformAlbumRepository;
 
     @Value("${server.integration.video-storage.uri}")
     private String videoStorageUri;
@@ -163,14 +162,13 @@ public class MeditationService {
     public void delete(UserDetails userDetails, UUID id) {
         programCommons.checkUserRole(userDetails);
         MeditationEntity meditation = getMeditation(id);
-        webClientRestService.delete(integrationServiceBaseUrl, videoStorageUri);
 
-        List<MeditationPlatformAlbumEntity> albums = meditation.getAlbumEntities();
-        for (MeditationPlatformAlbumEntity album : albums) {
-            album.getMeditationsFromPlatform().remove(meditation);
-        }
+        webClientRestService.delete(
+                integrationServiceBaseUrl,
+                videoStorageUri,
+                Map.of("video-link", meditation.getVideoLink())
+        );
 
-        meditationPlatformAlbumRepository.saveAll(albums);
         meditationRepository.delete(meditation);
     }
     public Meditation update(UserDetails userDetails, MeditationUpdateRequest request) {

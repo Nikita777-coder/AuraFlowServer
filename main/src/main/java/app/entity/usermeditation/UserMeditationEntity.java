@@ -51,4 +51,11 @@ public class UserMeditationEntity implements app.entity.Entity {
             orphanRemoval = true
     )
     private List<MeditationStatEntity> meditationStatEntities;
+
+    @PreRemove
+    private void preRemove() {
+        for (UserMeditationAlbumEntity album : albumEntities) {
+            album.getMeditations().remove(this);
+        }
+    }
 }

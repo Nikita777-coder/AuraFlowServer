@@ -1,5 +1,6 @@
 package app.entity;
 
+import app.entity.usermeditation.UserMeditationEntity;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import lombok.Getter;
@@ -33,6 +34,13 @@ public class MeditationPlatformAlbumEntity {
     )
     private List<MeditationEntity> meditationsFromPlatform;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.PERSIST})
+    @PreRemove
+    private void preRemove() {
+        for (MeditationEntity album : meditationsFromPlatform) {
+            album.getAlbumEntities().remove(this);
+        }
+    }
+
+    @ManyToOne
     private UserEntity userEntity;
 }

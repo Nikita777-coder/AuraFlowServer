@@ -88,11 +88,17 @@ public class UserEntity implements UserDetails {
     private List<PremiumEntity> premiumEntities;
 
     @OneToMany(
-            cascade = {CascadeType.REFRESH},
             mappedBy = "userEntity"
     )
     @ToString.Exclude
     private List<MeditationPlatformAlbumEntity> meditationPlatformAlbumEntities;
+
+    @PreRemove
+    private void preRemove() {
+        for (MeditationPlatformAlbumEntity album : meditationPlatformAlbumEntities) {
+            album.setUserEntity(null);
+        }
+    }
 
     @Column
     @Enumerated(value = EnumType.STRING)
