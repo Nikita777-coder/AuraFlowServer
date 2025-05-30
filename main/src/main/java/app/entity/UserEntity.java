@@ -59,6 +59,10 @@ public class UserEntity implements UserDetails {
     @Column
     private Boolean isPremium;
 
+    private Boolean isBlocked;
+
+    private Boolean isExitButtonPressed;
+
     @OneToMany(orphanRemoval = true,
             cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
     @ToString.Exclude
