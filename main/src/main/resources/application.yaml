@@ -37,6 +37,12 @@ server:
     onesignal-id: ${ADMIN_ONESIGNAL_ID}
   web:
     max-count-requests: ${MAX_COUNT_REQUESTS}
+  zitadel:
+    id: ${REGISTRATION_ID}
+    client-id: ${ZITADEL_CLIENT_ID}
+    client-secret: ${ZITADEL_CLIENT_SECRET}
+    scope: ${ZITADEL_SCOPE}
+    token-uri: ${ZITADEL_TOKEN_URI}
   jwt:
     token:
       signing:
@@ -49,13 +55,6 @@ server:
     protocol: smtps
     debug: false
     verification-code-length: ${VERIFICATION_CODE_LENGTH}
-  keycloak:
-    client-id: ${CLIENT_ID}
-    client-secret: ${CLIENT_SECRET}
-    url: ${KEYCLOAK_URL}
-    realm: ${KEYCLOAK_REALM}
-  oauth:
-    grand-type: "client_credentials"
   web-client:
     time-response: ${FIXED_RESPONSE}
   integration:
