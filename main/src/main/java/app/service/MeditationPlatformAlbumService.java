@@ -4,7 +4,7 @@ import app.dto.meditationalbum.MeditationAlbumPlatform;
 import app.dto.meditationalbum.MeditationAlbumRequest;
 import app.entity.MeditationPlatformAlbumEntity;
 import app.entity.UserEntity;
-import app.entity.meditation.MeditationEntity;
+import app.entity.MeditationEntity;
 import app.extra.ProgramCommons;
 import app.mapper.MeditationPlatformAlbumMapper;
 import app.repository.MeditationPlatformAlbumRepository;
@@ -56,14 +56,6 @@ public class MeditationPlatformAlbumService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void deletePlatformAlbumById(UserDetails userDetails, UUID id) {
         MeditationPlatformAlbumEntity entity = getPlatformAlbumWithAdminCheck(id, userDetails);
-
-        List<MeditationEntity> albums = entity.getMeditationsFromPlatform();
-
-        for (MeditationEntity album : albums) {
-            album.getAlbumEntities().remove(entity);
-        }
-
-        meditationRepository.saveAll(albums);
         meditationPlatformAlbumRepository.delete(entity);
     }
     @Transactional(isolation = Isolation.REPEATABLE_READ)

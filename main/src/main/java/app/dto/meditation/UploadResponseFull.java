@@ -8,4 +8,5 @@ import lombok.Setter;
 public class UploadResponseFull {
     private UploadResponse uploadResponse;
     private boolean wasUploadFromUrl;
+    private UploadStatus status;
 }

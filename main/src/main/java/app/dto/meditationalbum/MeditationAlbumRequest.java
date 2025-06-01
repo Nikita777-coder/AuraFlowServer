@@ -1,6 +1,5 @@
 package app.dto.meditationalbum;
 
-import app.entity.meditation.MeditationEntity;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;

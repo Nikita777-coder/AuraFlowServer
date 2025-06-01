@@ -1,6 +1,7 @@
-package app.entity.meditation;
+package app.entity;
 
 import app.dto.meditation.MeditationStatus;
+import app.dto.meditation.UploadStatus;
 import app.entity.MeditationPlatformAlbumEntity;
 import app.entity.usermeditation.UserMeditationEntity;
 import jakarta.persistence.*;
@@ -27,14 +28,15 @@ public class MeditationEntity implements app.entity.Entity {
     @Column(name = "video_link")
     private String videoLink;
 
-    private UUID videoId;
+    private UUID taskId;
 
     @Column(name = "tags")
     private String jsonTags;
 
     @OneToMany(
             mappedBy = "meditationFromPlatform",
-            orphanRemoval = true
+            orphanRemoval = true,
+            cascade = {CascadeType.REFRESH, CascadeType.REMOVE}
     )
     private List<UserMeditationEntity> userMeditationEntities;
 
@@ -64,8 +66,17 @@ public class MeditationEntity implements app.entity.Entity {
     )
     private List<MeditationPlatformAlbumEntity> albumEntities;
 
+    @PreRemove
+    private void preRemove() {
+        for (MeditationPlatformAlbumEntity album : albumEntities) {
+            album.getMeditationsFromPlatform().remove(this);
+        }
+    }
+
     @Column
-    private MeditationStatus status;
+    private UploadStatus status;
+
+    private int countStatusRequests = 1;
 
     private boolean wasUploadedFromUrl;
 }

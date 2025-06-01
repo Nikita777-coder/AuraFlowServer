@@ -1,6 +1,6 @@
 package app.entity;
 
-import app.entity.meditation.MeditationEntity;
+import app.entity.usermeditation.UserMeditationEntity;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import lombok.Getter;
@@ -33,6 +33,13 @@ public class MeditationPlatformAlbumEntity {
             inverseJoinColumns = @JoinColumn(name = "meditation_from_platform_id")
     )
     private List<MeditationEntity> meditationsFromPlatform;
+
+    @PreRemove
+    private void preRemove() {
+        for (MeditationEntity album : meditationsFromPlatform) {
+            album.getAlbumEntities().remove(this);
+        }
+    }
 
     @ManyToOne
     private UserEntity userEntity;

@@ -1,9 +1,12 @@
 package app;
 
+import app.dto.meditation.UploadStatus;
+import app.entity.MeditationEntity;
 import app.entity.UserEntity;
 import app.entity.userattributes.Role;
 import app.repository.MeditationRepository;
 import app.repository.UserRepository;
+import app.service.MeditationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -13,8 +16,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -22,6 +27,8 @@ public class ApplicationStartup
         implements ApplicationListener<ApplicationReadyEvent> {
     private final UserRepository userRepository;
     private final PasswordEncoder bCryptPasswordEncoder;
+    private final MeditationRepository meditationRepository;
+    private final MeditationService meditationService;
 
     @Value("${server.admin.email}")
     private String adminEmail;
@@ -38,6 +45,8 @@ public class ApplicationStartup
             userRepository.save(UserEntity
                     .builder()
                     .hasPractiseBreathOpt(true)
+                    .isBlocked(false)
+                    .isExitButtonPressed(false)
                     .oneSignalId(UUID.fromString(adminOneSignalId))
                             .startTimeOfBreathPractise(LocalTime.of(1, 0))
                             .stopTimeOfBreathPractise(LocalTime.of(23, 59))
@@ -49,5 +58,28 @@ public class ApplicationStartup
                     .password(bCryptPasswordEncoder.encode(adminPassword))
                     .build());
         }
+
+        loadMeditations();
+    }
+
+    private void loadMeditations() {
+        List<String> allPlatformMeditations = meditationService.getAllPlatformMeditations();
+        List<MeditationEntity> allLocalMeditations = meditationRepository.findAll();
+        Set<String> meditationLocalVideos = allLocalMeditations.stream().map(MeditationEntity::getVideoLink).collect(Collectors.toSet());
+        List<MeditationEntity> videoLinksForAddingToLocalMeditations = new ArrayList<>();
+
+        for (var meditation: allPlatformMeditations) {
+            if (!meditationLocalVideos.contains(meditation)) {
+                MeditationEntity meditationEntity = new MeditationEntity();
+                meditationEntity.setCreatedAt(LocalDateTime.now());
+                meditationEntity.setTitle(meditation.split("/")[5].split("\\.")[0]);
+                meditationEntity.setVideoLink(meditation);
+                meditationEntity.setStatus(UploadStatus.READY);
+
+                videoLinksForAddingToLocalMeditations.add(meditationEntity);
+            }
+        }
+
+        meditationRepository.saveAll(videoLinksForAddingToLocalMeditations);
     }
 }

@@ -6,7 +6,6 @@ import app.entity.usermeditation.UserMeditationEntity;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import lombok.*;
-import org.hibernate.annotations.Check;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -54,24 +53,52 @@ public class UserEntity implements UserDetails {
     private LocalTime stopTimeOfBreathPractise = LocalTime.of(22, 0);
 
     @Column
-    private Integer countBreathPractiseReminderPerDay = 4;
+    private int countBreathPractiseReminderPerDay = 4;
 
     @Column
     private Boolean isPremium;
 
+    private Boolean isBlocked;
+
+    private Boolean isExitButtonPressed;
+
     @OneToMany(orphanRemoval = true,
-            cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
+            cascade = {CascadeType.REFRESH, CascadeType.REMOVE},
+            mappedBy = "user",
+            fetch = FetchType.LAZY
+    )
     @ToString.Exclude
     private List<UserMeditationEntity> userMeditations;
 
     @OneToMany(orphanRemoval = true,
-            cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
+            cascade = {CascadeType.REMOVE, CascadeType.REFRESH},
+            mappedBy = "user",
+            fetch = FetchType.LAZY
+    )
     @ToString.Exclude
-    private List<MeditationAlbumEntity> meditationAlbumEntities;
+    private List<UserMeditationAlbumEntity> meditationAlbumEntities;
 
-    @OneToMany(orphanRemoval = true, mappedBy = "userEntity", cascade = {CascadeType.ALL})
+    @OneToMany(
+            orphanRemoval = true,
+            mappedBy = "userEntity",
+            cascade = {CascadeType.REFRESH, CascadeType.REMOVE},
+            fetch = FetchType.LAZY
+    )
     @ToString.Exclude
     private List<PremiumEntity> premiumEntities;
+
+    @OneToMany(
+            mappedBy = "userEntity"
+    )
+    @ToString.Exclude
+    private List<MeditationPlatformAlbumEntity> meditationPlatformAlbumEntities;
+
+    @PreRemove
+    private void preRemove() {
+        for (MeditationPlatformAlbumEntity album : meditationPlatformAlbumEntities) {
+            album.setUserEntity(null);
+        }
+    }
 
     @Column
     @Enumerated(value = EnumType.STRING)
