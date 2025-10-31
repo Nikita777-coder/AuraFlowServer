@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet id="1761713287170-6" author="Xiaomi (generated)" runOrder="first">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="platform_meditations"/>
+            </not>
+        </preConditions>
+        <createTable tableName="platform_meditations">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_platform_meditations"/>
+            </column>
+            <column name="video_link" type="VARCHAR(255)"/>
+            <column name="task_id" type="UUID"/>
+            <column name="tags" type="VARCHAR(255)"/>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="description" type="TEXT"/>
+            <column name="duration_seconds" type="DOUBLE"/>
+            <column name="creation_at" type="DATETIME"/>
+            <column name="updated_at" type="DATETIME"/>
+            <column name="author" type="VARCHAR(255)"/>
+            <column name="promoted" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="SMALLINT"/>
+            <column name="count_status_requests" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="was_uploaded_from_url" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable tableName="platform_meditations"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

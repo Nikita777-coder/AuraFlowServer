@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet id="1761713287170-5" author="Xiaomi (generated)" runOrder="first">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="meditation_statistic_data"/>
+            </not>
+        </preConditions>
+        <createTable tableName="meditation_statistic_data">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_meditation_statistic_data"/>
+            </column>
+            <column name="meditation_entity_id" type="UUID"/>
+            <column name="statistic_entity_id" type="UUID"/>
+            <column name="average_pulse" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable tableName="meditation_statistic_data"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

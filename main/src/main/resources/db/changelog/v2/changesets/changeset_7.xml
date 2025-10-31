@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet id="1761713287170-7" author="Xiaomi (generated)" runOrder="first">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="premiums"/>
+            </not>
+        </preConditions>
+        <createTable tableName="premiums">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_premiums"/>
+            </column>
+            <column name="user_entity_id" type="UUID"/>
+            <column name="payment_token" type="VARCHAR(255)"/>
+            <column name="transaction_status" type="SMALLINT"/>
+            <column name="transaction_time" type="DATETIME"/>
+            <column name="expired_time" type="DATETIME"/>
+            <column name="transaction_id" type="UUID"/>
+        </createTable>
+        <rollback>
+            <dropTable tableName="premiums"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

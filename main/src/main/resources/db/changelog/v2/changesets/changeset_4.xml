@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet id="1761713287170-4" author="Xiaomi (generated)" runOrder="first">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="meditation_platform_albums_meditation_from_platform"/>
+            </not>
+        </preConditions>
+        <createTable tableName="meditation_platform_albums_meditation_from_platform">
+            <column name="album_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="meditation_from_platform_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable tableName="meditation_platform_albums_meditation_from_platform"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

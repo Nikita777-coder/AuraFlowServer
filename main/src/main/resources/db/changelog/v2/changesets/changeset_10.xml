@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet id="1761713287170-10" author="Xiaomi (generated)" runOrder="first">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="users"/>
+            </not>
+        </preConditions>
+        <createTable tableName="users">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_users"/>
+            </column>
+            <column name="password" type="VARCHAR(255)"/>
+            <column name="email" type="VARCHAR(500)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="is_practise_breath_option_turned" type="BOOLEAN"/>
+            <column name="is_open_application_option_turned" type="BOOLEAN"/>
+            <column name="one_signal_id" type="UUID"/>
+            <column name="start_time_of_breath_practise" type="TIME"/>
+            <column name="stop_time_of_breath_practise" type="TIME"/>
+            <column name="count_breath_practise_reminder_per_day" type="INT"/>
+            <column name="is_premium" type="BOOLEAN"/>
+            <column name="is_blocked" type="BOOLEAN"/>
+            <column name="is_exit_button_pressed" type="BOOLEAN"/>
+            <column name="role" type="VARCHAR(255)"/>
+            <column name="generation_meditation_count" type="INT"/>
+        </createTable>
+        <rollback>
+            <dropTable tableName="users"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

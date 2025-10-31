@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet id="1761713287170-11" author="Xiaomi (generated)">
+        <addUniqueConstraint columnNames="email" constraintName="uc_users_email" tableName="users"/>
+        <rollback>
+            <dropUniqueConstraint tableName="users" constraintName="uc_users_email" />
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

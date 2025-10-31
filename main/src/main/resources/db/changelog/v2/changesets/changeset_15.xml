@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet id="1761713287170-15" author="Xiaomi (generated)" runOrder="last">
+        <addForeignKeyConstraint baseColumnNames="meditation_entity_id" baseTableName="meditation_statistic_data"
+                                 constraintName="FK_MEDITATION_STATISTIC_DATA_ON_MEDITATION_ENTITY"
+                                 referencedColumnNames="id" referencedTableName="user_meditations"/>
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="meditation_statistic_data" constraintName="FK_MEDITATION_STATISTIC_DATA_ON_MEDITATION_ENTITY" />
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet id="1761713287170-22" author="Xiaomi (generated)" runOrder="last">
+        <addForeignKeyConstraint baseColumnNames="meditation_from_user_id"
+                                 baseTableName="meditation_albums_meditation_from_user"
+                                 constraintName="fk_medalbmedfrouse_on_user_meditation_entity"
+                                 referencedColumnNames="id" referencedTableName="user_meditations"/>
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="meditation_albums_meditation_from_user" constraintName="fk_medalbmedfrouse_on_user_meditation_entity" />
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
